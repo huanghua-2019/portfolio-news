@@ -21,7 +21,67 @@ const CONFIG = {
   requestDelayMs: 800,
   rss2jsonBase: "https://api.rss2json.com/v1/api.json?rss_url=",
   perCompanyCap: 60,        // 单家公司最多保留条数，避免一家刷屏
+  quoteTimeoutMs: 8000,     // 行情接口超时
 };
+
+// 行情代码映射（腾讯免费接口 qt.gtimg.cn，无 key）
+// A股: sh/sz 前缀；港股: r_hk 前缀；美股: us 前缀
+const QUOTE_CODES = {
+  "贵州茅台": "sh600519",
+  "五粮液": "sz000858",
+  "泸州老窖": "sz000568",
+  "腾讯控股": "r_hk00700",
+  "拼多多": "usPDD",
+  "泡泡玛特": "r_hk09992",
+  "中远海控": "sh601919",
+};
+
+// 币种映射（targetPrice 字段已按各家币种存）
+const QUOTE_CCY = {
+  "贵州茅台": "CNY",
+  "五粮液": "CNY",
+  "泸州老窖": "CNY",
+  "腾讯控股": "HKD",
+  "拼多多": "USD",
+  "泡泡玛特": "HKD",
+  "中远海控": "CNY",
+};
+
+// 抓取实时行情（GBK 编码，用 TextDecoder 解码）
+async function fetchQuotes(holdings) {
+  const codes = holdings.map(h => QUOTE_CODES[h.name]).filter(Boolean);
+  if (!codes.length) return {};
+  const url = "https://qt.gtimg.cn/q=" + codes.join(",");
+  try {
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      signal: AbortSignal.timeout(CONFIG.quoteTimeoutMs),
+    });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const buf = await r.arrayBuffer();
+    // 腾讯接口返回 GBK
+    const dec = new TextDecoder("gbk");
+    const text = dec.decode(buf);
+    const out = {};
+    const re = /v_([^=]+)="([^"]+)"/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const sym = m[1];           // 例如 sh600519 / r_hk00700 / usPDD
+      const parts = m[2].split("~");
+      if (parts.length < 4) continue;
+      // 字段说明见 https://qt.gtimg.cn 约定：下标 0 未知/类型, 1 名称, 2 代码, 3 现价, ...
+      const price = parseFloat(parts[3]);
+      if (!isFinite(price) || price <= 0) continue;
+      // 时间戳：A股是连续数字（如 20260724161433），港股是 "2026/07/24 16:08:10"，美股是 "2026-07-24 09:36:20"
+      const tsRaw = parts[30] || "";
+      out[sym] = { price, tsRaw };
+    }
+    return out;
+  } catch (e) {
+    console.warn("quote fetch failed:", e.message);
+    return {};
+  }
+}
 
 // 预警词：价值投资者关注信号（去掉短期波动：大涨/涨停/大跌/跌停/暴跌/异动/主力）
 const ALERT = {
@@ -247,7 +307,18 @@ async function main() {
 
   all.sort((a, b) => (b.pubDate || "").localeCompare(a.pubDate || ""));
 
-  const companies = holdings.map((h) => ({ ...h, nextEarnings: nextEarnings(h) }));
+  // 抓取行情
+  const quotes = await fetchQuotes(holdings);
+  const companies = holdings.map((h) => {
+    const q = QUOTE_CODES[h.name] ? quotes[QUOTE_CODES[h.name]] : null;
+    return {
+      ...h,
+      nextEarnings: nextEarnings(h),
+      price: q ? q.price : null,
+      priceCcy: QUOTE_CCY[h.name] || null,
+      priceTime: q ? q.tsRaw : null,
+    };
+  });
   const out = { generatedAt: new Date().toISOString(), companies, all };
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT_PATH, JSON.stringify(out, null, 2), "utf8");

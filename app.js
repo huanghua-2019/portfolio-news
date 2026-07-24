@@ -48,6 +48,40 @@ function dateHead(ts){const d=new Date(ts),now=new Date();const today=ymd(now),y
   return ymd(ts);}
 function yesterday(s){const d=new Date(s+"T00:00:00");d.setDate(d.getDate()-1);return ymd(d.getTime());}
 
+// 目标价解析：各公司 targetPrice 字段是自然语言注释，提取「机构均价/一致预期」中的数字 + 币种
+// 返回 { value, currency } 或 null（解析失败时调用方按字符串原样展示）
+function parseTargetPrice(str, fallbackCcy) {
+  if (!str) return null;
+  const s = String(str);
+  // 匹配第一个数字（含 $HK 前缀与范围 117-120 的起点）
+  const m = s.match(/(?:约|均价|综合)?\s*([\$HK]?)\s*(\d{2,4}(?:\.\d+)?)/);
+  if (!m) return null;
+  const prefix = m[1] || "";
+  // 重要：币种以「数字附近」判定，避免“主目标 17元 / 后面港币”的误识别
+  // 范围：数字起点的 index ± 8 字符
+  const idx = m.index + m[0].length;
+  const start = Math.max(0, idx - 8), end = Math.min(s.length, idx + 8);
+  const near = s.slice(start, end);
+  let ccy = fallbackCcy || "CNY";
+  if (/港元|港币/.test(near)) ccy = "HKD";
+  else if (/美元|\$/.test(near)) ccy = "USD";
+  else if (/元/.test(near)) ccy = "CNY";
+  const v = parseFloat(m[2]);
+  if (!isFinite(v) || v <= 0) return null;
+  return { value: v, currency: ccy };
+}
+
+// 折价% = (target - price) / target，正数表示折价（便宜），负数表示溢价（贵）
+// 返回 { pct, band: "hit"/"neutral"/"premium" }
+function marginOf(price, target) {
+  if (price == null || target == null) return null;
+  const p = Number(price), t = Number(target);
+  if (!isFinite(p) || !isFinite(t) || t <= 0) return null;
+  const pct = (t - p) / t * 100;
+  const band = pct >= 30 ? "hit" : pct >= 0 ? "neutral" : "premium";
+  return { pct, band, target: t, price: p };
+}
+
 // ============================================================
 //  数据加载：读 ./data/news.json
 // ============================================================
@@ -248,9 +282,14 @@ function renderDash(){
     const last=fd[fd.length-1],prev=fd.length>1?fd[fd.length-2]:null;
     const npSeries=fd.map(d=>d.netProfit);
     const npYoy=last&&prev?yoyPct(last.netProfit,prev.netProfit):null;
+    // 行情 + 安全边际
+    const tp=parseTargetPrice(h.targetPrice,h.priceCcy);
+    const mg=tp?marginOf(h.price,tp.value):null;
+    const hitBand=mg&&mg.band==="hit";
+    const premiumBand=mg&&mg.band==="premium";
     const initials=h.name.slice(0,2);
     const sc=sectorColor(h.sector);
-    html+=`<div class="dash-card" style="--sc:${sc}">
+    html+=`<div class="dash-card ${hitBand?"hit-zone":""}" style="--sc:${sc}">
       <div class="dc-top">
         <div class="dc-avatar" style="background:${sc}1a;color:${sc};border-color:${sc}55">${esc(initials)}</div>
         <div class="dc-id">
@@ -264,7 +303,11 @@ function renderDash(){
         <div class="dc-kpi"><div class="k-l">ROE <i>${last.year}</i></div><div class="k-v">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${(last.roe!=null&&prev&&prev.roe!=null)?yoyBadge(last.roe-prev.roe,"pp"):""}</div>
         <div class="dc-kpi"><div class="k-l">新闻 / 预警</div><div class="k-v">${cnt}<i>条</i></div>${negN?`<span class="fs-yoy down">⚠ 利空 ${negN}</span>`:`<span class="dc-kpi-ok">无利空</span>`}</div>
       </div>`:""}
-      ${h.targetPrice?`<div class="dc-target"><span class="t-i">🎯</span><span class="t-l">目标价</span><span class="t-v">${esc(h.targetPrice)}</span></div>`:""}
+      ${(h.price!=null||h.targetPrice)?`<div class="dc-price">
+        <div class="dp-cell dp-price"><div class="dp-l">现价</div><div class="dp-v ${premiumBand?"premium":""}">${h.price!=null?fmtNum(h.price):"—"}<i>${esc(h.priceCcy||"")}</i></div></div>
+        <div class="dp-cell dp-target"><div class="dp-l">目标价</div><div class="dp-v">${tp?fmtNum(tp.value):"—"}<i>${esc(tp?tp.currency:(h.priceCcy||""))}</i></div></div>
+        <div class="dp-cell dp-gap"><div class="dp-l">折价 / 溢价</div><div class="dp-v ${hitBand?"hit":(mg&&mg.band==="neutral"?"neutral":"premium")}">${mg?(mg.pct>=0?"▼ ":"▲ ")+fmtNum(Math.abs(mg.pct))+"%":"—"}</div>${hitBand?`<span class="dp-badge hit">击球区</span>`:""}</div>
+      </div>`:""}
       ${h.moat?`<div class="dc-moat"><span class="m-i">🛡</span><span class="m-v">${esc(h.moat)}</span></div>`:""}
       ${h.thesis?`<div class="dc-thesis">${esc(h.thesis)}</div>`:""}
       ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
@@ -498,6 +541,8 @@ function renderHome(){
   const nearest=earnRows[0]||null;
   const roes=hs.map(h=>{const d=h.financials&&h.financials.data;if(!d||!d.length)return null;const last=d[d.length-1];return typeof last.roe==="number"?last.roe:null;}).filter(v=>v!=null);
   const avgRoe=roes.length?(roes.reduce((a,b)=>a+b,0)/roes.length):null;
+  // 击球区：现价较目标价折价≥30%的家数
+  const hitN=hs.filter(h=>{const tp=parseTargetPrice(h.targetPrice,h.priceCcy);return tp?marginOf(h.price,tp.value)&&marginOf(h.price,tp.value).band==="hit":false;}).length;
 
   // ---- Hero 品牌头（问候 + 日期 + 摘要 + 更新时间）----
   const hr=new Date().getHours();
@@ -520,6 +565,7 @@ function renderHome(){
     <div class="hm-kpi ${alerts7d.length?"warn":""}" onclick="gotoView('alert')" title="点击查看预警"><div class="hm-kpi-ic">🔔</div><div class="hm-kpi-main"><div class="hm-kpi-l">7日预警</div><div class="hm-kpi-v">${alerts7d.length}<span class="u">条</span></div></div></div>
     <div class="hm-kpi ${nearest&&nearest.ne.inDays<=15?"hot":""}" onclick="gotoView('cal')" title="点击查看日历"><div class="hm-kpi-ic">📅</div><div class="hm-kpi-main"><div class="hm-kpi-l">最近财报${nearest?" · "+esc(nearest.h.name):""}</div><div class="hm-kpi-v">${nearest?nearest.ne.inDays+"<span class='u'>天</span>":"—"}</div></div></div>
     <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-ic">🛡</div><div class="hm-kpi-main"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div></div>
+    <div class="hm-kpi ${hitN>0?"hit":""}" onclick="gotoView('dash')" title="点击查看总览（折价≥30%为击球区）"><div class="hm-kpi-ic">⚾</div><div class="hm-kpi-main"><div class="hm-kpi-l">击球区</div><div class="hm-kpi-v">${hitN}<span class="u">只</span></div></div></div>
   </div>`;
 
   // ---- 持仓速览墙 ----
