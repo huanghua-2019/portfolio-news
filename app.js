@@ -331,6 +331,7 @@ function renderDash(){
     const nextEarn=nextEarnings(h);
     const soon=nextEarn&&nextEarn.inDays>=0&&nextEarn.inDays<=45;
     const alerts=its.filter(x=>x.alert);
+    const posN=alerts.filter(x=>x.alert==="pos").length;
     const negN=alerts.filter(x=>x.alert==="neg").length;
     // 财务速览（来自 financials 透传）
     const f=h.financials,fd=(f&&f.data)||[];
@@ -356,7 +357,7 @@ function renderDash(){
       ${last?`<div class="dc-kpis">
         <div class="dc-kpi"><div class="k-l">净利 <i>${last.year}</i></div><div class="k-v">${fmtNum(last.netProfit)}<i>${esc((f&&f.unit)||"亿")}</i></div>${yoyBadge(npYoy)}</div>
         <div class="dc-kpi"><div class="k-l">ROE <i>${last.year}</i></div><div class="k-v">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${(last.roe!=null&&prev&&prev.roe!=null)?yoyBadge(last.roe-prev.roe,"pp"):""}</div>
-        <div class="dc-kpi"><div class="k-l">新闻 / 预警</div><div class="k-v">${cnt}<i>条</i></div>${negN?`<span class="fs-yoy down">⚠ 利空 ${negN}</span>`:`<span class="dc-kpi-ok">无利空</span>`}</div>
+        <div class="dc-kpi"><div class="k-l">新闻 / 预警</div><div class="k-v">${cnt}<i>条</i></div>${(posN||negN)?`<span class="dc-kpi-tags">${posN?`<b class="k-pos">📈 ${posN}</b>`:""}${negN?`<b class="k-neg">⚠ ${negN}</b>`:""}</span>`:`<span class="dc-kpi-ok">无预警</span>`}</div>
       </div>`:""}
       ${(h.price!=null||h.targetPrice)?`<div class="dc-price">
         <div class="dp-cell dp-price"><div class="dp-l">现价</div><div class="dp-v ${premiumBand?"premium":""}">${h.price!=null?fmtNum(h.price):"—"}<i>${esc(h.priceCcy||"")}</i></div></div>

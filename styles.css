@@ -200,6 +200,10 @@ a:hover{text-decoration:underline}
 .dc-kpi .k-v i{font-style:normal;font-size:9px;font-weight:400;color:var(--ink-dim);margin-left:1px}
 .dc-kpi .fs-yoy{margin-top:2px;font-size:10px;padding:0 5px}
 .dc-kpi-ok{display:inline-block;margin-top:2px;font-size:10px;color:var(--green);font-weight:600}
+.dc-kpi-tags{display:inline-flex;gap:4px;margin-top:3px;font-size:10.5px;flex-wrap:wrap;justify-content:center}
+.dc-kpi-tags b{padding:1px 6px;border-radius:99px;font-weight:700;font-family:var(--mono)}
+.dc-kpi-tags .k-pos{color:var(--green);background:rgba(46,125,79,.10);border:1px solid rgba(46,125,79,.25)}     /* 利好=绿 */
+.dc-kpi-tags .k-neg{color:var(--red);background:rgba(192,57,43,.09)}                                                /* 利空=红 */
 /* 目标价横带 */
 .dc-target{
   display:flex;align-items:center;gap:7px;margin-bottom:8px;
