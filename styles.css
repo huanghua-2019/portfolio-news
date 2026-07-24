@@ -104,6 +104,7 @@ a:hover{text-decoration:underline}
 .n-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.4}
 .n-title a{color:var(--ink)}
 .n-title a:hover{color:var(--brand)}
+.n-title .kw{color:var(--brand);background:color-mix(in srgb,var(--brand) 14%,transparent);font-weight:700;padding:0 2px;border-radius:3px}
 .n-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:3px;font-size:12px;color:var(--ink-soft)}
 .src{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:5px;border:1px solid}
 .src-Google{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 35%,var(--line));background:var(--brand-soft)}
@@ -138,6 +139,12 @@ a:hover{text-decoration:underline}
 .dc-code{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
 .dc-sector{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-soft);margin-top:2px}
 .dc-note{font-size:12px;color:var(--ink-soft);margin:6px 0}
+.dc-fundamentals{margin:8px 0;padding:8px 10px;background:var(--panel-2);border-radius:8px;border:1px dashed var(--line);display:flex;flex-direction:column;gap:4px}
+.dc-row{display:flex;gap:8px;font-size:12px;line-height:1.55;color:var(--ink);align-items:flex-start}
+.dc-row .dc-lbl{color:var(--ink-soft);font-weight:600;flex-shrink:0;min-width:74px}
+.dc-row .dc-val{color:var(--ink);flex:1;word-break:break-word}
+.dc-thesis-row{padding-top:6px;border-top:1px dashed var(--line);margin-top:2px}
+.dc-thesis-row .dc-val{font-style:italic}
 .dc-stats{display:flex;gap:14px;margin-top:8px;font-family:var(--mono);font-size:12px}
 .dc-stats .s-num{font-size:18px;font-weight:700;color:var(--brand)}
 .dc-stats .s-lbl{color:var(--ink-dim);font-size:11px}

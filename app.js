@@ -132,6 +132,16 @@ function renderTimeline(container,list,opts){
   bindRowActions(container);
 }
 
+function highlightKeyVars(title, company){
+  const h=state.holdings.find(x=>x.name===company);
+  if(!h||!h.keyVars||!h.keyVars.length)return esc(title);
+  // 按关键词长度倒序，避免短词先匹配把长词切碎
+  const words=[...h.keyVars].sort((a,b)=>b.length-a.length);
+  const escaped=words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
+  const re=new RegExp("("+escaped.join("|")+")","g");
+  return esc(title).replace(re,'<span class="kw">$1</span>');
+}
+
 function newsRow(it,opts){
   const favCls=state.fav.has(it.id)?"on":"";
   const readCls=state.read.has(it.id)?"on":"";
@@ -143,7 +153,7 @@ function newsRow(it,opts){
   else if(it.alert==="neg")tag=`<span class="tag-neg">利空·${esc(it.alertWords.join("/"))}</span>`;
   return `<div class="news-item ${alertCls}" data-id="${esc(it.id)}">
     <div>
-      <div class="n-title"><a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.title)}</a></div>
+      <div class="n-title"><a href="${esc(it.link)}" target="_blank" rel="noopener">${highlightKeyVars(it.title, it.company)}</a></div>
       <div class="n-meta">
         <span class="src ${srcCls}">${esc(it.source)}</span>
         <span class="n-co">${esc(it.company)} <span class="code">${esc(it.code)}</span></span>
@@ -214,6 +224,11 @@ function renderDash(){
         <span class="dc-sector">${esc(h.sector||"未分类")}</span></div>
       </div>
       <div class="dc-note">${esc(h.note||"")}</div>
+      ${(h.targetPrice||h.moat||h.thesis)?`<div class="dc-fundamentals">
+        ${h.targetPrice?`<div class="dc-row"><span class="dc-lbl">🎯 目标价</span><span class="dc-val">${esc(h.targetPrice)}</span></div>`:""}
+        ${h.moat?`<div class="dc-row"><span class="dc-lbl">🛡 护城河</span><span class="dc-val">${esc(h.moat)}</span></div>`:""}
+        ${h.thesis?`<div class="dc-row dc-thesis-row"><span class="dc-lbl">💡 投资逻辑</span><span class="dc-val">${esc(h.thesis)}</span></div>`:""}
+      </div>`:""}
       <div class="dc-stats">
         <div><div class="s-num">${cnt}</div><div class="s-lbl">相关新闻</div></div>
         <div><div class="s-num">${latest?relTime(latest.ts):"—"}</div><div class="s-lbl">最近更新</div></div>
