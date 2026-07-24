@@ -239,7 +239,7 @@ function renderDash(){
     const its=state.all.filter(x=>x.company===h.name).sort((a,b)=>b.ts-a.ts);
     const cnt=its.length;
     const latest=its[0];
-    const nextEarn=nextEarnings(h.earningsMonths);
+    const nextEarn=nextEarnings(h);
     const soon=nextEarn&&nextEarn.inDays>=0&&nextEarn.inDays<=45;
     const alerts=its.filter(x=>x.alert);
     const negN=alerts.filter(x=>x.alert==="neg").length;
@@ -268,13 +268,23 @@ function renderDash(){
       ${h.thesis?`<div class="dc-thesis">${esc(h.thesis)}</div>`:""}
       ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
       <div class="dc-latest">${latest?`<span class="dc-latest-l">最新</span><a href="${esc(latest.link)}" target="_blank" rel="noopener" title="${esc(latest.title)}">${esc(latest.title)}</a><span class="dc-latest-t">${esc(relTime(latest.ts))}</span>`:`<span class="dc-latest-l">最新</span><span class="dc-latest-none">暂无新闻</span>`}</div>
-      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`约 ${nextEarn.month} 月${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}`:"未配置"}</div>
+      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.confirmed?`<b>${esc(nextEarn.date)}</b>`:`约 ${nextEarn.month} 月`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
     </div>`;
   }
   grid.innerHTML=html;
 }
 
-function nextEarnings(months){
+function nextEarnings(h){
+  // 优先读取 holdings 中由权威源核实的 nextEarningsDate（经 crawler 透传到 news.json.companies）
+  if(h&&h.nextEarningsDate){
+    const d=new Date(h.nextEarningsDate+"T00:00:00");
+    if(!isNaN(d)){
+      const inDays=Math.ceil((d.getTime()-Date.now())/86400000);
+      return {month:d.getMonth()+1,date:h.nextEarningsDate,inDays,source:h.nextEarningsSource||"",confirmed:h.nextEarningsEstimated?false:true};
+    }
+  }
+  // 回退：按 earningsMonths「当月1日」粗略估算（仅兜底）
+  const months=h&&h.earningsMonths;
   if(!months||!months.length)return null;
   const now=new Date();const y=now.getFullYear();const m=now.getMonth()+1;
   let cand=months.filter(mo=>mo>=m).sort((a,b)=>a-b);
@@ -282,7 +292,7 @@ function nextEarnings(months){
   const year=cand.length?y:(m>months[months.length-1]?y+1:y);
   const d=new Date(year,target-1,1);
   const inDays=Math.ceil((d.getTime()-now.getTime())/86400000);
-  return {month:target,inDays};
+  return {month:target,inDays,source:"估算(月份级)",confirmed:false};
 }
 
 // ============================================================
@@ -303,19 +313,19 @@ function renderAlert(){
 function renderCal(){
   const wrap=document.getElementById("cal-wrap");
   const rows=state.holdings.map(h=>{
-    const ne=nextEarnings(h.earningsMonths);
+    const ne=nextEarnings(h);
     return {h,ne};
   }).sort((a,b)=>(a.ne?a.ne.inDays:-1e9)-(b.ne?b.ne.inDays:-1e9));
-  let html=`<div class="cal-section"><div class="cal-title">📅 财报披露日历（月份需自行核实！）</div><div class="cal-grid">`;
+  let html=`<div class="cal-section"><div class="cal-title">📅 财报披露日历（已按权威源核实）</div><div class="cal-grid">`;
   for(const r of rows){
     const {h,ne}=r;
     if(!ne){html+=`<div class="cal-card"><div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div><div class="cal-note">未配置财报月份</div></div>`;continue;}
     const soon=ne.inDays>=0&&ne.inDays<=45;
     html+=`<div class="cal-card ${soon?"soon":""}">
       <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div>
-      <div class="cal-next">距约 <span class="d">${ne.month}月</span> 披露：<span class="d">${ne.inDays>=0?ne.inDays+" 天":"待核实"}</span></div>
-      <div class="cal-months">披露月：${esc((h.earningsMonths||[]).join(" / "))} 月</div>
-      <div class="cal-note">⚠ 具体日期需核实，这里按"约当月1日"粗略倒计时</div>
+      <div class="cal-next">${ne.confirmed?`披露日 <span class="d">${esc(ne.date)}</span>`:`距约 <span class="d">${ne.month}月</span> 披露`}：<span class="d">${ne.inDays>=0?ne.inDays+" 天":"待核实"}</span></div>
+      <div class="cal-months">${ne.confirmed?`✓ 已确认 · ${esc(ne.source||"权威源")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月`}</div>
+      <div class="cal-note">${ne.confirmed?"":"⚠ 具体日期需核实，这里按\"约当月1日\"粗略倒计时"}</div>
     </div>`;
   }
   html+=`</div></div>`;

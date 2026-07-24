@@ -93,9 +93,26 @@ function relevant(title, aliases) {
   return aliases.some((a) => t.includes(String(a).toLowerCase()));
 }
 
-function nextEarnings(months) {
-  if (!months || !months.length) return null;
+// 下一步财报披露日：优先读取 holdings.json 中由权威源（交易所/巨潮/港交所/IR）核实的
+// nextEarningsDate；未配置时回退到按 earningsMonths「当月15日」的粗略估算（仅兜底）。
+function nextEarnings(h) {
   const now = new Date();
+  if (h.nextEarningsDate) {
+    const d = new Date(h.nextEarningsDate + "T00:00:00");
+    if (!isNaN(d)) {
+      const days = Math.ceil((d - now) / 86400000);
+      return {
+        month: d.getMonth() + 1,
+        date: h.nextEarningsDate,
+        days,
+        source: h.nextEarningsSource || "持仓配置",
+        confirmed: !h.nextEarningsEstimated,
+      };
+    }
+  }
+  // 回退：按 earningsMonths 估算（仅当月15日，非精确，仅兜底）
+  const months = h.earningsMonths;
+  if (!months || !months.length) return null;
   const y = now.getFullYear();
   const cand = [];
   for (const m of months) {
@@ -106,7 +123,7 @@ function nextEarnings(months) {
   cand.sort((a, b) => a - b);
   const next = cand[0];
   const days = Math.ceil((next - now) / 86400000);
-  return { month: next.getMonth() + 1, date: next.toISOString().slice(0, 10), days };
+  return { month: next.getMonth() + 1, date: next.toISOString().slice(0, 10), days, source: "估算(月份级)", confirmed: false };
 }
 
 // 清洗标题：Google/百度 标题常形如 "正文 - 来源"，剥离尾部来源
@@ -230,7 +247,7 @@ async function main() {
 
   all.sort((a, b) => (b.pubDate || "").localeCompare(a.pubDate || ""));
 
-  const companies = holdings.map((h) => ({ ...h, nextEarnings: nextEarnings(h.earningsMonths) }));
+  const companies = holdings.map((h) => ({ ...h, nextEarnings: nextEarnings(h) }));
   const out = { generatedAt: new Date().toISOString(), companies, all };
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT_PATH, JSON.stringify(out, null, 2), "utf8");
