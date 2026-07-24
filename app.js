@@ -296,28 +296,62 @@ function renderCal(){
 // ============================================================
 function fmtNum(n){
   if(n==null||isNaN(n))return "—";
-  const r=Math.round(n*100)/100;
-  return r.toLocaleString("en-US");
+  return Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-// 轻量 SVG 折线图（护眼米色金棕主题，无外部依赖）
+// 升级版 SVG 折线图：平滑曲线 + 渐变面积 + 数据点标值 + 末年高亮（护眼主题，无外部依赖）
+let __finGid=0;
 function lineChartSVG(vals,opts){
   opts=opts||{};
-  const W=300,H=132,P={l:10,r:10,t:10,b:22};
+  const W=320,H=168,P={l:12,r:16,t:24,b:20};
   const years=opts.years||vals.map((_,i)=>i);
-  const nums=vals.filter(v=>v!=null);
+  const nums=vals.filter(v=>v!=null&&!isNaN(v));
   if(!nums.length)return '<div class="fin-no">暂无数据</div>';
   let min=Math.min(...nums),max=Math.max(...nums);
-  if(min===max){min=min*0.92;max=max*1.08;}
+  if(min===max){const dd=Math.abs(min)*0.08||1;min-=dd;max+=dd;}
+  const span=max-min;min-=span*0.05;max+=span*0.05;
   const innerW=W-P.l-P.r,innerH=H-P.t-P.b,n=vals.length;
   const X=i=>P.l+(n===1?innerW/2:innerW*i/(n-1));
   const Y=v=>P.t+innerH*(1-(v-min)/(max-min));
+  const gid="fg"+(++__finGid);
+  const color=opts.color||"#b8861b";
+  const sfx=opts.suffix||"";
+  // 网格线
   let grid="";
-  for(let g=0;g<=2;g++){const gy=P.t+innerH*g/2;grid+=`<line x1="${P.l}" y1="${gy.toFixed(1)}" x2="${W-P.r}" y2="${gy.toFixed(1)}" stroke="#d9d2bf" stroke-width="1" stroke-dasharray="2 3"/>`;}
-  let pts="",dots="",lastLabel="";
-  vals.forEach((v,i)=>{ if(v==null)return; const cx=X(i),cy=Y(v);pts+=(pts?" ":"")+cx.toFixed(1)+","+cy.toFixed(1);dots+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.6" fill="${opts.color}"/>`;});
-  let labels="";
-  years.forEach((yr,i)=>{labels+=`<text x="${X(i).toFixed(1)}" y="${H-7}" font-size="8" fill="#8a857a" text-anchor="middle">${String(yr).slice(2)}</text>`;});
-  return `<svg class="fin-chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${grid}<polyline points="${pts}" fill="none" stroke="${opts.color}" stroke-width="2" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+  for(let g=0;g<=3;g++){const gy=P.t+innerH*g/3;
+    grid+=`<line x1="${P.l}" y1="${gy.toFixed(1)}" x2="${W-P.r}" y2="${gy.toFixed(1)}" stroke="#e6dfcc" stroke-width="1" ${g<3?'stroke-dasharray="3 4"':''}/>`;}
+  // 有效数据点
+  const pts=[];vals.forEach((v,i)=>{if(v!=null&&!isNaN(v))pts.push({x:X(i),y:Y(v),v:v});});
+  // 平滑曲线（Catmull-Rom → 三次贝塞尔）
+  let d="M"+pts[0].x.toFixed(1)+","+pts[0].y.toFixed(1);
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+    d+=`C${(p1.x+(p2.x-p0.x)/6).toFixed(1)},${(p1.y+(p2.y-p0.y)/6).toFixed(1)} ${(p2.x-(p3.x-p1.x)/6).toFixed(1)},${(p2.y-(p3.y-p1.y)/6).toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  const base=(P.t+innerH).toFixed(1);
+  const area=d+`L${pts[pts.length-1].x.toFixed(1)},${base}L${pts[0].x.toFixed(1)},${base}Z`;
+  // 数据点 + 数值标签（统一两位小数）
+  let dots="",labels="";
+  pts.forEach((p,k)=>{
+    const isLast=k===pts.length-1;
+    dots+=isLast
+      ?`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.2" fill="${color}" stroke="#fffdf8" stroke-width="1.6"/>`
+      :`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.2" fill="#fffdf8" stroke="${color}" stroke-width="1.8"/>`;
+    let tx=p.x,anchor="middle";
+    if(k===0){tx=Math.max(p.x,P.l+2);anchor="start";}
+    else if(isLast){tx=Math.min(p.x,W-2);anchor="end";}
+    labels+=`<text x="${tx.toFixed(1)}" y="${(p.y-7).toFixed(1)}" font-size="8.5" fill="${isLast?color:'#8a857a'}" font-weight="${isLast?'700':'400'}" text-anchor="${anchor}">${fmtNum(p.v)}${sfx}</text>`;
+  });
+  // 年份标签
+  let yrs="";
+  years.forEach((yr,i)=>{yrs+=`<text x="${X(i).toFixed(1)}" y="${H-6}" font-size="8.5" fill="#a09a8a" text-anchor="middle">${String(yr)}</text>`;});
+  return `<svg class="fin-chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.25"/><stop offset="100%" stop-color="${color}" stop-opacity="0.02"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#${gid})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}${yrs}</svg>`;
+}
+// 同比涨跌徽标（中国惯例：涨红跌绿）
+function yoyPct(cur,prev){if(cur==null||prev==null||!prev)return null;return (cur/prev-1)*100;}
+function yoyBadge(p,sfx){
+  if(p==null||isNaN(p))return "";
+  const up=p>=0;
+  return `<span class="fs-yoy ${up?"up":"down"}">${up?"▲":"▼"} ${fmtNum(Math.abs(p))}${sfx||"%"}</span>`;
 }
 function finCard(h){
   const f=h.financials;
@@ -326,6 +360,14 @@ function finCard(h){
   const rev=f.data.map(d=>d.revenue),np=f.data.map(d=>d.netProfit),roe=f.data.map(d=>d.roe);
   const unit=f.unit||"亿元";
   const c1="#b8861b",c2="#2e7d4f",c3="#7d5ba6";
+  // 速览条：最新年份 + 同比（涨红跌绿，ROE 用百分点差）
+  const last=f.data[f.data.length-1],prev=f.data.length>1?f.data[f.data.length-2]:null;
+  const roeDiff=(last&&prev&&last.roe!=null&&prev.roe!=null)?(last.roe-prev.roe):null;
+  const summary=`<div class="fin-sum">
+      <div class="fs-item"><div class="fs-l">营收<span class="fs-y">${last.year}</span></div><div class="fs-v" style="color:${c1}">${fmtNum(last.revenue)}<span class="fs-u">${esc(unit)}</span></div>${yoyBadge(yoyPct(last.revenue,prev&&prev.revenue))}</div>
+      <div class="fs-item"><div class="fs-l">净利<span class="fs-y">${last.year}</span></div><div class="fs-v" style="color:${c2}">${fmtNum(last.netProfit)}<span class="fs-u">${esc(unit)}</span></div>${yoyBadge(yoyPct(last.netProfit,prev&&prev.netProfit))}</div>
+      <div class="fs-item"><div class="fs-l">ROE<span class="fs-y">${last.year}</span></div><div class="fs-v" style="color:${c3}">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${yoyBadge(roeDiff,"pp")}</div>
+    </div>`;
   const rows=f.data.map(d=>`<tr>
       <td>${d.year}</td>
       <td class="num">${fmtNum(d.revenue)}</td>
@@ -334,10 +376,11 @@ function finCard(h){
     </tr>`).join("");
   return `<div class="fin-card">
     <div class="fin-h">${esc(h.name)}<span class="fin-code">${esc(h.code)}</span><span class="fin-unit">${esc(unit)}${f.currency?' · '+esc(f.currency):''}</span></div>
+    ${summary}
     <div class="fin-charts">
-      <div class="fin-ch"><div class="fin-ch-t">📈 营业收入</div>${lineChartSVG(rev,{years,color:c1})}</div>
-      <div class="fin-ch"><div class="fin-ch-t">💰 归母净利润</div>${lineChartSVG(np,{years,color:c2})}</div>
-      <div class="fin-ch"><div class="fin-ch-t">📊 ROE（净资产收益率）</div>${lineChartSVG(roe,{years,color:c3})}</div>
+      <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c1}"></span>营业收入</div>${lineChartSVG(rev,{years,color:c1})}</div>
+      <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c2}"></span>归母净利润</div>${lineChartSVG(np,{years,color:c2})}</div>
+      <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c3}"></span>ROE（净资产收益率）</div>${lineChartSVG(roe,{years,color:c3,suffix:"%"})}</div>
     </div>
     <table class="fin-tbl"><thead><tr><th>年份</th><th>营收</th><th>净利</th><th>ROE</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="fin-note">${esc(f.note||"")}${f.asOf?' · 截至 '+esc(f.asOf):''} · 来源：${esc(f.source||"需核实")}</div>
@@ -347,7 +390,7 @@ function renderStat(){
   const wrap=document.getElementById("stat-wrap");
   if(!state.holdings.length){wrap.innerHTML='<div class="empty">暂无持仓数据，请先确认爬虫已运行并刷新。</div>';return;}
   const cards=state.holdings.map(h=>finCard(h)).join("");
-  wrap.innerHTML=`<div class="fin-head">📊 各持仓近五年财务（营业收入 / 归母净利润 / ROE）</div>${cards}<div class="fin-foot">数据取自公开年报与财经媒体（检索于 2026-07），标注「需核实」者请以交易所公告为准；后续将由定时任务自动刷新。</div>`;
+  wrap.innerHTML=`<div class="fin-head">💰 各持仓近五年财务（营业收入 / 归母净利润 / ROE）</div>${cards}<div class="fin-foot">数据取自公开年报与财经媒体（检索于 2026-07），标注「需核实」者请以交易所公告为准；后续将由定时任务自动刷新。数值统一保留两位小数；同比涨跌按中国惯例涨红跌绿，ROE 同比为百分点差（pp）。</div>`;
 }
 
 // ============================================================
