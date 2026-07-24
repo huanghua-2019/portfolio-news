@@ -303,7 +303,7 @@ function fmtNum(n){
 function lineChartSVG(vals,opts){
   opts=opts||{};
   const W=300,H=132,P={l:10,r:10,t:10,b:22};
-  const years=opts.years||val s.map((_,i)=>i);
+  const years=opts.years||vals.map((_,i)=>i);
   const nums=vals.filter(v=>v!=null);
   if(!nums.length)return '<div class="fin-no">暂无数据</div>';
   let min=Math.min(...nums),max=Math.max(...nums);
