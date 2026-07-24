@@ -26,6 +26,8 @@ const state = {
   filterCo: "all",
   filterBoard: "all",
   filterCat: "all",
+  filterTime: "7d",      // 默认近7天，缓解长列表在手机端翻不动
+  hideRead: false,
   search: "",
   view: "news",
 };
@@ -97,6 +99,12 @@ function getVisible(){
   if(state.filterCo!=="all")list=list.filter(x=>x.company===state.filterCo);
   if(state.filterBoard!=="all")list=list.filter(x=>x.sector===state.filterBoard);
   if(state.filterCat!=="all")list=list.filter(x=>x.category===state.filterCat);
+  if(state.filterTime && state.filterTime!=="all"){
+    const days={"1d":1,"3d":3,"7d":7}[state.filterTime]||7;
+    const cutoff=Date.now()-days*86400000;
+    list=list.filter(x=>x.ts>=cutoff);
+  }
+  if(state.hideRead)list=list.filter(x=>!state.read.has(x.id));
   if(state.search){
     const q=state.search.toLowerCase();
     list=list.filter(x=>(x.title||"").toLowerCase().includes(q)||(x.company||"").toLowerCase().includes(q));
@@ -176,7 +184,9 @@ function renderNews(){
   const list=getVisible();
   const updated=state.generatedAt?relTime(state.generatedAt):"—";
   const coCount=new Set(state.all.map(x=>x.company)).size;
-  let stat=`<span>共 <b>${state.all.length}</b> 条</span><span>显示 <b>${list.length}</b> 条</span><span>覆盖 <b>${coCount}</b> 家</span><span>更新 <b>${updated}</b></span>`;
+  const readN=state.all.filter(x=>state.read.has(x.id)).length;
+  const unreadN=state.all.length-readN;
+  let stat=`<span>共 <b>${state.all.length}</b> 条</span><span>未读 <b>${unreadN}</b></span><span>显示 <b>${list.length}</b> 条</span><span>覆盖 <b>${coCount}</b> 家</span><span>更新 <b>${updated}</b></span>`;
   document.getElementById("statbar").innerHTML=stat;
   let hint="";
   if(state.loadError)hint=`<div class="cache-hint">⚠ 数据加载失败。可能爬虫尚未首次运行，或 Pages 尚未生效。点"刷新"重试，或确认 Actions 已跑通。</div>`;
@@ -361,6 +371,13 @@ async function init(){
   }));
   document.getElementById("q-input").addEventListener("input",e=>{state.search=e.target.value.trim();renderNews();});
   document.getElementById("refreshBtn").addEventListener("click",()=>{state.loadError=false;loadNews();});
+  document.querySelectorAll("#time-chips .chip").forEach(c=>c.addEventListener("click",()=>{
+    state.filterTime=c.getAttribute("data-time");
+    document.querySelectorAll("#time-chips .chip").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active");
+    renderNews();
+  }));
+  document.getElementById("hideRead").addEventListener("change",e=>{state.hideRead=e.target.checked;renderNews();});
   buildChips();
   await loadNews();
   setInterval(tickCountdown,1000);

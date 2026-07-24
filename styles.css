@@ -69,6 +69,9 @@ a:hover{text-decoration:underline}
 }
 .search:focus{outline:none;border-color:var(--brand)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toolbar-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.toggle{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-soft);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--brand);width:14px;height:14px}
 .chip-label{color:var(--ink-dim);font-size:12px;margin-right:2px}
 .chip{
   background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);
@@ -176,6 +179,7 @@ a:hover{text-decoration:underline}
   .brand{font-size:14px;width:100%}
   .tabs{order:3;width:100%}
   .topbar-right{margin-left:auto}
+  .toolbar-row{width:100%;justify-content:flex-start}
   .date-head{top:50px}
   .stat-grid2{grid-template-columns:1fr}
   .n-title{font-size:13px}

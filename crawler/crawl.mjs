@@ -20,6 +20,7 @@ const CONFIG = {
   timeoutMs: 20000,
   requestDelayMs: 800,
   rss2jsonBase: "https://api.rss2json.com/v1/api.json?rss_url=",
+  perCompanyCap: 60,        // 单家公司最多保留条数，避免一家刷屏
 };
 
 // 预警词：利好 / 利空
@@ -30,11 +31,23 @@ const ALERT = {
 
 // 分类规则（命中即归类，按序优先）
 const CAT_RULES = [
-  { key: "业绩", words: ["业绩", "财报", "营收", "净利润", "预增", "预减", "预盈", "预亏", "季报", "年报", "中报", "分红", "送转"] },
-  { key: "公告", words: ["公告", "披露", "停牌", "复牌", "股东大会", "增发", "配股", "可转债", "回购"] },
-  { key: "股价", words: ["涨停", "跌停", "大涨", "大跌", "创历史", "新高", "新低", "异动", "拉升", "下挫", "成交额", "市值"] },
-  { key: "行业", words: ["行业", "政策", "工信部", "发改委", "证监会", "央行", "利率", "关税", "出口", "进口"] },
+  { key: "业绩", words: ["业绩", "财报", "营收", "净利润", "利润", "预增", "预减", "预盈", "预亏", "季报", "年报", "中报", "一季报", "三季报", "分红", "送转", "派息", "股息", "毛利率", "现金流", "超预期", "低于预期"] },
+  { key: "公告", words: ["公告", "披露", "停牌", "复牌", "股东大会", "增发", "配股", "可转债", "回购", "问询", "监管函", "澄清", "声明", "回应", "致歉", "辟谣", "立案", "处罚"] },
+  { key: "股价", words: ["涨停", "跌停", "大涨", "大跌", "创历史", "新高", "新低", "异动", "拉升", "下挫", "成交额", "市值", "股价", "收涨", "收跌", "涨超", "跌超", "翻红", "翻绿", "盘中", "收盘价", "港股通", "北向资金", "南向资金", "主力"] },
+  { key: "行业", words: ["行业", "政策", "工信部", "发改委", "证监会", "央行", "利率", "关税", "出口", "进口", "白酒", "酱酒", "航运", "运价", "集运", "集装箱", "电商", "直播", "游戏", "版号", "潮玩", "盲盒", "消费", "零售", "出海", "跨境"] },
+  { key: "产品", words: ["新品", "发布", "上市", "预售", "联名", "开店", "门店", "微信", "视频号", "小程序", "Temu", "Labubu", "飞天", "生肖", "i茅台"] },
 ];
+
+// 公司别名：标题必须命中其一才保留（过滤"顺带提到"的噪音新闻）
+const ALIASES = {
+  "贵州茅台": ["茅台"],
+  "五粮液": ["五粮液"],
+  "泸州老窖": ["泸州老窖", "老窖"],
+  "腾讯控股": ["腾讯", "tencent"],
+  "拼多多": ["拼多多", "pdd", "temu"],
+  "泡泡玛特": ["泡泡玛特", "pop mart", "popmart", "labubu", "拉布布"],
+  "中远海控": ["中远海控", "中远海运", "海控", "cosco"],
+};
 
 function classify(it) {
   const text = (it.title || "") + " " + (it.source || "");
@@ -47,6 +60,12 @@ function classify(it) {
     if (r.words.some((w) => text.includes(w))) { category = r.key; break; }
   }
   return { ...it, category, alert, alertWords };
+}
+
+// 相关性：标题必须命中公司名/别名，过滤"顺带提到公司名"的噪音（大盘/ETF/行业泛闻）
+function relevant(title, aliases) {
+  const t = (title || "").toLowerCase();
+  return aliases.some((a) => t.includes(String(a).toLowerCase()));
 }
 
 function nextEarnings(months) {
@@ -152,23 +171,34 @@ async function fetchRss(company) {
 async function main() {
   const holdings = JSON.parse(readFileSync(HOLDINGS_PATH, "utf8"));
   const all = [];
-  const seen = new Set();
+  const seenLink = new Set();
+  const seenTitle = new Set();
 
   for (const h of holdings) {
+    const aliases = ALIASES[h.name] || [h.name];
     const raws = await fetchRss(h);
+    let kept = 0;
     for (const it of raws) {
-      if (!it.link || seen.has(it.link)) continue;
-      seen.add(it.link);
-      const { title, source } = cleanTitle(it.title);
+      if (kept >= CONFIG.perCompanyCap) break;
+      if (!it.link || seenLink.has(it.link)) continue;
+      const ct = cleanTitle(it.title);
+      // 相关性过滤：标题须含公司名/别名，丢弃仅"顺带提到"的噪音
+      if (!relevant(ct.title, aliases)) continue;
+      // 标题去重：同一新闻多源转载只留一条
+      const tkey = ct.title.toLowerCase().replace(/\s+/g, "");
+      if (seenTitle.has(tkey)) continue;
+      seenLink.add(it.link);
+      seenTitle.add(tkey);
       all.push(classify({
-        title,
+        title: ct.title,
         link: it.link,
-        source: source || it.source || "未知",
+        source: ct.source || it.source || "未知",
         company: h.name,
         code: h.code,
         pubDate: it.pubDate,
         pubRaw: it.pubRaw,
       }));
+      kept++;
     }
     await new Promise((r) => setTimeout(r, CONFIG.requestDelayMs));
   }
