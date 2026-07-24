@@ -209,6 +209,28 @@ function renderNews(){
 // ============================================================
 //  渲染：总览 Dashboard
 // ============================================================
+// 迷你走势线（sparkline）：总览卡里的五年净利小曲线
+function miniSpark(vals,color){
+  const nums=(vals||[]).filter(v=>v!=null&&!isNaN(v));
+  if(nums.length<2)return "";
+  const W=92,H=30,P=3;
+  let min=Math.min(...nums),max=Math.max(...nums);
+  if(min===max){min-=1;max+=1;}
+  const pts=[];let idx=0;
+  vals.forEach(v=>{if(v==null||isNaN(v))return;
+    const x=P+(W-2*P)*idx/(nums.length-1);
+    const y=P+(H-2*P)*(1-(v-min)/(max-min));
+    pts.push({x,y});idx++;});
+  let d="M"+pts[0].x.toFixed(1)+","+pts[0].y.toFixed(1);
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+    d+=`C${(p1.x+(p2.x-p0.x)/6).toFixed(1)},${(p1.y+(p2.y-p0.y)/6).toFixed(1)} ${(p2.x-(p3.x-p1.x)/6).toFixed(1)},${(p2.y-(p3.y-p1.y)/6).toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  const gid="ds"+hashId(d).slice(0,6)+Math.floor(Math.random()*1e4);
+  const area=d+`L${pts[pts.length-1].x.toFixed(1)},${H-1}L${pts[0].x.toFixed(1)},${H-1}Z`;
+  const lastP=pts[pts.length-1];
+  return `<svg class="dc-spark" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0.02"/></linearGradient></defs><path d="${area}" fill="url(#${gid})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round"/><circle cx="${lastP.x.toFixed(1)}" cy="${lastP.y.toFixed(1)}" r="2.6" fill="${color}" stroke="#fffdf8" stroke-width="1"/></svg>`;
+}
 function renderDash(){
   const grid=document.getElementById("dash-grid");
   if(!state.holdings.length){grid.innerHTML='<div class="empty">holdings.json 中没有配置持仓。</div>';return;}
@@ -218,23 +240,35 @@ function renderDash(){
     const cnt=its.length;
     const latest=its[0];
     const nextEarn=nextEarnings(h.earningsMonths);
+    const soon=nextEarn&&nextEarn.inDays>=0&&nextEarn.inDays<=45;
+    const alerts=its.filter(x=>x.alert);
+    const negN=alerts.filter(x=>x.alert==="neg").length;
+    // 财务速览（来自 financials 透传）
+    const f=h.financials,fd=(f&&f.data)||[];
+    const last=fd[fd.length-1],prev=fd.length>1?fd[fd.length-2]:null;
+    const npSeries=fd.map(d=>d.netProfit);
+    const npYoy=last&&prev?yoyPct(last.netProfit,prev.netProfit):null;
+    const initials=h.name.slice(0,2);
     html+=`<div class="dash-card">
-      <div class="dc-head">
-        <div><div class="dc-name">${esc(h.name)}<span class="dc-code">${esc(h.code)}</span></div>
-        <span class="dc-sector">${esc(h.sector||"未分类")}</span></div>
+      <div class="dc-top">
+        <div class="dc-avatar">${esc(initials)}</div>
+        <div class="dc-id">
+          <div class="dc-name">${esc(h.name)}</div>
+          <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector">${esc(h.sector||"未分类")}</span></div>
+        </div>
+        <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利五年</div>`:""}</div>
       </div>
-      <div class="dc-note">${esc(h.note||"")}</div>
-      ${(h.targetPrice||h.moat||h.thesis)?`<div class="dc-fundamentals">
-        ${h.targetPrice?`<div class="dc-row"><span class="dc-lbl">🎯 目标价</span><span class="dc-val">${esc(h.targetPrice)}</span></div>`:""}
-        ${h.moat?`<div class="dc-row"><span class="dc-lbl">🛡 护城河</span><span class="dc-val">${esc(h.moat)}</span></div>`:""}
-        ${h.thesis?`<div class="dc-row dc-thesis-row"><span class="dc-lbl">💡 投资逻辑</span><span class="dc-val">${esc(h.thesis)}</span></div>`:""}
+      ${last?`<div class="dc-kpis">
+        <div class="dc-kpi"><div class="k-l">净利 <i>${last.year}</i></div><div class="k-v">${fmtNum(last.netProfit)}<i>${esc((f&&f.unit)||"亿")}</i></div>${yoyBadge(npYoy)}</div>
+        <div class="dc-kpi"><div class="k-l">ROE <i>${last.year}</i></div><div class="k-v">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${(last.roe!=null&&prev&&prev.roe!=null)?yoyBadge(last.roe-prev.roe,"pp"):""}</div>
+        <div class="dc-kpi"><div class="k-l">新闻 / 预警</div><div class="k-v">${cnt}<i>条</i></div>${negN?`<span class="fs-yoy down">⚠ 利空 ${negN}</span>`:`<span class="dc-kpi-ok">无利空</span>`}</div>
       </div>`:""}
-      <div class="dc-stats">
-        <div><div class="s-num">${cnt}</div><div class="s-lbl">相关新闻</div></div>
-        <div><div class="s-num">${latest?relTime(latest.ts):"—"}</div><div class="s-lbl">最近更新</div></div>
-      </div>
-      <div class="dc-latest">${latest?`<a href="${esc(latest.link)}" target="_blank" rel="noopener">${esc(latest.title)}</a>`:"暂无新闻"}</div>
-      <div class="dc-earn">${nextEarn?`📅 下次财报：约 ${nextEarn.month} 月（${nextEarn.inDays>=0?nextEarn.inDays+" 天后":"待核实"}${h.earningsMonths?" · 披露月："+h.earningsMonths.join("/")+"月":""}）`:"📅 未配置财报月"}</div>
+      ${h.targetPrice?`<div class="dc-target"><span class="t-i">🎯</span><span class="t-l">目标价</span><span class="t-v">${esc(h.targetPrice)}</span></div>`:""}
+      ${h.moat?`<div class="dc-moat"><span class="m-i">🛡</span><span class="m-v">${esc(h.moat)}</span></div>`:""}
+      ${h.thesis?`<div class="dc-thesis">${esc(h.thesis)}</div>`:""}
+      ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
+      <div class="dc-latest">${latest?`<span class="dc-latest-l">最新</span><a href="${esc(latest.link)}" target="_blank" rel="noopener" title="${esc(latest.title)}">${esc(latest.title)}</a><span class="dc-latest-t">${esc(relTime(latest.ts))}</span>`:`<span class="dc-latest-l">最新</span><span class="dc-latest-none">暂无新闻</span>`}</div>
+      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`约 ${nextEarn.month} 月${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}`:"未配置"}</div>
     </div>`;
   }
   grid.innerHTML=html;
