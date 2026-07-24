@@ -82,6 +82,45 @@ function marginOf(price, target) {
   return { pct, band, target: t, price: p };
 }
 
+// 股息率 = DPS / 现价（%），仅在币种一致时计算
+function dividendYield(h) {
+  if (h == null) return null;
+  const dps = h.dividendPerShare, price = h.price;
+  if (dps == null || price == null || price <= 0) return null;
+  const dccy = h.dividendCcy, pccy = h.priceCcy;
+  if (dccy && pccy && dccy !== pccy) {
+    // 币种不同，提示但不计算
+    return { pct: null, mismatch: true, dccy, pccy, dps };
+  }
+  return { pct: dps / price * 100, mismatch: false, dps, dccy: dccy || pccy || "" };
+}
+
+// 买入检查清单渲染（5 项三态：✅/❌/⬜）
+function checklistHTML(h, marginBand) {
+  const ck = h.checklist || {};
+  const items = [
+    { key: "roe15",         label: "近5年ROE≥15%",   val: ck.roe15 },
+    { key: "fcfPositive",   label: "自由现金流为正",   val: ck.fcfPositive },
+    { key: "mgmtIntegrity", label: "管理层诚信（一票否决）", val: ck.mgmtIntegrity },
+    { key: "marginSafety",  label: "估值安全边际（≥30%）", val: ck.marginSafety === "auto" ? (marginBand === "hit") : ck.marginSafety },
+    { key: "divOk",         label: "股息率达标",       val: ck.divOk },
+  ];
+  const sym = v => v === true ? "✅" : v === false ? "❌" : "⬜";
+  const cls = v => v === true ? "ok" : v === false ? "no" : "na";
+  const rows = items.map(i => `<li><span class="ck-${cls(i.val)}">${sym(i.val)}</span> ${esc(i.label)}</li>`).join("");
+  return `<ul class="ck-list">${rows}</ul>`;
+}
+
+// 七力评分卡徽章
+function powersHTML(h) {
+  const ps = h.powers || [];
+  if (!ps.length) return '<span class="powers-empty">未配置七力</span>';
+  return ps.map(p => {
+    const star = "★".repeat(p.score) + "☆".repeat(5 - p.score);
+    return `<span class="power-chip" title="${esc(p.note || '')}"><b>${esc(p.name)}</b><i>${star}</i></span>`;
+  }).join("");
+}
+
 // ============================================================
 //  数据加载：读 ./data/news.json
 // ============================================================
@@ -90,6 +129,22 @@ async function loadNews(){
     const r=await fetch("./data/news.json",{cache:"no-store"});
     if(!r.ok)throw new Error("HTTP "+r.status);
     const data=await r.json();
+    // holdings.json 里含 dividend/checklist/powers，合并进 companies（任务三、四、五）
+    try{
+      const hr=await fetch("./holdings.json",{cache:"no-store"});
+      if(hr.ok){
+        const holdings=await hr.json();
+        const hm={};
+        holdings.forEach(h=>hm[h.name]=h);
+        (data.companies||[]).forEach(c=>{
+          const h=hm[c.name];
+          if(!h) return;
+          if(h.dividendPerShare!==undefined){c.dividendPerShare=h.dividendPerShare;c.dividendYear=h.dividendYear;c.dividendCcy=h.dividendCcy;c.dividendSource=h.dividendSource;}
+          if(h.checklist) c.checklist=h.checklist;
+          if(h.powers) c.powers=h.powers;
+        });
+      }
+    }catch(_){}
     loadData(data);
     state.loadError=false;
   }catch(e){
@@ -309,8 +364,18 @@ function renderDash(){
         <div class="dp-cell dp-gap"><div class="dp-l">折价 / 溢价</div><div class="dp-v ${hitBand?"hit":(mg&&mg.band==="neutral"?"neutral":"premium")}">${mg?(mg.pct>=0?"▼ ":"▲ ")+fmtNum(Math.abs(mg.pct))+"%":"—"}</div>${hitBand?`<span class="dp-badge hit">击球区</span>`:""}</div>
       </div>`:""}
       ${h.moat?`<div class="dc-moat"><span class="m-i">🛡</span><span class="m-v">${esc(h.moat)}</span></div>`:""}
+      ${(h.powers&&h.powers.length)?'<div class="dc-powers">'+powersHTML(h)+'</div>':""}
+      ${(()=>{
+        const dy=dividendYield(h);
+        if(dy==null) return "";
+        if(dy.mismatch) return '<div class="dc-dy warn">股息率 — <i>币种不同（'+esc(dy.dccy)+' 股息 vs '+esc(dy.pccy)+' 现价），不计算</i></div>';
+        if(dy.pct==null || isNaN(dy.pct)) return '<div class="dc-dy na">股息率 — <i>待核</i></div>';
+        const tag=dy.pct>=4?"high":dy.pct>=2?"mid":"low";
+        return '<div class="dc-dy '+tag+'">💰 股息率 <b>'+dy.pct.toFixed(2)+'%</b> <i>'+esc(dy.dccy||"")+' · '+esc(h.dividendYear||"")+'</i></div>';
+      })()}
       ${h.thesis?`<div class="dc-thesis">${esc(h.thesis)}</div>`:""}
       ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
+      ${h.checklist?`<details class="dc-checklist"><summary>✓ 买入检查清单</summary>${checklistHTML(h, mg?mg.band:null)}</details>`:""}
       <div class="dc-latest">${latest?`<span class="dc-latest-l">最新</span><a href="${esc(latest.link)}" target="_blank" rel="noopener" title="${esc(latest.title)}">${esc(latest.title)}</a><span class="dc-latest-t">${esc(relTime(latest.ts))}</span>`:`<span class="dc-latest-l">最新</span><span class="dc-latest-none">暂无新闻</span>`}</div>
       <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.confirmed?`<b>${esc(nextEarn.date)}</b>`:`约 ${nextEarn.month} 月`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
     </div>`;
