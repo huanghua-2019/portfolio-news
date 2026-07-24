@@ -6,24 +6,28 @@
   <title>持仓监控 · 新闻回看</title>
   <meta name="description" content="个人持仓公司新闻监控看板：自动抓取贵州茅台 / 腾讯控股 / 拼多多 / 泡泡玛特等持仓相关新闻，支持按公司、板块、分类、时间筛选与预警、已读管理。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
-  <!-- ===== 顶栏 ===== -->
-  <header class="topbar">
-    <div class="brand">📊 持仓监控 <span class="sub">· 新闻回看</span></div>
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-view="news">📰 新闻</button>
-      <button class="tab" data-view="dash">📊 总览</button>
-      <button class="tab" data-view="alert">🔔 预警</button>
-      <button class="tab" data-view="cal">📅 日历</button>
-      <button class="tab" data-view="stat">📈 统计</button>
-    </nav>
-    <div class="topbar-right">
-      <span id="countdown" class="countdown" title="距下次预计云端更新">--</span>
-      <button id="refreshBtn" class="btn-refresh" title="拉取最新已生成数据">↻ 刷新</button>
-    </div>
-  </header>
+  <div class="layout">
+    <!-- ===== 左侧栏 ===== -->
+    <aside class="sidebar">
+      <div class="brand">📊 持仓监控 <span class="sub">· 新闻回看</span></div>
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-view="news">📰 新闻</button>
+        <button class="tab" data-view="dash">📊 总览</button>
+        <button class="tab" data-view="alert">🔔 预警</button>
+        <button class="tab" data-view="cal">📅 日历</button>
+        <button class="tab" data-view="stat">📈 统计</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span id="countdown" class="countdown" title="距下次预计云端更新">--</span>
+        <button id="refreshBtn" class="btn-refresh" title="拉取最新已生成数据">↻ 刷新</button>
+      </div>
+    </aside>
+
+    <!-- ===== 右侧内容 ===== -->
+    <main class="content">
 
   <!-- ===== 新闻视图 ===== -->
   <section id="view-news" class="view active">
@@ -75,6 +79,8 @@
     <p>数据由 GitHub Actions 定时爬虫在云端抓取（每 <span id="cfgInterval">30</span> 分钟），抓完自动提交到仓库，本页直接读取。</p>
     <p>持仓 / 板块 / 财报月在 <code>holdings.json</code> 配置；爬虫在 <code>crawler/crawl.mjs</code>；预警词在 <code>app.js</code> 顶部 <code>ALERT</code> 配置。</p>
   </footer>
+    </main>
+  </div>
 
   <script src="app.js?v=3"></script>
 </body>
