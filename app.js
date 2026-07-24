@@ -83,6 +83,23 @@ function marginOf(price, target) {
 }
 
 // 股息率 = DPS / 现价（%），仅在币种一致时计算
+// 财报后静默期：财报披露后 ±3 天股价可能高震荡，提示用户谨慎操作
+// 返回 null（不在静默期）或 {daysAgo, daysToGo, label}
+function earningsQuietPeriod(h) {
+  const ne = nextEarnings(h);
+  if (!ne) return null;
+  // inDays 是距离下次财报的天数（负数=已披露后第几天）
+  if (ne.inDays < -10 || ne.inDays > 10) return null;
+  const daysAgo = -ne.inDays;
+  const daysToGo = ne.inDays;
+  let label;
+  if (ne.inDays >= 0 && ne.inDays <= 3)  label = `距财报 ≤3天`;  // 前静默
+  else if (ne.inDays > -10 && ne.inDays < 0 && daysAgo <= 7)
+    label = `财报后${daysAgo}天`;                                  // 后静默
+  else return null;
+  return { daysAgo, daysToGo, label, est: !ne.confirmed };
+}
+
 function dividendYield(h) {
   if (h == null) return null;
   const dps = h.dividendPerShare, price = h.price;
@@ -121,10 +138,120 @@ function powersHTML(h) {
   }).join("");
 }
 
+// 6维度评分：返回 0=红/差 1=黄/中 2=绿/好；数据缺失返回 1（中性灰）
+function gradeOf(kind, val) {
+  if (val == null || (typeof val === "number" && isNaN(val))) return 1;
+  if (kind === "margin")  { if (val >= 30) return 2; if (val >= 0) return 1; return 0; }   // 折价 %（越大越好）
+  if (kind === "roe")     { if (val >= 15) return 2; if (val >= 10) return 1; return 0; }
+  if (kind === "dy")      { if (val >= 5)  return 2; if (val >= 2)  return 1; return 0; }
+  if (kind === "power")   { if (val >= 5)  return 2; if (val >= 3)  return 1; return 0; }   // 七力 max 1-5
+  if (kind === "check")   { if (val >= 0.8) return 2; if (val >= 0.4) return 1; return 0; }  // 通过率 0-1
+  if (kind === "news")    { if (val < 0.05) return 2; if (val <= 0.20) return 1; return 0; }// 利空率5%/20% 分档，越低越好
+  return 1;
+}
+
+// 掫取一家公司 6 维度的原始数值（不评分）
+function metricsOf(h) {
+  // 1. 折价
+  const tp = parseTargetPrice(h.targetPrice, h.priceCcy);
+  const m = tp ? marginOf(h.price, tp.value) : null;
+  const margin = m ? m.gap * 100 : null;  // 例 35.1 含义是现价较目标价低 35.1%
+  // 2. ROE：取最近年
+  const fd = h.financials && h.financials.data;
+  const roe = fd && fd.length ? fd[fd.length-1].roe : null;
+  // 3. 股息率
+  const dyRes = dividendYield(h);
+  const dy = (dyRes && !dyRes.mismatch && dyRes.pct != null) ? dyRes.pct : null;
+  // 4. 七力：取最强那项的 score
+  const ps = h.powers || [];
+  const power = ps.length ? Math.max(...ps.map(p => p.score || 0)) : null;
+  // 5. 清单通过率：有状态的看是否通过，null 视为不计
+  const cl = h.checklist || {};
+  const ckFields = ["roe15","strongBS","steadyRev","highMargin","dcfUnder"];
+  let ckTotal = 0, ckPass = 0;
+  for (const k of ckFields) {
+    const v = cl[k];
+    if (v === true || v === false) { ckTotal++; if (v) ckPass++; }
+  }
+  const check = ckTotal ? ckPass / ckTotal : null;
+  // 6. 新闻利空率（近7天）
+  const now = Date.now();
+  const items = (state.all || []).filter(x => x.company === h.name && x.ts >= now - 7*86400000);
+  const negN = items.filter(x => x.alert === "neg").length;
+  const newsNegRate = items.length ? negN / items.length : null;
+  return { margin, roe, dy, power, check, newsNegRate, _itemsLen: items.length };
+}
+
+// 热力图：渲染 7家公司 × 6维度网格
+function renderHeatmap(hs) {
+  if (!hs.length) return "";
+  const cols = [
+    { key: "margin", label: "折价", val: m => m.margin == null ? "—" : (m.margin >= 0 ? "+"+m.margin.toFixed(1) : m.margin.toFixed(1))+"%" },
+    { key: "roe",    label: "ROE", val: m => m.roe == null ? "—" : m.roe.toFixed(1)+"%" },
+    { key: "dy",     label: "股息",val: m => m.dy == null ? "—" : m.dy.toFixed(2)+"%" },
+    { key: "power",  label: "七力",val: m => m.power == null ? "—" : m.power+"★" },
+    { key: "check",  label: "清单",val: m => m.check == null ? "—" : Math.round(m.check*100)+"%" },
+    { key: "news",   label: "利空",val: m => m._itemsLen === 0 ? "无" : (m.newsNegRate*100).toFixed(0)+"%" }
+  ];
+  let h = '<div class="hm-heat">';
+  h += '<table class="heat-tbl"><thead><tr><th class="ht-name">公司</th>';
+  cols.forEach(c => { h += `<th class="ht-col" title="${c.label}">${c.label}</th>`; });
+  h += '</tr></thead><tbody>';
+  for (const ho of hs) {
+    const m = metricsOf(ho);
+    h += `<tr class="ht-row" data-co="${esc(ho.name)}" onclick="dashJumpTo('${esc(ho.name).replace(/'/g, "\\'")}')">`;
+    h += `<td class="ht-name"><span class="ht-dot" style="background:${sectorColor(ho.sector)}"></span>${esc(ho.name)}</td>`;
+    cols.forEach(c => {
+      const g = gradeOf(c.key, c.key==="margin"?m.margin : c.key==="roe"?m.roe : c.key==="dy"?m.dy : c.key==="power"?m.power : c.key==="check"?m.check : c.key==="news"?m.newsNegRate : null);
+      h += `<td class="ht-cell g${g}" data-label="${c.label}" title="${c.label}: ${esc(c.val(m))}">${c.val(m)}</td>`;
+    });
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  h += '<div class="heat-legend"><i class="g2"></i>好 <i class="g1"></i>中 <i class="g0"></i>差 <i class="g1"></i>缺数据</div>';
+  h += '</div>';
+  return h;
+}
+
+// 跳转到总览视图并高亮某家公司
+function dashJumpTo(name) {
+  gotoView("dash", name);
+  // 等待 renderDash 后滚动+高亮
+  setTimeout(() => {
+    const el = document.querySelector(`.dash-card[data-co="${name}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("dc-flash");
+      setTimeout(() => el.classList.remove("dc-flash"), 2000);
+    }
+  }, 50);
+}
+
+// 仅闪烁高亮（不跳转，在总览页内部调用）
+function flashCard(name) {
+  const el = document.querySelector(`.dash-card[data-co="${name}"]`);
+  if (!el) return;
+  el.classList.remove("dc-flash");
+  void el.offsetWidth;  // 强制重流动画重启
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("dc-flash");
+  setTimeout(() => el.classList.remove("dc-flash"), 2000);
+}
+
 // ============================================================
 //  数据加载：读 ./data/news.json
 // ============================================================
 async function loadNews(){
+  // 超 200ms 才显示骨架，避免本地快速加载时闪烁
+  const skTimer=setTimeout(()=>{
+    const t=document.body;
+    if(!t.querySelector(".page-skeleton")){
+      const s=document.createElement("div");
+      s.className="page-skeleton";
+      s.innerHTML='<div class="sk-bar"></div><div class="sk-grid"></div>';
+      t.appendChild(s);
+    }
+  },200);
   try{
     const r=await fetch("./data/news.json",{cache:"no-store"});
     if(!r.ok)throw new Error("HTTP "+r.status);
@@ -150,6 +277,9 @@ async function loadNews(){
   }catch(e){
     state.loadError=true;   // 仅表示本次拉取失败，可能爬虫还没跑过/部署未生效
   }
+  clearTimeout(skTimer);
+  const sk=document.querySelector(".page-skeleton");
+  if(sk)sk.remove();
   // 数据加载完成后重建筛选标签：公司/板块/分类此时才有真实数据
   buildChips();
   renderCurrent();
@@ -345,12 +475,12 @@ function renderDash(){
     const premiumBand=mg&&mg.band==="premium";
     const initials=h.name.slice(0,2);
     const sc=sectorColor(h.sector);
-    html+=`<div class="dash-card ${hitBand?"hit-zone":""}" style="--sc:${sc}">
+    html+=`<div class="dash-card ${hitBand?"hit-zone":""}" data-co="${esc(h.name)}" style="--sc:${sc}">
       <div class="dc-top">
         <div class="dc-avatar" style="background:${sc}1a;color:${sc};border-color:${sc}55">${esc(initials)}</div>
         <div class="dc-id">
-          <div class="dc-name">${esc(h.name)}</div>
-          <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector" style="color:${sc};background:${sc}14;border-color:${sc}40">${esc(h.sector||"未分类")}</span></div>
+          <div class="dc-name" onclick="flashCard('${esc(h.name).replace(/'/g, "\\'")}')" style="cursor:pointer" title="点击高亮">${esc(h.name)}</div>
+          <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector" style="color:${sc};background:${sc}14;border-color:${sc}40">${esc(h.sector||"未分类")}</span>${(()=>{const qp=earningsQuietPeriod(h);return qp?`<span class="dc-quiet ${qp.est?"est":""}" title="${qp.est?"估算日期":"权威日期"}">⏸ ${qp.label}</span>`:"";})()}</div>
         </div>
         <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利五年</div>`:""}</div>
       </div>
@@ -741,6 +871,9 @@ function renderHome(){
     <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-ic">🛡</div><div class="hm-kpi-main"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div></div>
     <div class="hm-kpi ${hitN>0?"hit":""}" onclick="gotoView('dash')" title="点击查看总览（折价≥30%为击球区）"><div class="hm-kpi-ic">⚾</div><div class="hm-kpi-main"><div class="hm-kpi-l">击球区</div><div class="hm-kpi-v">${hitN}<span class="u">只</span></div></div></div>
   </div>`;
+
+  // ---- 热力图（7家×6维度一眼对照） ----
+  html+=`<div class="hm-sec"><div class="hm-title">🌡 价值热力图 <span class="hm-sub">点击公司名跳转总览 · 6维度对照·色块趋绿越优</span></div>${renderHeatmap(hs)}</div>`;
 
   // ---- 持仓速览墙 ----
   html+=`<div class="hm-sec"><div class="hm-title">💼 持仓速览 <span class="hm-sub">点卡片看该公司新闻</span></div><div class="hm-wall">`;
