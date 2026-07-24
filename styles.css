@@ -28,8 +28,40 @@
   /* —— 字体 —— */
   --mono:"SF Mono",ui-monospace,"JetBrains Mono",Consolas,Menlo,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  /* —— 阴影层次 —— */
+  --sh-sm:0 1px 2px rgba(60,50,20,.04);
+  --sh-md:0 2px 10px rgba(80,64,24,.07);
+  --sh-lg:0 6px 22px rgba(80,64,24,.10);
 }
+/* ============================================================
+   深色监控风（夜间）—— 一键切换，语义色保持涨红跌绿
+   ============================================================ */
+html[data-theme="dark"]{
+  --bg:#12141a;            /* 页面背景：深蓝灰 */
+  --panel:#1b1e27;         /* 卡片/面板 */
+  --panel-2:#232733;       /* 次面板 */
+  --line:#2f3441;          /* 边框/分隔 */
+  --ink:#eceae3;          /* 主文字：浅米白 */
+  --ink-soft:#aeaaa2;     /* 次文字 */
+  --ink-dim:#7a766e;       /* 辅助文字 */
+  --brand:#d9a92a;         /* 金棕主色（深色下提亮） */
+  --brand-2:#ecc23f;      /* 亮金 */
+  --brand-soft:rgba(217,169,42,.14);
+  --blue:#d9a92a;
+  --cyan:#c6a24a;
+  --red:#e0655a;          /* 利空/跌（提亮以保对比） */
+  --green:#43b06f;        /* 利好/涨 */
+  --orange:#e0982e;
+  --purple:#a684cf;
+  --pos:#43b06f;
+  --neg:#e0655a;
+  --sh-sm:0 1px 2px rgba(0,0,0,.28);
+  --sh-md:0 2px 12px rgba(0,0,0,.34);
+  --sh-lg:0 8px 26px rgba(0,0,0,.42);
+}
+html[data-theme="dark"] .hm-secseg{color:#12141a}
 *{box-sizing:border-box;margin:0;padding:0}
+html{transition:background-color .25s ease}
 html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
 body{padding-bottom:0}
 a{color:var(--brand);text-decoration:none}
@@ -376,4 +408,116 @@ a:hover{text-decoration:underline}
   .hm-wall{grid-template-columns:repeat(2,minmax(0,1fr))}
   .hm-moats{grid-template-columns:1fr}
   .hm-kpi-v{font-size:20px}
+}
+
+/* ============================================================
+   全站 UI 升级 v10：品牌头 / 进度环 / 板块色 / 质感打磨
+   ============================================================ */
+/* —— 全局：自定义滚动条 —— */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--brand)}
+
+/* —— 全局：视图切入动画升级 —— */
+.view.active{animation:fadeUp .28s cubic-bezier(.22,.9,.36,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* —— 侧栏：主题切换按钮 —— */
+.btn-theme{background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-family:var(--sans);transition:.15s}
+.btn-theme:hover{border-color:var(--brand);color:var(--brand)}
+
+/* —— 侧栏 tab 激活态：左侧亮条 —— */
+.tab{position:relative}
+.tab.active::before{content:"";position:absolute;left:-13px;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--brand-2)}
+
+/* —— 首页 Hero 品牌头 —— */
+.hm-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;padding:18px 20px;border-radius:14px;background:linear-gradient(120deg,var(--brand-soft),var(--panel) 65%);border:1px solid var(--line);box-shadow:var(--sh-sm)}
+.hm-hi{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:.3px}
+.hm-hi .accent{color:var(--brand)}
+.hm-date{font-size:12px;color:var(--ink-dim);margin-top:3px;font-family:var(--mono)}
+.hm-summary{font-size:13px;color:var(--ink-soft);margin-top:8px}
+.hm-summary b{color:var(--brand);font-family:var(--mono)}
+.hm-updated{font-size:11px;color:var(--ink-dim);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.hm-updated .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* —— KPI 卡升级：图标 + 呼吸感 —— */
+.hm-kpis{gap:12px}
+.hm-kpi{display:flex;align-items:center;gap:11px;border-radius:13px;padding:14px 16px;box-shadow:var(--sh-sm)}
+.hm-kpi:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.hm-kpi-ic{font-size:21px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:11px;background:var(--brand-soft);flex:0 0 40px}
+.hm-kpi.warn .hm-kpi-ic{background:rgba(192,57,43,.10)}
+.hm-kpi.hot .hm-kpi-ic{background:rgba(199,127,26,.13)}
+.hm-kpi.good .hm-kpi-ic{background:rgba(46,125,79,.10)}
+.hm-kpi-main{min-width:0}
+
+/* —— 持仓信号卡：板块色顶条 —— */
+.hm-card{position:relative;overflow:hidden;border-radius:11px;box-shadow:var(--sh-sm)}
+.hm-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--sc,var(--brand));opacity:.8}
+.hm-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.hm-sector{font-weight:600}
+
+/* —— 财报倒计时进度环 —— */
+.hm-ring{width:46px;height:46px;flex:0 0 46px}
+.hm-ring .rbg{fill:none;stroke:var(--line);stroke-width:4}
+.hm-ring .rfg{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dasharray .4s}
+.hm-ring text{font-family:var(--mono);font-size:14px;font-weight:700;text-anchor:middle;fill:var(--ink)}
+.hm-ring.hot .rfg{stroke:var(--red)}.hm-ring.hot text{fill:var(--red)}
+.hm-ring.mid .rfg{stroke:var(--orange)}.hm-ring.mid text{fill:var(--orange)}
+.hm-ring.ok .rfg{stroke:var(--green)}
+.hm-earn{display:flex;align-items:center;gap:11px}
+.hm-earn-body{flex:1;min-width:0}
+.hm-earn-tail{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+
+/* —— 区块通用：卡片质感统一 —— */
+.hm-sec{border-radius:13px;box-shadow:var(--sh-sm)}
+
+/* —— 新闻页：条目卡片化 + 已读弱化 + 未读金点 —— */
+.news-item{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;padding:11px 13px;transition:.15s;box-shadow:var(--sh-sm)}
+.news-item:hover{border-color:var(--brand);box-shadow:var(--sh-md)}
+.news-item .n-title{position:relative;padding-left:13px}
+.news-item .n-title::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--brand-2)}
+.news-item.is-read{opacity:.55}
+.news-item.is-read .n-title::before{background:var(--line)}
+.news-item.alert-neg{border-left:3px solid var(--red)}
+.news-item.alert-pos{border-left:3px solid var(--green)}
+.date-head{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 2px 6px;font-weight:700;color:var(--ink-soft);backdrop-filter:blur(4px)}
+
+/* —— 总览页：公司卡板块色顶条 —— */
+.dash-card{position:relative;overflow:hidden;border-radius:13px;box-shadow:var(--sh-sm);transition:.15s}
+.dash-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--sc,var(--brand));opacity:.85}
+.dash-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.dc-avatar{border:1px solid}
+.dc-sector{border:1px solid;border-radius:99px;padding:1px 8px}
+
+/* —— 日历页：进度环行布局 —— */
+.cal-card{position:relative;overflow:hidden;border-radius:12px;box-shadow:var(--sh-sm);transition:.15s}
+.cal-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sc,var(--brand));opacity:.8}
+.cal-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.cal-row{display:flex;align-items:center;gap:13px}
+.cal-main{flex:1;min-width:0}
+
+/* —— 财务页：ROE 15% 生死线标色 —— */
+.fin-tbl td.roe.pass{color:var(--green);font-weight:700}
+.fin-tbl td.roe.fail{color:var(--red);font-weight:700}
+.fin-tbl tbody tr:nth-child(even){background:var(--panel-2)}
+.fin-tbl tbody tr:hover{background:var(--brand-soft)}
+.roe-line{font-size:10px;color:var(--ink-dim);font-weight:400;border:1px solid var(--line);border-radius:5px;padding:0 4px;margin-left:3px;cursor:help}
+.fin-card{border-radius:13px;box-shadow:var(--sh-sm)}
+.fin-card:hover{box-shadow:var(--sh-md)}
+
+/* —— 深色模式下的细节修正 —— */
+html[data-theme="dark"] .hm-hero{background:linear-gradient(120deg,rgba(217,169,42,.10),var(--panel) 65%)}
+html[data-theme="dark"] .hm-ring text{fill:var(--ink)}
+html[data-theme="dark"] .tab.active{color:#12141a}
+html[data-theme="dark"] .chip.active{color:#12141a}
+
+/* —— 移动端 —— */
+@media (max-width:720px){
+  .hm-hero{flex-direction:column;align-items:flex-start;gap:8px;padding:14px 15px}
+  .hm-hi{font-size:19px}
+  .hm-kpi{padding:11px 12px;gap:8px}
+  .hm-kpi-ic{width:34px;height:34px;font-size:18px;flex-basis:34px}
+  .cal-row{gap:10px}
 }

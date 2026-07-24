@@ -151,7 +151,7 @@ function newsRow(it,opts){
   let tag="";
   if(it.alert==="pos")tag=`<span class="tag-pos">利好·${esc(it.alertWords.join("/"))}</span>`;
   else if(it.alert==="neg")tag=`<span class="tag-neg">利空·${esc(it.alertWords.join("/"))}</span>`;
-  return `<div class="news-item ${alertCls}" data-id="${esc(it.id)}">
+  return `<div class="news-item ${alertCls} ${readCls?"is-read":""}" data-id="${esc(it.id)}">
     <div>
       <div class="n-title"><a href="${esc(it.link)}" target="_blank" rel="noopener">${highlightKeyVars(it.title, it.company)}</a></div>
       <div class="n-meta">
@@ -249,12 +249,13 @@ function renderDash(){
     const npSeries=fd.map(d=>d.netProfit);
     const npYoy=last&&prev?yoyPct(last.netProfit,prev.netProfit):null;
     const initials=h.name.slice(0,2);
-    html+=`<div class="dash-card">
+    const sc=sectorColor(h.sector);
+    html+=`<div class="dash-card" style="--sc:${sc}">
       <div class="dc-top">
-        <div class="dc-avatar">${esc(initials)}</div>
+        <div class="dc-avatar" style="background:${sc}1a;color:${sc};border-color:${sc}55">${esc(initials)}</div>
         <div class="dc-id">
           <div class="dc-name">${esc(h.name)}</div>
-          <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector">${esc(h.sector||"未分类")}</span></div>
+          <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector" style="color:${sc};background:${sc}14;border-color:${sc}40">${esc(h.sector||"未分类")}</span></div>
         </div>
         <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利五年</div>`:""}</div>
       </div>
@@ -321,11 +322,16 @@ function renderCal(){
     const {h,ne}=r;
     if(!ne){html+=`<div class="cal-card"><div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div><div class="cal-note">未配置财报月份</div></div>`;continue;}
     const soon=ne.inDays>=0&&ne.inDays<=45;
-    html+=`<div class="cal-card ${soon?"soon":""}">
-      <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div>
-      <div class="cal-next">${ne.confirmed?`披露日 <span class="d">${esc(ne.date)}</span>`:`距约 <span class="d">${ne.month}月</span> 披露`}：<span class="d">${ne.inDays>=0?ne.inDays+" 天":"待核实"}</span></div>
-      <div class="cal-months">${ne.confirmed?`✓ 已确认 · ${esc(ne.source||"权威源")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月`}</div>
-      <div class="cal-note">${ne.confirmed?"":"⚠ 具体日期需核实，这里按\"约当月1日\"粗略倒计时"}</div>
+    const sc=sectorColor(h.sector);
+    html+=`<div class="cal-card ${soon?"soon":""}" style="--sc:${sc}">
+      <div class="cal-row">
+        ${ne.inDays>=0?earnRing(ne.inDays):""}
+        <div class="cal-main">
+          <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div>
+          <div class="cal-next">${ne.confirmed?`披露日 <span class="d">${esc(ne.date)}</span>`:`距约 <span class="d">${ne.month}月</span> 披露`}</div>
+          <div class="cal-months">${ne.confirmed?`✓ 已确认 · ${esc(ne.source||"权威源")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月 · ⚠ 待核实`}</div>
+        </div>
+      </div>
     </div>`;
   }
   html+=`</div></div>`;
@@ -416,7 +422,7 @@ function finCard(h){
       <td>${d.year}</td>
       <td class="num">${fmtNum(d.revenue)}</td>
       <td class="num">${fmtNum(d.netProfit)}</td>
-      <td class="num">${d.roe==null?'<span class="ty">需核实</span>':fmtNum(d.roe)+'%'}${d.adj?'<span class="adj" title="口径调整（审慎调减）">⚠</span>':''}</td>
+      <td class="num roe ${d.roe==null?"":(d.roe>=15?"pass":"fail")}">${d.roe==null?'<span class="ty">需核实</span>':fmtNum(d.roe)+'%'}${d.adj?'<span class="adj" title="口径调整（审慎调减）">⚠</span>':''}</td>
     </tr>`).join("");
   return `<div class="fin-card">
     <div class="fin-h">${esc(h.name)}<span class="fin-code">${esc(h.code)}</span><span class="fin-unit">${esc(unit)}${f.currency?' · '+esc(f.currency):''}</span></div>
@@ -426,7 +432,7 @@ function finCard(h){
       <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c2}"></span>归母净利润</div>${lineChartSVG(np,{years,color:c2})}</div>
       <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c3}"></span>ROE（净资产收益率）</div>${lineChartSVG(roe,{years,color:c3,suffix:"%"})}</div>
     </div>
-    <table class="fin-tbl"><thead><tr><th>年份</th><th>营收</th><th>净利</th><th>ROE</th></tr></thead><tbody>${rows}</tbody></table>
+    <table class="fin-tbl"><thead><tr><th>年份</th><th>营收</th><th>净利</th><th>ROE <span class="roe-line" title="ROE 生死线 15%：达标绿 / 不达标红">↕15%</span></th></tr></thead><tbody>${rows}</tbody></table>
     <div class="fin-note">${esc(f.note||"")}${f.asOf?' · 截至 '+esc(f.asOf):''} · 来源：${esc(f.source||"需核实")}</div>
   </div>`;
 }
@@ -462,6 +468,20 @@ function gotoView(v,coName){
 }
 
 // ============================================================
+//  板块固定色系统：每个板块一个专属色，贯穿首页/总览/新闻
+// ============================================================
+const SECTOR_COLORS={"白酒":"#b8861b","互联网":"#3a7ca5","电商":"#c0392b","潮玩":"#7d5ba6","航运":"#2e7d4f","金融":"#c77f1a","能源":"#8a6d3b"};
+function sectorColor(s){return SECTOR_COLORS[s]||"#9a7b2e";}
+
+// 财报倒计时进度环（92天≈一个财报季，剩得越少环越满）
+function earnRing(d){
+  const total=92,pct=Math.max(0.04,Math.min(1,1-d/total));
+  const R=19,C=2*Math.PI*R;
+  const cls=d<=15?"hot":d<=30?"mid":"ok";
+  return `<svg class="hm-ring ${cls}" viewBox="0 0 46 46"><circle class="rbg" cx="23" cy="23" r="${R}"/><circle class="rfg" cx="23" cy="23" r="${R}" stroke-dasharray="${(C*pct).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 23 23)"/><text x="23" y="27.5">${d}</text></svg>`;
+}
+
+// ============================================================
 //  渲染：首页仪表盘（驾驶舱：聚合 + 引流，不重复各视图细节）
 // ============================================================
 function renderHome(){
@@ -479,12 +499,27 @@ function renderHome(){
   const roes=hs.map(h=>{const d=h.financials&&h.financials.data;if(!d||!d.length)return null;const last=d[d.length-1];return typeof last.roe==="number"?last.roe:null;}).filter(v=>v!=null);
   const avgRoe=roes.length?(roes.reduce((a,b)=>a+b,0)/roes.length):null;
 
-  // ---- KPI 条 ----
-  let html=`<div class="hm-kpis">
-    <div class="hm-kpi" onclick="gotoView('news','all')" title="点击查看新闻"><div class="hm-kpi-l">今日新闻</div><div class="hm-kpi-v">${todayNews}</div></div>
-    <div class="hm-kpi ${alerts7d.length?"warn":""}" onclick="gotoView('alert')" title="点击查看预警"><div class="hm-kpi-l">7日预警</div><div class="hm-kpi-v">${alerts7d.length}</div></div>
-    <div class="hm-kpi ${nearest&&nearest.ne.inDays<=15?"hot":""}" onclick="gotoView('cal')" title="点击查看日历"><div class="hm-kpi-l">最近财报${nearest?" · "+esc(nearest.h.name):""}</div><div class="hm-kpi-v">${nearest?nearest.ne.inDays+"<span class='u'>天</span>":"—"}</div></div>
-    <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div>
+  // ---- Hero 品牌头（问候 + 日期 + 摘要 + 更新时间）----
+  const hr=new Date().getHours();
+  const greet=hr<6?"凌晨好":hr<11?"早上好":hr<13?"中午好":hr<18?"下午好":"晚上好";
+  const wk=["日","一","二","三","四","五","六"][new Date().getDay()];
+  const dateStr=`${new Date().getFullYear()}年${new Date().getMonth()+1}月${new Date().getDate()}日 · 周${wk}`;
+  const upd=state.generatedAt?relTime(state.generatedAt):"—";
+  let html=`<div class="hm-hero">
+    <div>
+      <div class="hm-hi">${greet}，<span class="accent">华</span> 👋</div>
+      <div class="hm-date">${dateStr}</div>
+      <div class="hm-summary">今日 <b>${todayNews}</b> 条要闻 · 近7日 <b>${alerts7d.length}</b> 条预警${nearest?` · 最近财报 <b>${esc(nearest.h.name)}</b> ${nearest.ne.inDays} 天后`:""}</div>
+    </div>
+    <div class="hm-updated"><span class="dot"></span>数据更新 ${esc(upd)}</div>
+  </div>`;
+
+  // ---- KPI 条（图标 + 微图）----
+  html+=`<div class="hm-kpis">
+    <div class="hm-kpi" onclick="gotoView('news','all')" title="点击查看新闻"><div class="hm-kpi-ic">📰</div><div class="hm-kpi-main"><div class="hm-kpi-l">今日新闻</div><div class="hm-kpi-v">${todayNews}<span class="u">条</span></div></div></div>
+    <div class="hm-kpi ${alerts7d.length?"warn":""}" onclick="gotoView('alert')" title="点击查看预警"><div class="hm-kpi-ic">🔔</div><div class="hm-kpi-main"><div class="hm-kpi-l">7日预警</div><div class="hm-kpi-v">${alerts7d.length}<span class="u">条</span></div></div></div>
+    <div class="hm-kpi ${nearest&&nearest.ne.inDays<=15?"hot":""}" onclick="gotoView('cal')" title="点击查看日历"><div class="hm-kpi-ic">📅</div><div class="hm-kpi-main"><div class="hm-kpi-l">最近财报${nearest?" · "+esc(nearest.h.name):""}</div><div class="hm-kpi-v">${nearest?nearest.ne.inDays+"<span class='u'>天</span>":"—"}</div></div></div>
+    <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-ic">🛡</div><div class="hm-kpi-main"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div></div>
   </div>`;
 
   // ---- 持仓速览墙 ----
@@ -495,8 +530,9 @@ function renderHome(){
     const hasAlert=items.some(x=>x.alert&&x.ts>=now-3*86400000);
     const ne=nextEarnings(h);
     const soon=ne&&ne.inDays>=0&&ne.inDays<=15;
-    html+=`<div class="hm-card ${hasAlert?"alerted":""}" onclick="gotoView('news','${esc(h.name).replace(/'/g,"\\'")}')">
-      <div class="hm-card-top"><span class="hm-name">${esc(h.name)}</span><span class="hm-sector">${esc(h.sector||"")}</span></div>
+    const sc=sectorColor(h.sector);
+    html+=`<div class="hm-card ${hasAlert?"alerted":""}" style="--sc:${sc}" onclick="gotoView('news','${esc(h.name).replace(/'/g,"\\'")}')">
+      <div class="hm-card-top"><span class="hm-name">${esc(h.name)}</span><span class="hm-sector" style="color:${sc}">${esc(h.sector||"")}</span></div>
       <div class="hm-card-meta">7日 ${n7} 条新闻</div>
       <div class="hm-card-tags">
         ${hasAlert?'<span class="hm-tag neg">● 预警</span>':""}
@@ -513,7 +549,7 @@ function renderHome(){
   else{
     for(const r of earnRows.slice(0,3)){
       const d=r.ne.inDays;
-      html+=`<div class="hm-earn"><div><div class="hm-earn-n">${esc(r.h.name)}</div><div class="hm-earn-d">${r.ne.confirmed?esc(r.ne.date):"约"+r.ne.month+"月"}${r.ne.confirmed?"":" ·待核实"}</div></div><div class="hm-earn-v ${d<=15?"hot":d<=30?"mid":""}">${d}<span class="u">天</span></div></div>`;
+      html+=`<div class="hm-earn">${earnRing(d)}<div class="hm-earn-body"><div class="hm-earn-n">${esc(r.h.name)}</div><div class="hm-earn-d">${r.ne.confirmed?esc(r.ne.date):"约"+r.ne.month+"月"}${r.ne.confirmed?"":" ·待核实"}</div></div><div class="hm-earn-tail">天后披露</div></div>`;
     }
   }
   html+=`</div>`;
@@ -543,10 +579,9 @@ function renderHome(){
   const secCount={};
   hs.forEach(h=>{const s=h.sector||"未分类";secCount[s]=(secCount[s]||0)+1;});
   const secArr=Object.entries(secCount).sort((a,b)=>b[1]-a[1]);
-  const SEC_COLORS=["#b8861b","#2e7d4f","#7d5ba6","#c0392b","#3a7ca5","#c77f1a"];
   html+=`<div class="hm-sec"><div class="hm-title">🛡 板块分布 & 护城河</div><div class="hm-secbar">`;
-  secArr.forEach(([s,c],i)=>{
-    html+=`<div class="hm-secseg" style="flex:${c};background:${SEC_COLORS[i%SEC_COLORS.length]}">${esc(s)} ${Math.round(c/hs.length*100)}%</div>`;
+  secArr.forEach(([s,c])=>{
+    html+=`<div class="hm-secseg" style="flex:${c};background:${sectorColor(s)}">${esc(s)} ${Math.round(c/hs.length*100)}%</div>`;
   });
   html+=`</div><div class="hm-moats">`;
   for(const h of hs){
@@ -601,6 +636,24 @@ async function init(){
     document.getElementById("view-"+v).classList.add("active");
     renderCurrent();
   }));
+  // 主题切换：跟随按钮切换 dark/light，记住偏好
+  const themeBtn=document.getElementById("themeBtn");
+  function syncThemeBtn(){
+    const t=document.documentElement.getAttribute("data-theme");
+    if(themeBtn)themeBtn.textContent=t==="dark"?"☀️ 浅色":"🌙 深色";
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta)meta.setAttribute("content",t==="dark"?"#12141a":"#f5f0e6");
+  }
+  if(themeBtn){
+    themeBtn.addEventListener("click",()=>{
+      const cur=document.documentElement.getAttribute("data-theme");
+      const next=cur==="dark"?"light":"dark";
+      document.documentElement.setAttribute("data-theme",next);
+      try{localStorage.setItem("pf-theme",next);}catch(e){}
+      syncThemeBtn();
+    });
+    syncThemeBtn();
+  }
   document.getElementById("q-input").addEventListener("input",e=>{state.search=e.target.value.trim();renderNews();});
   document.getElementById("refreshBtn").addEventListener("click",()=>{
     state.loadError=false;
