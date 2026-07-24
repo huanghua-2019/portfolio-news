@@ -49,15 +49,20 @@ const ALIASES = {
   "中远海控": ["中远海控", "中远海运", "海控", "cosco"],
 };
 
-function classify(it) {
+function classify(it, keyVars) {
   const text = (it.title || "") + " " + (it.source || "");
   let alert = null;
   const alertWords = [];
   for (const w of ALERT.pos) if (text.includes(w)) { alert = "pos"; alertWords.push(w); }
   for (const w of ALERT.neg) if (text.includes(w)) { alert = "neg"; alertWords.push(w); }
+  // 优先：关键变量（各公司核心经营指标，如白酒批价/库存），命中即归此类，覆盖普通分类
   let category = "其他";
-  for (const r of CAT_RULES) {
-    if (r.words.some((w) => text.includes(w))) { category = r.key; break; }
+  if (keyVars && keyVars.some((w) => text.includes(w))) {
+    category = "关键变量";
+  } else {
+    for (const r of CAT_RULES) {
+      if (r.words.some((w) => text.includes(w))) { category = r.key; break; }
+    }
   }
   return { ...it, category, alert, alertWords };
 }
@@ -197,7 +202,7 @@ async function main() {
         code: h.code,
         pubDate: it.pubDate,
         pubRaw: it.pubRaw,
-      }));
+      }, h.keyVars));
       kept++;
     }
     await new Promise((r) => setTimeout(r, CONFIG.requestDelayMs));

@@ -1,9 +1,9 @@
 [
-  { "name": "贵州茅台", "code": "600519.SH", "sector": "白酒", "note": "白酒龙头 · 长线", "earningsMonths": [4, 8] },
-  { "name": "五粮液",   "code": "000858.SZ", "sector": "白酒", "note": "白酒 · 次龙头", "earningsMonths": [4, 8] },
-  { "name": "泸州老窖", "code": "000568.SZ", "sector": "白酒", "note": "白酒 · 高端",   "earningsMonths": [4, 8] },
-  { "name": "腾讯控股", "code": "00700.HK", "sector": "港股", "note": "港股核心仓",   "earningsMonths": [3, 8] },
-  { "name": "拼多多",   "code": "PDD",       "sector": "中概", "note": "中概 · 美股", "earningsMonths": [3, 8] },
-  { "name": "泡泡玛特", "code": "09992.HK", "sector": "港股", "note": "港股 · 潮玩", "earningsMonths": [3, 8] },
-  { "name": "中远海控", "code": "601919.SH", "sector": "航运", "note": "航运 · 周期", "earningsMonths": [3, 8] }
+  { "name": "贵州茅台", "code": "600519.SH", "sector": "白酒", "note": "白酒龙头 · 长线", "earningsMonths": [4, 8], "keyVars": ["批价", "批发价", "库存", "动销", "回款", "渠道库存", "社会库存", "出厂价"] },
+  { "name": "五粮液",   "code": "000858.SZ", "sector": "白酒", "note": "白酒 · 次龙头", "earningsMonths": [4, 8], "keyVars": ["批价", "批发价", "库存", "动销", "回款", "渠道库存", "社会库存"] },
+  { "name": "泸州老窖", "code": "000568.SZ", "sector": "白酒", "note": "白酒 · 高端",   "earningsMonths": [4, 8], "keyVars": ["批价", "批发价", "库存", "动销", "回款", "渠道库存", "社会库存"] },
+  { "name": "腾讯控股", "code": "00700.HK", "sector": "港股", "note": "港股核心仓",   "earningsMonths": [3, 8], "keyVars": ["游戏流水", "游戏版号", "广告收入", "金融科技", "微信生态", "视频号"] },
+  { "name": "拼多多",   "code": "PDD",       "sector": "中概", "note": "中概 · 美股", "earningsMonths": [3, 8], "keyVars": ["GMV", "Temu", "营收", "百亿补贴", "农产品上行", "月活"] },
+  { "name": "泡泡玛特", "code": "09992.HK", "sector": "港股", "note": "港股 · 潮玩", "earningsMonths": [3, 8], "keyVars": ["Labubu", "IP", "销量", "门店", "出海", "会员"] },
+  { "name": "中远海控", "code": "601919.SH", "sector": "航运", "note": "航运 · 周期", "earningsMonths": [3, 8], "keyVars": ["运价", "SCFI", "CCFI", "集运", "舱位", "长协"] }
 ]

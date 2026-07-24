@@ -118,6 +118,7 @@ a:hover{text-decoration:underline}
 .cat-股价{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 35%,var(--line))}
 .cat-行业{color:var(--cyan);border-color:color-mix(in srgb,var(--cyan) 30%,var(--line))}
 .cat-其他{color:var(--ink-dim);border-color:var(--line)}
+.cat-关键变量{color:var(--brand);background:color-mix(in srgb,var(--brand) 14%,var(--panel));border-color:color-mix(in srgb,var(--brand) 40%,var(--line));font-weight:600}
 .tag-pos{font-size:10px;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--pos) 14%,var(--panel));color:var(--pos);font-weight:600}
 .tag-neg{font-size:10px;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--neg) 14%,var(--panel));color:var(--neg);font-weight:600}
 .n-actions{display:flex;gap:8px}
