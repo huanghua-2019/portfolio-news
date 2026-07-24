@@ -291,43 +291,63 @@ function renderCal(){
 // ============================================================
 //  渲染：统计视图
 // ============================================================
+// ============================================================
+//  渲染：统计视图 → 各持仓近五年财务（收入/净利润/ROE）
+// ============================================================
+function fmtNum(n){
+  if(n==null||isNaN(n))return "—";
+  const r=Math.round(n*100)/100;
+  return r.toLocaleString("en-US");
+}
+// 轻量 SVG 折线图（护眼米色金棕主题，无外部依赖）
+function lineChartSVG(vals,opts){
+  opts=opts||{};
+  const W=300,H=132,P={l:10,r:10,t:10,b:22};
+  const years=opts.years||val s.map((_,i)=>i);
+  const nums=vals.filter(v=>v!=null);
+  if(!nums.length)return '<div class="fin-no">暂无数据</div>';
+  let min=Math.min(...nums),max=Math.max(...nums);
+  if(min===max){min=min*0.92;max=max*1.08;}
+  const innerW=W-P.l-P.r,innerH=H-P.t-P.b,n=vals.length;
+  const X=i=>P.l+(n===1?innerW/2:innerW*i/(n-1));
+  const Y=v=>P.t+innerH*(1-(v-min)/(max-min));
+  let grid="";
+  for(let g=0;g<=2;g++){const gy=P.t+innerH*g/2;grid+=`<line x1="${P.l}" y1="${gy.toFixed(1)}" x2="${W-P.r}" y2="${gy.toFixed(1)}" stroke="#d9d2bf" stroke-width="1" stroke-dasharray="2 3"/>`;}
+  let pts="",dots="",lastLabel="";
+  vals.forEach((v,i)=>{ if(v==null)return; const cx=X(i),cy=Y(v);pts+=(pts?" ":"")+cx.toFixed(1)+","+cy.toFixed(1);dots+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.6" fill="${opts.color}"/>`;});
+  let labels="";
+  years.forEach((yr,i)=>{labels+=`<text x="${X(i).toFixed(1)}" y="${H-7}" font-size="8" fill="#8a857a" text-anchor="middle">${String(yr).slice(2)}</text>`;});
+  return `<svg class="fin-chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${grid}<polyline points="${pts}" fill="none" stroke="${opts.color}" stroke-width="2" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+}
+function finCard(h){
+  const f=h.financials;
+  if(!f||!f.data||!f.data.length)return `<div class="fin-card"><div class="fin-h">${esc(h.name)}<span class="fin-code">${esc(h.code)}</span></div><div class="fin-no">暂无财务数据</div></div>`;
+  const years=f.data.map(d=>d.year);
+  const rev=f.data.map(d=>d.revenue),np=f.data.map(d=>d.netProfit),roe=f.data.map(d=>d.roe);
+  const unit=f.unit||"亿元";
+  const c1="#b8861b",c2="#2e7d4f",c3="#7d5ba6";
+  const rows=f.data.map(d=>`<tr>
+      <td>${d.year}</td>
+      <td class="num">${fmtNum(d.revenue)}</td>
+      <td class="num">${fmtNum(d.netProfit)}</td>
+      <td class="num">${d.roe==null?'<span class="ty">需核实</span>':fmtNum(d.roe)+'%'}${d.adj?'<span class="adj" title="口径调整（审慎调减）">⚠</span>':''}</td>
+    </tr>`).join("");
+  return `<div class="fin-card">
+    <div class="fin-h">${esc(h.name)}<span class="fin-code">${esc(h.code)}</span><span class="fin-unit">${esc(unit)}${f.currency?' · '+esc(f.currency):''}</span></div>
+    <div class="fin-charts">
+      <div class="fin-ch"><div class="fin-ch-t">📈 营业收入</div>${lineChartSVG(rev,{years,color:c1})}</div>
+      <div class="fin-ch"><div class="fin-ch-t">💰 归母净利润</div>${lineChartSVG(np,{years,color:c2})}</div>
+      <div class="fin-ch"><div class="fin-ch-t">📊 ROE（净资产收益率）</div>${lineChartSVG(roe,{years,color:c3})}</div>
+    </div>
+    <table class="fin-tbl"><thead><tr><th>年份</th><th>营收</th><th>净利</th><th>ROE</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="fin-note">${esc(f.note||"")}${f.asOf?' · 截至 '+esc(f.asOf):''} · 来源：${esc(f.source||"需核实")}</div>
+  </div>`;
+}
 function renderStat(){
   const wrap=document.getElementById("stat-wrap");
-  if(!state.all.length){wrap.innerHTML='<div class="empty">暂无数据，请先确认爬虫已运行并刷新。</div>';return;}
-  const byCo={};state.all.forEach(x=>byCo[x.company]=(byCo[x.company]||0)+1);
-  const bySrc={};state.all.forEach(x=>bySrc[x.source]=(bySrc[x.source]||0)+1);
-  const byDay={};const now=new Date();
-  for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);byDay[ymd(d.getTime())]=0;}
-  state.all.forEach(x=>{const k=ymd(x.ts);if(k in byDay)byDay[k]++;});
-  const byCat={};state.all.forEach(x=>byCat[x.category]=(byCat[x.category]||0)+1);
-  const posN=state.all.filter(x=>x.alert==="pos").length;
-  const negN=state.all.filter(x=>x.alert==="neg").length;
-
-  const maxCo=Math.max(1,...Object.values(byCo));
-  const maxSrc=Math.max(1,...Object.values(bySrc));
-  const maxDay=Math.max(1,...Object.values(byDay));
-
-  let html="";
-  html+=`<div class="stat-grid2">
-    <div class="stat-block"><div class="stat-title">📊 各持仓新闻量</div>${barRows(byCo,maxCo,"")}</div>
-    <div class="stat-block"><div class="stat-title">🌐 来源分布</div>${barRows(bySrc,maxSrc,"src")}</div>
-  </div>`;
-  html+=`<div class="stat-grid2">
-    <div class="stat-block"><div class="stat-title">📅 近 7 天（按日期）</div>${barRows(byDay,maxDay,"day")}</div>
-    <div class="stat-block"><div class="stat-title">🏷 分类 / 预警</div>
-      ${barRows(byCat,Math.max(1,...Object.values(byCat)),"")}
-      <div class="bar-row"><span class="bl">利好命中</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(posN/Math.max(1,state.all.length)*100)}%"></div></div><span class="bar-num">${posN}</span></div>
-      <div class="bar-row"><span class="bl">利空命中</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(negN/Math.max(1,state.all.length)*100)}%;background:linear-gradient(90deg,#ff8a8a,var(--neg))"></div></div><span class="bar-num">${negN}</span></div>
-    </div>
-  </div>`;
-  wrap.innerHTML=html;
-}
-
-function barRows(obj,max,extra){
-  return Object.keys(obj).sort((a,b)=>obj[b]-obj[a]).map(k=>{
-    const v=obj[k];const pct=Math.round(v/max*100);
-    return `<div class="bar-row"><span class="bl" title="${esc(k)}">${esc(k)}</span><div class="bar-track"><div class="bar-fill ${extra}" style="width:${pct}%"></div></div><span class="bar-num">${v}</span></div>`;
-  }).join("");
+  if(!state.holdings.length){wrap.innerHTML='<div class="empty">暂无持仓数据，请先确认爬虫已运行并刷新。</div>';return;}
+  const cards=state.holdings.map(h=>finCard(h)).join("");
+  wrap.innerHTML=`<div class="fin-head">📊 各持仓近五年财务（营业收入 / 归母净利润 / ROE）</div>${cards}<div class="fin-foot">数据取自公开年报与财经媒体（检索于 2026-07），标注「需核实」者请以交易所公告为准；后续将由定时任务自动刷新。</div>`;
 }
 
 // ============================================================

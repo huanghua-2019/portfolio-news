@@ -198,4 +198,27 @@ a:hover{text-decoration:underline}
   .date-head{top:auto}
   .stat-grid2{grid-template-columns:1fr}
   .n-title{font-size:13px}
+  .fin-charts{grid-template-columns:1fr;gap:8px}
+  .fin-card{padding:11px}
 }
+
+/* ---- 统计页：各持仓近五年财务 ---- */
+.fin-head{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.fin-foot{font-size:11px;color:var(--ink-dim);margin-top:12px;line-height:1.6;border-top:1px dashed var(--line);padding-top:8px}
+.fin-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;border-top:3px solid var(--brand)}
+.fin-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.fin-h .fin-code{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+.fin-h .fin-unit{font-size:11px;color:var(--ink-soft);margin-left:auto}
+.fin-charts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
+.fin-ch{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:8px}
+.fin-ch-t{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:4px}
+.fin-chart{width:100%;height:auto;display:block}
+.fin-tbl{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px}
+.fin-tbl th,.fin-tbl td{border:1px solid var(--line);padding:5px 7px;text-align:right}
+.fin-tbl th{background:var(--panel-2);color:var(--ink-soft);font-weight:600;text-align:center}
+.fin-tbl td:first-child,.fin-tbl th:first-child{text-align:center;color:var(--ink-soft);font-family:var(--mono)}
+.fin-tbl td.num{font-family:var(--mono);color:var(--ink)}
+.fin-tbl .ty{color:var(--orange);font-weight:600}
+.fin-tbl .adj{color:var(--orange);cursor:help}
+.fin-no{padding:20px;text-align:center;color:var(--ink-soft);font-size:13px}
+.fin-note{font-size:11px;color:var(--ink-dim);margin-top:8px;line-height:1.6}
