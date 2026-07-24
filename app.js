@@ -385,7 +385,12 @@ async function init(){
     renderCurrent();
   }));
   document.getElementById("q-input").addEventListener("input",e=>{state.search=e.target.value.trim();renderNews();});
-  document.getElementById("refreshBtn").addEventListener("click",()=>{state.loadError=false;loadNews();});
+  document.getElementById("refreshBtn").addEventListener("click",()=>{
+    state.loadError=false;
+    loadNews();   // ① 本地立即重新拉取已生成的 news.json（若云端已跑过，秒看到新数据）
+    // ② 联动：打开 GitHub Actions 的 Run workflow 页，点一下即可触发云端爬虫抓最新新闻
+    window.open("https://github.com/huanghua-2019/portfolio-news/actions/workflows/crawl.yml","_blank","noopener");
+  });
   document.querySelectorAll("#time-chips .chip").forEach(c=>c.addEventListener("click",()=>{
     state.filterTime=c.getAttribute("data-time");
     document.querySelectorAll("#time-chips .chip").forEach(x=>x.classList.remove("active"));
