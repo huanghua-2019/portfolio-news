@@ -360,25 +360,133 @@ function renderCal(){
     const ne=nextEarnings(h);
     return {h,ne};
   }).sort((a,b)=>(a.ne?a.ne.inDays:-1e9)-(b.ne?b.ne.inDays:-1e9));
-  let html=`<div class="cal-section"><div class="cal-title">📅 财报披露日历（已按权威源核实）</div><div class="cal-grid">`;
+
+  // ====== 顶部：时间轴（12 个月水平条，事件色块） ======
+  const yearStart=new Date();yearStart.setMonth(0,1);yearStart.setHours(0,0,0,0);
+  const yearEnd=new Date(yearStart);yearEnd.setFullYear(yearStart.getFullYear()+1);
+  const yearMs=yearEnd.getTime()-yearStart.getTime();
+  const now=Date.now();
+  const nowPct=Math.max(0,Math.min(100,(now-yearStart.getTime())/yearMs*100));
+
+  // 按月份计数事件
+  const monthCount=new Array(12).fill(0);
+  const monthItems={}; // monthIdx → [{h,ne,sc,name,soon}]
   for(const r of rows){
+    if(!r.ne||r.ne.inDays<0)continue;
+    const d=new Date((r.ne.confirmed&&r.ne.date)?r.ne.date+"T00:00:00":yearStart.getTime());
+    d.setMonth((r.ne.month||(d.getMonth()+1))-1,15);
+    const mi=d.getMonth();
+    if(!monthItems[mi])monthItems[mi]=[];
+    monthItems[mi].push({...r,sc:sectorColor(r.h.sector),soon:r.ne.inDays<=45});
+    monthCount[mi]++;
+  }
+
+  // 事件点（按真实时间定位）—— 仅 confirmed 的事件会画到轴上
+  // 先按 left 排序，按相邻间距交替到上下两行避免重叠
+  const evts=[];
+  for(const r of rows){
+    if(!r.ne||!r.ne.confirmed||r.ne.inDays<0)continue;
+    const d=new Date(r.ne.date+"T00:00:00");
+    const pct=(d.getTime()-yearStart.getTime())/yearMs*100;
+    if(pct<0||pct>100)continue;
+    evts.push({pct,r,sc:sectorColor(r.h.sector)});
+  }
+  evts.sort((a,b)=>a.pct-b.pct);
+  // 交错：上一行 near=8px（默认），下一行 near=28px
+  let lastTop=false;let lastPct=-100;
+  let eventsHtml="";
+  for(const e of evts){
+    let topPx=8;
+    if(e.pct-lastPct<2.5){ // 太近 → 错位
+      topPx=lastTop?8:28;
+    }else{
+      topPx=8;
+    }
+    lastPct=e.pct;lastTop=topPx===28;
+    eventsHtml+=`<div class="cal-evt" style="left:${e.pct.toFixed(2)}%;top:${topPx}px;--sc:${e.sc}" data-name="${esc(e.r.h.name)}" data-date="${esc(e.r.ne.date)}" data-in="${e.r.ne.inDays}" data-src="${esc(e.r.ne.source||"权威源")}" data-code="${esc(e.r.h.code)}" title="${esc(e.r.h.name)} · ${esc(e.r.ne.date)}（${e.r.ne.inDays}天后）· ${esc(e.r.ne.source||"权威源")}">
+      <span class="cal-evt-dot"></span><span class="cal-evt-lbl">${esc(e.r.h.name)}</span>
+    </div>`;
+  }
+
+  // 月份格 + 当月计数
+  const monthNames=["1","2","3","4","5","6","7","8","9","10","11","12"];
+  const monthLabels=monthNames.map((m,i)=>{
+    const cnt=monthCount[i];
+    return `<div class="cal-m-cell ${i===(new Date()).getMonth()?"now":""}"><span class="cal-m-n">${m}月</span>${cnt?`<span class="cal-m-cnt">${cnt}</span>`:""}</div>`;
+  }).join("");
+
+  // 过滤状态
+  const filt=state.calFilter||"all";
+  const filterBtns=[
+    {k:"all",l:"全部",n:rows.length},
+    {k:"soon",l:"45天内",n:rows.filter(r=>r.ne&&r.ne.inDays>=0&&r.ne.inDays<=45).length},
+    {k:"confirmed",l:"已确认",n:rows.filter(r=>r.ne&&r.ne.confirmed).length},
+    {k:"unknown",l:"待核实",n:rows.filter(r=>r.ne&&!r.ne.confirmed).length},
+  ].map(b=>`<button class="cal-f-btn ${filt===b.k?"on":""}" data-f="${b.k}">${b.l}<i>${b.n}</i></button>`).join("");
+
+  // 过滤后的卡片列表
+  const filtRows=rows.filter(r=>{
+    if(filt==="all")return true;
+    if(!r.ne)return false;
+    if(filt==="soon")return r.ne.inDays>=0&&r.ne.inDays<=45;
+    if(filt==="confirmed")return r.ne.confirmed;
+    if(filt==="unknown")return !r.ne.confirmed;
+    return true;
+  });
+
+  let cardsHtml="";
+  for(const r of filtRows){
     const {h,ne}=r;
-    if(!ne){html+=`<div class="cal-card"><div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div><div class="cal-note">未配置财报月份</div></div>`;continue;}
+    if(!ne){cardsHtml+=`<div class="cal-card"><div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div><div class="cal-note">未配置财报月份</div></div>`;continue;}
     const soon=ne.inDays>=0&&ne.inDays<=45;
     const sc=sectorColor(h.sector);
-    html+=`<div class="cal-card ${soon?"soon":""}" style="--sc:${sc}">
+    cardsHtml+=`<div class="cal-card ${soon?"soon":""} ${ne.confirmed?"confirmed":"unknown"}" style="--sc:${sc}">
       <div class="cal-row">
         ${ne.inDays>=0?earnRing(ne.inDays):""}
         <div class="cal-main">
-          <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div>
+          <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span>${soon?`<span class="cal-tag-soon">临近</span>`:""}</div>
           <div class="cal-next">${ne.confirmed?`披露日 <span class="d">${esc(ne.date)}</span>`:`距约 <span class="d">${ne.month}月</span> 披露`}</div>
           <div class="cal-months">${ne.confirmed?`✓ 已确认 · ${esc(ne.source||"权威源")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月 · ⚠ 待核实`}</div>
         </div>
       </div>
     </div>`;
   }
-  html+=`</div></div>`;
+
+  let html=`
+  <div class="cal-section">
+    <div class="cal-title">📅 财报披露日历（2026 年时间轴 + 列表）</div>
+    <div class="cal-filters">${filterBtns}</div>
+    <div class="cal-timeline">
+      <div class="cal-m-row">${monthLabels}</div>
+      <div class="cal-axis">
+        <div class="cal-today" style="left:${nowPct.toFixed(2)}%" title="今天 ${ymd(now)}"><span>今天</span></div>
+        ${eventsHtml}
+      </div>
+    </div>
+    <div class="cal-grid">${cardsHtml}</div>
+  </div>`;
   wrap.innerHTML=html;
+
+  // 事件点点击 → 滚动到对应卡片
+  wrap.querySelectorAll(".cal-evt").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const name=el.getAttribute("data-name");
+      wrap.querySelectorAll(".cal-card .cal-name").forEach(n=>{
+        if(n.textContent.includes(name)){
+          n.closest(".cal-card").scrollIntoView({behavior:"smooth",block:"center"});
+          n.closest(".cal-card").classList.add("cal-flash");
+          setTimeout(()=>n.closest(".cal-card").classList.remove("cal-flash"),1600);
+        }
+      });
+    });
+  });
+  // 过滤按钮
+  wrap.querySelectorAll(".cal-f-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      state.calFilter=btn.getAttribute("data-f");
+      renderCal();
+    });
+  });
 }
 
 // ============================================================

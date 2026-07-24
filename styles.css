@@ -260,6 +260,36 @@ a:hover{text-decoration:underline}
 /* ---- 日历 ---- */
 .cal-section{margin-bottom:18px}
 .cal-title{font-size:13px;color:var(--brand);font-family:var(--mono);margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+/* —— 过滤按钮 —— */
+.cal-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.cal-f-btn{font-family:var(--mono);font-size:11px;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer;transition:.15s}
+.cal-f-btn:hover{border-color:var(--brand);color:var(--brand)}
+.cal-f-btn.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.cal-f-btn i{font-style:normal;color:var(--ink-dim);margin-left:4px;font-size:10px}
+.cal-f-btn.on i{color:#fff8}
+/* —— 时间轴 —— */
+.cal-timeline{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px 22px;margin-bottom:14px;position:relative}
+.cal-m-row{display:grid;grid-template-columns:repeat(12,1fr);gap:0;margin-bottom:10px}
+.cal-m-cell{text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-soft);position:relative;padding:4px 0}
+.cal-m-cell .cal-m-n{display:block}
+.cal-m-cell .cal-m-cnt{display:inline-block;background:var(--brand);color:#fff;font-size:9px;padding:1px 6px;border-radius:99px;margin-top:2px;font-weight:700}
+.cal-m-cell.now{color:var(--brand);font-weight:700}
+.cal-m-cell.now .cal-m-cnt{background:var(--orange)}
+.cal-axis{position:relative;height:42px;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/12 - 1px),var(--line) calc(100%/12 - 1px),var(--line) calc(100%/12));border-radius:8px}
+.cal-today{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--orange);z-index:3;pointer-events:none}
+.cal-today::before{content:"";position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.cal-today span{position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:#fff;background:var(--orange);padding:2px 7px;border-radius:6px;white-space:nowrap;font-weight:700}
+/* 事件点 */
+.cal-evt{position:absolute;display:flex;align-items:center;cursor:pointer;transition:transform .15s;height:14px}
+.cal-evt:hover{transform:scale(1.08);z-index:4}
+.cal-evt-dot{width:8px;height:8px;border-radius:50%;background:var(--sc,var(--brand));box-shadow:0 0 0 2px color-mix(in srgb,var(--sc,var(--brand)) 25%,transparent);flex:none}
+.cal-evt-lbl{position:absolute;top:-2px;left:13px;font-family:var(--mono);font-size:10px;color:var(--sc,var(--brand));font-weight:600;white-space:nowrap;background:var(--panel);padding:0 4px;border-radius:3px;border:1px solid var(--sc,var(--brand))}
+/* —— 卡片 —— */
+.cal-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.cal-card.soon{border-color:var(--orange);box-shadow:0 0 0 1px color-mix(in srgb,var(--orange) 35%,transparent)}
+.cal-card.cal-flash{animation:calFlash 1.6s ease}
+@keyframes calFlash{0%{box-shadow:0 0 0 4px var(--brand);transform:scale(1.03)}100%{box-shadow:0 0 0 0 transparent;transform:scale(1)}}
+.cal-tag-soon{display:inline-block;background:var(--orange);color:#fff;font-size:9px;padding:1px 6px;border-radius:99px;margin-left:6px;font-weight:700}
 .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .cal-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
 .cal-card.soon{border-color:var(--orange);box-shadow:0 0 0 1px color-mix(in srgb,var(--orange) 35%,transparent)}
@@ -538,4 +568,8 @@ html[data-theme="dark"] .chip.active{color:#12141a}
   .hm-kpi{padding:11px 12px;gap:8px}
   .hm-kpi-ic{width:34px;height:34px;font-size:18px;flex-basis:34px}
   .cal-row{gap:10px}
+  .cal-timeline{padding:10px 12px 16px}
+  .cal-evt-lbl{font-size:9px}
+  .cal-m-cell{font-size:10px}
+  .cal-m-cell .cal-m-cnt{font-size:8px;padding:0 4px}
 }
