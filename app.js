@@ -59,6 +59,8 @@ async function loadNews(){
   }catch(e){
     state.loadError=true;   // 仅表示本次拉取失败，可能爬虫还没跑过/部署未生效
   }
+  // 数据加载完成后重建筛选标签：公司/板块/分类此时才有真实数据
+  buildChips();
   renderCurrent();
 }
 
