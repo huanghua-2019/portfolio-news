@@ -1,0 +1,163 @@
+/* ============================================================
+   持仓监控 · 新闻回看 — 深色终端监控风（GitHub Pages 版）
+   ============================================================ */
+:root{
+  --bg:#0b0e14; --panel:#121722; --panel-2:#0f141d; --line:#1f2733;
+  --ink:#e6edf3; --ink-soft:#8b97a8; --ink-dim:#5b6677;
+  --accent:#4cc2ff; --blue:#4cc2ff; --cyan:#36d6c3;
+  --red:#ff5c5c; --green:#3ddc84; --orange:#ffae42; --purple:#b794ff;
+  --pos:#3ddc84; --neg:#ff5c5c;
+  --mono:"SF Mono",ui-monospace,"JetBrains Mono",Consolas,Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+body{padding-bottom:48px;max-width:1100px;margin:0 auto}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---- 顶栏 ---- */
+.topbar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;
+  padding:10px 14px;background:rgba(11,14,20,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.brand{font-weight:700;font-size:16px;white-space:nowrap}
+.brand .sub{color:var(--ink-soft);font-weight:400;font-size:12px}
+.tabs{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.tab{
+  background:var(--panel);color:var(--ink-soft);border:1px solid var(--line);
+  padding:6px 11px;border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--sans);
+  transition:.15s;white-space:nowrap;
+}
+.tab:hover{color:var(--ink);border-color:#2c3850}
+.tab.active{background:var(--accent);color:#04121d;border-color:var(--accent);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.countdown{font-family:var(--mono);font-size:12px;color:var(--cyan);background:var(--panel);border:1px solid var(--line);padding:4px 8px;border-radius:6px;min-width:54px;text-align:center}
+.btn-refresh{background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:var(--sans)}
+.btn-refresh:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---- 视图切换 ---- */
+.view{display:none;padding:14px}
+.view.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---- 工具栏 / chips ---- */
+.toolbar{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.search{
+  width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  color:var(--ink);padding:9px 12px;font-size:14px;font-family:var(--sans);
+}
+.search:focus{outline:none;border-color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip-label{color:var(--ink-dim);font-size:12px;margin-right:2px}
+.chip{
+  background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);
+  padding:4px 10px;border-radius:14px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:.12s;
+}
+.chip:hover{color:var(--ink)}
+.chip.active{background:var(--accent);color:#04121d;border-color:var(--accent);font-weight:600}
+
+/* ---- 统计条 ---- */
+.statbar{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);
+  border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-family:var(--mono)}
+.statbar b{color:var(--ink)}
+.statbar .warn{color:var(--orange)}
+
+/* ---- 时间线 ---- */
+.timeline{display:flex;flex-direction:column;gap:0}
+.date-head{position:sticky;top:54px;z-index:10;background:var(--bg);color:var(--cyan);
+  font-family:var(--mono);font-size:13px;font-weight:600;padding:10px 2px 6px;border-bottom:1px dashed var(--line);margin-top:6px}
+.news-item{
+  display:grid;grid-template-columns:1fr auto;gap:4px 10px;
+  padding:11px 4px;border-bottom:1px solid var(--line);position:relative;
+}
+.news-item.alert-pos{border-left:3px solid var(--pos);padding-left:9px;background:rgba(61,220,132,.05)}
+.news-item.alert-neg{border-left:3px solid var(--neg);padding-left:9px;background:rgba(255,92,92,.06)}
+.n-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.4}
+.n-title a{color:var(--ink)}
+.n-title a:hover{color:var(--accent)}
+.n-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:3px;font-size:12px;color:var(--ink-soft)}
+.src{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:5px;border:1px solid}
+.src-Google{color:var(--blue);border-color:rgba(76,194,255,.4);background:rgba(76,194,255,.08)}
+.src-百度{color:var(--cyan);border-color:rgba(54,214,195,.4);background:rgba(54,214,195,.08)}
+.n-co{color:var(--ink);font-weight:600}
+.n-co .code{color:var(--ink-dim);font-weight:400;font-family:var(--mono);font-size:11px}
+.n-time{font-family:var(--mono);color:var(--ink-soft)}
+.n-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.cat{font-size:10px;padding:1px 6px;border-radius:4px;font-family:var(--mono);border:1px solid}
+.cat-业绩{color:var(--orange);border-color:rgba(255,174,66,.4)}
+.cat-公告{color:var(--purple);border-color:rgba(183,148,255,.4)}
+.cat-股价{color:var(--blue);border-color:rgba(76,194,255,.4)}
+.cat-行业{color:var(--cyan);border-color:rgba(54,214,195,.4)}
+.cat-其他{color:var(--ink-dim);border-color:var(--line)}
+.tag-pos{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(61,220,132,.15);color:var(--pos);font-weight:600}
+.tag-neg{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,92,92,.15);color:var(--neg);font-weight:600}
+.n-actions{display:flex;gap:8px}
+.act{background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:12px;font-family:var(--sans)}
+.act:hover{color:var(--accent)}
+.act.on{color:var(--orange)}
+.n-link{font-size:12px;color:var(--accent);white-space:nowrap}
+
+.empty{padding:24px 14px;text-align:center;color:var(--ink-soft);font-size:13px}
+.cache-hint{font-size:11px;color:var(--orange);padding:6px 12px;border:1px dashed var(--orange);border-radius:8px;margin-bottom:10px;background:rgba(255,174,66,.06)}
+
+/* ---- 总览 Dashboard ---- */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.dash-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;border-top:3px solid var(--accent)}
+.dash-card .dc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dc-name{font-size:15px;font-weight:700}
+.dc-code{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+.dc-sector{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-soft);margin-top:2px}
+.dc-note{font-size:12px;color:var(--ink-soft);margin:6px 0}
+.dc-stats{display:flex;gap:14px;margin-top:8px;font-family:var(--mono);font-size:12px}
+.dc-stats .s-num{font-size:18px;font-weight:700;color:var(--ink)}
+.dc-stats .s-lbl{color:var(--ink-dim);font-size:11px}
+.dc-latest{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:12px;color:var(--ink-soft)}
+.dc-latest a{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.dc-earn{margin-top:8px;font-size:12px;font-family:var(--mono);color:var(--orange)}
+
+/* ---- 预警页头 ---- */
+.alert-head{font-size:12px;color:var(--ink-soft);margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.alert-legend .lg{display:inline-block;margin-right:8px}
+.alert-legend .lg-pos{color:var(--pos)}.alert-legend .lg-neg{color:var(--neg)}
+
+/* ---- 日历 ---- */
+.cal-section{margin-bottom:18px}
+.cal-title{font-size:13px;color:var(--cyan);font-family:var(--mono);margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.cal-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.cal-card.soon{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,174,66,.3)}
+.cal-name{font-weight:700;font-size:14px}
+.cal-code{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-left:6px}
+.cal-next{font-family:var(--mono);font-size:12px;margin-top:6px}
+.cal-next .d{color:var(--orange);font-weight:700}
+.cal-months{font-size:12px;color:var(--ink-soft);margin-top:4px}
+.cal-note{font-size:11px;color:var(--ink-dim);margin-top:6px}
+
+/* ---- 统计 ---- */
+.stat-block{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.stat-title{font-size:13px;color:var(--cyan);font-family:var(--mono);margin-bottom:10px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 40px;gap:8px;align-items:center;margin-bottom:7px;font-size:12px}
+.bar-row .bl{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:var(--panel-2);border-radius:5px;height:16px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));border-radius:5px}
+.bar-fill.src{background:linear-gradient(90deg,#2a6f9e,var(--blue))}
+.bar-fill.day{background:linear-gradient(90deg,#6b4ea8,var(--purple))}
+.bar-num{font-family:var(--mono);color:var(--ink);text-align:right}
+.stat-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ---- 页脚 ---- */
+.footer{border-top:1px solid var(--line);margin-top:20px;padding:14px;font-size:12px;color:var(--ink-dim);line-height:1.7}
+.footer code{font-family:var(--mono);background:var(--panel);padding:1px 5px;border-radius:4px;color:var(--ink-soft)}
+
+/* ---- 手机优先 ---- */
+@media (max-width:640px){
+  .topbar{gap:8px;padding:8px 10px}
+  .brand{font-size:14px;width:100%}
+  .tabs{order:3;width:100%}
+  .topbar-right{margin-left:auto}
+  .date-head{top:50px}
+  .stat-grid2{grid-template-columns:1fr}
+  .n-title{font-size:13px}
+}

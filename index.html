@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>持仓监控 · 新闻回看</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== 顶栏 ===== -->
+  <header class="topbar">
+    <div class="brand">📊 持仓监控 <span class="sub">· 新闻回看</span></div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-view="news">📰 新闻</button>
+      <button class="tab" data-view="dash">📊 总览</button>
+      <button class="tab" data-view="alert">🔔 预警</button>
+      <button class="tab" data-view="cal">📅 日历</button>
+      <button class="tab" data-view="stat">📈 统计</button>
+    </nav>
+    <div class="topbar-right">
+      <span id="countdown" class="countdown" title="距下次预计云端更新">--</span>
+      <button id="refreshBtn" class="btn-refresh" title="拉取最新已生成数据">↻ 刷新</button>
+    </div>
+  </header>
+
+  <!-- ===== 新闻视图 ===== -->
+  <section id="view-news" class="view active">
+    <div class="toolbar">
+      <input id="q-input" class="search" type="text" placeholder="搜索标题或内容…" />
+      <div class="chips" id="company-chips"><span class="chip-label">公司</span></div>
+      <div class="chips" id="board-chips"><span class="chip-label">板块</span></div>
+      <div class="chips" id="category-chips"><span class="chip-label">分类</span></div>
+    </div>
+    <div class="statbar" id="statbar"></div>
+    <div id="timeline" class="timeline"></div>
+  </section>
+
+  <!-- ===== 总览视图 ===== -->
+  <section id="view-dash" class="view">
+    <div id="dash-grid" class="dash-grid"></div>
+  </section>
+
+  <!-- ===== 预警视图 ===== -->
+  <section id="view-alert" class="view">
+    <div class="alert-head">
+      <span>命中以下关键词的新闻会在此高亮：</span>
+      <span id="alert-legend" class="alert-legend"></span>
+    </div>
+    <div id="alert-list" class="timeline"></div>
+  </section>
+
+  <!-- ===== 日历视图 ===== -->
+  <section id="view-cal" class="view">
+    <div id="cal-wrap"></div>
+  </section>
+
+  <!-- ===== 统计视图 ===== -->
+  <section id="view-stat" class="view">
+    <div id="stat-wrap"></div>
+  </section>
+
+  <footer class="footer">
+    <p>数据由 GitHub Actions 定时爬虫在云端抓取（每 <span id="cfgInterval">30</span> 分钟），抓完自动提交到仓库，本页直接读取。</p>
+    <p>持仓 / 板块 / 财报月在 <code>holdings.json</code> 配置；爬虫在 <code>crawler/crawl.mjs</code>；预警词在 <code>app.js</code> 顶部 <code>ALERT</code> 配置。</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
