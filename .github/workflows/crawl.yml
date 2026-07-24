@@ -1,0 +1,40 @@
+name: 持仓新闻爬虫
+
+on:
+  schedule:
+    # 每 30 分钟跑一次（UTC）。GitHub cron 有约 0-15 分钟延迟，正常现象。
+    # 免费额度：每天 48 次 × 约 1 分钟 ≈ 48 分钟/月，远低于 2000 分钟免费上限。
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}      # 允许在 Actions 页面手动点一次
+
+permissions:
+  contents: write        # 允许 workflow 把 data/news.json 提交回仓库
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 运行爬虫
+        run: node crawler/crawl.mjs
+
+      - name: 提交 data/news.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/news.json
+          if git diff --cached --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "chore: 更新持仓新闻 $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+          fi
