@@ -29,7 +29,7 @@ const state = {
   filterTime: "7d",      // 默认近7天，缓解长列表在手机端翻不动
   hideRead: false,
   search: "",
-  view: "news",
+  view: "home",
 };
 
 // ============================================================
@@ -441,11 +441,121 @@ function renderStat(){
 //  视图切换 & 筛选栏
 // ============================================================
 function renderCurrent(){
-  if(state.view==="news")renderNews();
+  if(state.view==="home")renderHome();
+  else if(state.view==="news")renderNews();
   else if(state.view==="dash")renderDash();
   else if(state.view==="alert")renderAlert();
   else if(state.view==="cal")renderCal();
   else if(state.view==="stat")renderStat();
+}
+
+// 程序化切换视图（供首页卡片点击跳转用）
+function gotoView(v,coName){
+  if(coName!==undefined){state.filterCo=coName;buildChips();}
+  state.view=v;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.getAttribute("data-view")===v));
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  const sec=document.getElementById("view-"+v);
+  if(sec)sec.classList.add("active");
+  renderCurrent();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+// ============================================================
+//  渲染：首页仪表盘（驾驶舱：聚合 + 引流，不重复各视图细节）
+// ============================================================
+function renderHome(){
+  const wrap=document.getElementById("home-wrap");
+  if(!wrap)return;
+  const hs=state.holdings||[];
+  const now=Date.now();
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+
+  // ---- KPI 计算 ----
+  const todayNews=state.all.filter(x=>x.ts>=todayStart.getTime()).length;
+  const alerts7d=state.all.filter(x=>x.alert&&x.ts>=now-7*86400000);
+  const earnRows=hs.map(h=>({h,ne:nextEarnings(h)})).filter(r=>r.ne&&r.ne.inDays>=0).sort((a,b)=>a.ne.inDays-b.ne.inDays);
+  const nearest=earnRows[0]||null;
+  const roes=hs.map(h=>{const d=h.financials&&h.financials.data;if(!d||!d.length)return null;const last=d[d.length-1];return typeof last.roe==="number"?last.roe:null;}).filter(v=>v!=null);
+  const avgRoe=roes.length?(roes.reduce((a,b)=>a+b,0)/roes.length):null;
+
+  // ---- KPI 条 ----
+  let html=`<div class="hm-kpis">
+    <div class="hm-kpi" onclick="gotoView('news','all')" title="点击查看新闻"><div class="hm-kpi-l">今日新闻</div><div class="hm-kpi-v">${todayNews}</div></div>
+    <div class="hm-kpi ${alerts7d.length?"warn":""}" onclick="gotoView('alert')" title="点击查看预警"><div class="hm-kpi-l">7日预警</div><div class="hm-kpi-v">${alerts7d.length}</div></div>
+    <div class="hm-kpi ${nearest&&nearest.ne.inDays<=15?"hot":""}" onclick="gotoView('cal')" title="点击查看日历"><div class="hm-kpi-l">最近财报${nearest?" · "+esc(nearest.h.name):""}</div><div class="hm-kpi-v">${nearest?nearest.ne.inDays+"<span class='u'>天</span>":"—"}</div></div>
+    <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div>
+  </div>`;
+
+  // ---- 持仓速览墙 ----
+  html+=`<div class="hm-sec"><div class="hm-title">💼 持仓速览 <span class="hm-sub">点卡片看该公司新闻</span></div><div class="hm-wall">`;
+  for(const h of hs){
+    const items=state.all.filter(x=>x.company===h.name);
+    const n7=items.filter(x=>x.ts>=now-7*86400000).length;
+    const hasAlert=items.some(x=>x.alert&&x.ts>=now-3*86400000);
+    const ne=nextEarnings(h);
+    const soon=ne&&ne.inDays>=0&&ne.inDays<=15;
+    html+=`<div class="hm-card ${hasAlert?"alerted":""}" onclick="gotoView('news','${esc(h.name).replace(/'/g,"\\'")}')">
+      <div class="hm-card-top"><span class="hm-name">${esc(h.name)}</span><span class="hm-sector">${esc(h.sector||"")}</span></div>
+      <div class="hm-card-meta">7日 ${n7} 条新闻</div>
+      <div class="hm-card-tags">
+        ${hasAlert?'<span class="hm-tag neg">● 预警</span>':""}
+        ${soon?`<span class="hm-tag hot">财报 ${ne.inDays}天</span>`:(ne&&ne.inDays>=0?`<span class="hm-tag dim">财报 ${ne.inDays}天</span>`:"")}
+      </div>
+    </div>`;
+  }
+  html+=`</div></div>`;
+
+  // ---- 中段两栏：财报倒计时 + 预警流 ----
+  html+=`<div class="hm-cols">`;
+  html+=`<div class="hm-sec hm-col"><div class="hm-title">📅 财报倒计时 <span class="hm-link" onclick="gotoView('cal')">全部 ›</span></div>`;
+  if(!earnRows.length){html+=`<div class="hm-empty">暂无待披露财报</div>`;}
+  else{
+    for(const r of earnRows.slice(0,3)){
+      const d=r.ne.inDays;
+      html+=`<div class="hm-earn"><div><div class="hm-earn-n">${esc(r.h.name)}</div><div class="hm-earn-d">${r.ne.confirmed?esc(r.ne.date):"约"+r.ne.month+"月"}${r.ne.confirmed?"":" ·待核实"}</div></div><div class="hm-earn-v ${d<=15?"hot":d<=30?"mid":""}">${d}<span class="u">天</span></div></div>`;
+    }
+  }
+  html+=`</div>`;
+  html+=`<div class="hm-sec hm-col"><div class="hm-title">🔔 最新预警 <span class="hm-link" onclick="gotoView('alert')">全部 ›</span></div>`;
+  const alertsLatest=state.all.filter(x=>x.alert).sort((a,b)=>b.ts-a.ts).slice(0,4);
+  if(!alertsLatest.length){html+=`<div class="hm-empty">暂无预警命中</div>`;}
+  else{
+    for(const a of alertsLatest){
+      const neg=a.alert==="neg";
+      html+=`<a class="hm-alert ${neg?"neg":"pos"}" href="${esc(a.link)}" target="_blank" rel="noopener"><span class="hm-alert-co">${esc(a.company)}</span><span class="hm-alert-w">${esc((a.alertWords||[]).slice(0,2).join(" / "))}</span><span class="hm-alert-t">${esc(relTime(a.ts))}</span></a>`;
+    }
+  }
+  html+=`</div></div>`;
+
+  // ---- 最新要闻 ----
+  html+=`<div class="hm-sec"><div class="hm-title">📰 最新要闻 <span class="hm-link" onclick="gotoView('news','all')">全部 ›</span></div>`;
+  const latest=state.all.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
+  if(!latest.length){html+=`<div class="hm-empty">暂无新闻数据，等云端爬虫跑完自动出现</div>`;}
+  else{
+    for(const it of latest){
+      html+=`<a class="hm-news" href="${esc(it.link)}" target="_blank" rel="noopener"><span class="hm-news-co">${esc(it.company)}</span><span class="hm-news-t">${esc(it.title)}</span><span class="hm-news-time">${esc(relTime(it.ts))}</span></a>`;
+    }
+  }
+  html+=`</div>`;
+
+  // ---- 板块分布 + 护城河速览 ----
+  const secCount={};
+  hs.forEach(h=>{const s=h.sector||"未分类";secCount[s]=(secCount[s]||0)+1;});
+  const secArr=Object.entries(secCount).sort((a,b)=>b[1]-a[1]);
+  const SEC_COLORS=["#b8861b","#2e7d4f","#7d5ba6","#c0392b","#3a7ca5","#c77f1a"];
+  html+=`<div class="hm-sec"><div class="hm-title">🛡 板块分布 & 护城河</div><div class="hm-secbar">`;
+  secArr.forEach(([s,c],i)=>{
+    html+=`<div class="hm-secseg" style="flex:${c};background:${SEC_COLORS[i%SEC_COLORS.length]}">${esc(s)} ${Math.round(c/hs.length*100)}%</div>`;
+  });
+  html+=`</div><div class="hm-moats">`;
+  for(const h of hs){
+    const m=(h.moat||"").split("+")[0].trim();
+    html+=`<div class="hm-moat"><span class="hm-moat-n">${esc(h.name)}</span><span class="hm-moat-v">${esc(m||"—")}</span></div>`;
+  }
+  html+=`</div></div>`;
+
+  wrap.innerHTML=html;
 }
 
 function buildChips(){

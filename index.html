@@ -9,7 +9,7 @@
   <title>持仓监控 · 新闻回看</title>
   <meta name="description" content="个人持仓公司新闻监控看板：自动抓取贵州茅台 / 腾讯控股 / 拼多多 / 泡泡玛特等持仓相关新闻，支持按公司、板块、分类、时间筛选与预警、已读管理。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <div class="layout">
@@ -17,7 +17,8 @@
     <aside class="sidebar">
       <div class="brand">📊 持仓监控 <span class="sub">· 新闻回看</span></div>
       <nav class="tabs" id="tabs">
-        <button class="tab active" data-view="news">📰 新闻</button>
+        <button class="tab active" data-view="home">🏠 首页</button>
+        <button class="tab" data-view="news">📰 新闻</button>
         <button class="tab" data-view="dash">📊 总览</button>
         <button class="tab" data-view="alert">🔔 预警</button>
         <button class="tab" data-view="cal">📅 日历</button>
@@ -32,8 +33,13 @@
     <!-- ===== 右侧内容 ===== -->
     <main class="content">
 
+  <!-- ===== 首页仪表盘 ===== -->
+  <section id="view-home" class="view active">
+    <div id="home-wrap"></div>
+  </section>
+
   <!-- ===== 新闻视图 ===== -->
-  <section id="view-news" class="view active">
+  <section id="view-news" class="view">
     <div class="toolbar">
       <input id="q-input" class="search" type="text" placeholder="搜索标题或内容…" />
       <div class="toolbar-row">
@@ -85,6 +91,6 @@
     </main>
   </div>
 
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

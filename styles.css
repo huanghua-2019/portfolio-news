@@ -292,3 +292,88 @@ a:hover{text-decoration:underline}
 .fin-tbl .adj{color:var(--orange);cursor:help}
 .fin-no{padding:20px;text-align:center;color:var(--ink-soft);font-size:13px}
 .fin-note{font-size:11px;color:var(--ink-dim);margin-top:8px;line-height:1.6}
+
+/* ============================================================
+   首页仪表盘（驾驶舱）
+   ============================================================ */
+/* —— KPI 条 —— */
+.hm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.hm-kpi{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px;cursor:pointer;transition:.15s}
+.hm-kpi:hover{border-color:var(--brand);transform:translateY(-1px)}
+.hm-kpi-l{font-size:12px;color:var(--ink-dim);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-kpi-v{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--ink);line-height:1.2}
+.hm-kpi-v .u{font-size:12px;font-weight:400;color:var(--ink-dim);margin-left:2px}
+.hm-kpi.warn .hm-kpi-v{color:var(--red)}
+.hm-kpi.hot .hm-kpi-v{color:var(--orange)}
+.hm-kpi.good .hm-kpi-v{color:var(--green)}
+
+/* —— 区块通用 —— */
+.hm-sec{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-bottom:12px}
+.hm-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.hm-sub{font-size:11px;color:var(--ink-dim);font-weight:400}
+.hm-link{font-size:12px;color:var(--brand);font-weight:400;cursor:pointer;white-space:nowrap}
+.hm-link:hover{text-decoration:underline}
+.hm-empty{padding:14px;text-align:center;color:var(--ink-dim);font-size:12px}
+.hm-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hm-cols .hm-sec{margin-bottom:12px}
+
+/* —— 持仓速览墙 —— */
+.hm-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.hm-card{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;transition:.15s}
+.hm-card:hover{border-color:var(--brand);background:var(--panel)}
+.hm-card.alerted{border-color:rgba(192,57,43,.45)}
+.hm-card-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.hm-name{font-size:13px;font-weight:700;color:var(--ink)}
+.hm-sector{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+.hm-card-meta{font-size:11px;color:var(--ink-soft);margin-top:3px}
+.hm-card-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.hm-tag{font-size:11px;padding:1px 7px;border-radius:99px;font-family:var(--mono)}
+.hm-tag.neg{color:var(--red);background:rgba(192,57,43,.09)}
+.hm-tag.hot{color:var(--orange);background:rgba(199,127,26,.12);font-weight:700}
+.hm-tag.dim{color:var(--ink-dim);background:var(--panel)}
+
+/* —— 财报倒计时 —— */
+.hm-earn{display:flex;align-items:center;justify-content:space-between;padding:7px 2px;border-bottom:1px dashed var(--line)}
+.hm-earn:last-child{border-bottom:none}
+.hm-earn-n{font-size:13px;font-weight:600;color:var(--ink)}
+.hm-earn-d{font-size:11px;color:var(--ink-dim);font-family:var(--mono)}
+.hm-earn-v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink-soft)}
+.hm-earn-v .u{font-size:11px;font-weight:400;color:var(--ink-dim)}
+.hm-earn-v.hot{color:var(--red)}
+.hm-earn-v.mid{color:var(--orange)}
+
+/* —— 预警流 —— */
+.hm-alert{display:flex;align-items:center;gap:8px;padding:7px 8px;border-left:3px solid;border-radius:0 7px 7px 0;margin-bottom:6px;background:var(--panel-2);font-size:12px;color:var(--ink);text-decoration:none}
+.hm-alert:hover{background:var(--brand-soft);text-decoration:none}
+.hm-alert.neg{border-color:var(--red)}
+.hm-alert.pos{border-color:var(--green)}
+.hm-alert-co{font-weight:700;white-space:nowrap}
+.hm-alert-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-alert.neg .hm-alert-w{color:var(--red)}
+.hm-alert.pos .hm-alert-w{color:var(--green)}
+.hm-alert-t{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+
+/* —— 最新要闻 —— */
+.hm-news{display:flex;align-items:baseline;gap:8px;padding:6px 2px;border-bottom:1px dashed var(--line);font-size:13px;color:var(--ink);text-decoration:none}
+.hm-news:last-child{border-bottom:none}
+.hm-news:hover .hm-news-t{color:var(--brand);text-decoration:underline}
+.hm-news-co{font-size:11px;color:var(--brand);background:var(--brand-soft);padding:1px 7px;border-radius:99px;white-space:nowrap}
+.hm-news-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-news-time{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+
+/* —— 板块分布 & 护城河 —— */
+.hm-secbar{display:flex;gap:4px;margin-bottom:10px;border-radius:7px;overflow:hidden}
+.hm-secseg{height:26px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fffdf8;font-weight:600;white-space:nowrap;padding:0 6px;min-width:0;overflow:hidden;text-overflow:ellipsis;border-radius:5px}
+.hm-moats{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.hm-moat{display:flex;align-items:baseline;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.hm-moat-n{font-weight:600;color:var(--ink);white-space:nowrap}
+.hm-moat-v{color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* —— 移动端适配 —— */
+@media (max-width:720px){
+  .hm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hm-cols{grid-template-columns:1fr}
+  .hm-wall{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hm-moats{grid-template-columns:1fr}
+  .hm-kpi-v{font-size:20px}
+}
