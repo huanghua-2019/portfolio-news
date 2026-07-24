@@ -106,11 +106,13 @@ GitHub Pages（免费静态托管）重新部署前端
 
 ## 四、首次部署详细步骤（约 5–10 分钟）
 
-> **前置条件**
+> **前置条件（为什么需要这些？）**
 > 1. 一个 GitHub 账号（https://github.com，免费注册）。
+>    - 💡 **为什么**：整个方案的"云端机器人"和"网址展示柜"都跑在 GitHub 上，没账号就没地方托管。
 > 2. 电脑装了 Git（https://git-scm.com 下载，一路下一步）。
+>    - 💡 **为什么**：Git 是"把本地文件上传到 GitHub 仓库"的工具，没有它就没法把这套代码推上去。
 > 3. 已配置好 SSH 密钥并连过 GitHub（公钥贴在 GitHub → Settings → SSH and GPG keys）。
->    本项目实际就是用 SSH 推送的，比填密码的 HTTPS 更省心。
+>    - 💡 **为什么**：SSH 密钥相当于"电脑和 GitHub 之间的身份证"，配好后推送代码不用每次输密码、也更安全。本项目实际就是用 SSH 推送的。
 
 ### 第 1 步：在 GitHub 建仓库
 1. 登录 GitHub，右上角 **+ → New repository**。
@@ -119,12 +121,16 @@ GitHub Pages（免费静态托管）重新部署前端
 4. **不要**勾 "Add a README file"（我们用本地这套）。
 5. 点 **Create repository**。
 
+> 💡 **为什么做这一步**：仓库（repository）就是 GitHub 上用来"装代码 + 跑自动化"的容器。爬虫要往里写新闻、Pages 要从里读网页，都得先有这么一个仓库。选 Public 是因为免费版 Pages 对公开仓库最省心；不勾自带 README 是因为我们本地已经有一套完整文件，避免冲突。
+
 ### 第 2 步：本地准备（进到这个文件夹）
 把本 README 所在的整个 `portfolio-news` 文件夹，放到你电脑方便的位置（本项目放在 `D:\portfolio-news`）。然后在终端进入它：
 
 ```bash
 cd D:\portfolio-news
 ```
+
+> 💡 **为什么做这一步**：后面所有 `git` 命令都只在"当前文件夹"生效。先 `cd` 进到这个目录，才能保证你提交、推送的是看板这一套文件，而不是电脑里别的乱七八糟的东西。
 
 ### 第 3 步：初始化并提交（设置 git 身份 + 首次 commit）
 ```bash
@@ -137,6 +143,15 @@ git branch -M main
 ```
 > `data/news.json` 已自带首次抓取结果（约 70 条），推上去后 Pages 第一次打开就有数据，不空屏。
 
+> 💡 **为什么做这一步（每条命令的意义）**：
+> - `git init`：把这个文件夹变成一个"被 Git 管理的仓库"，生成 `.git` 目录来记录所有变更历史。
+> - `git config user.name/email`：给这次提交署个名。GitHub 要求每次提交都必须有作者身份，不填会直接报错。
+> - `git add .`：把当前文件夹里所有文件"放进暂存区"，告诉 Git"这些是要提交的"。
+> - `git commit`：正式生成一次快照（存档点），`"init: ..."` 是这次存档的说明。
+> - `git branch -M main`：把主分支命名为 `main`（GitHub 现在默认叫 main，名字对上才能顺利推送）。
+>
+> 简单记：**init = 开仓库，add+commit = 拍第一张存档照，branch = 定主分支名。**
+
 ### 第 4 步：用 SSH 推送到 GitHub
 ```bash
 git remote add origin git@github.com:你的用户名/portfolio-news.git
@@ -147,6 +162,12 @@ git push -u origin main
 > - 本项目实际仓库：`git@github.com:huanghua-2019/portfolio-news.git`
 > - （备选 HTTPS 方式：`git remote add origin https://github.com/你的用户名/portfolio-news.git`，推送时填**个人访问令牌 Token** 当密码，不是登录密码。）
 
+> 💡 **为什么做这一步（每条命令的意义）**：
+> - `git remote add origin <地址>`：给远端仓库起个代号叫 `origin`，以后 `git push` 就知道往哪推。相当于"把 U 盘插上并命名"。
+> - `git push -u origin main`：把本地 `main` 分支的存档**上传到 GitHub**。`-u` 是"记住这次的推送关系"，以后直接 `git push` 就行，不用再写 `origin main`。
+>
+> 这一步是把代码真正"放到网上"的关键——之前全在本地，推完 GitHub 上才有内容，Pages 才能托管。
+
 ### 第 5 步：开启 Pages（把仓库变成网址）
 1. 进仓库 → **Settings**（右上齿轮）→ 左侧 **Pages**。
 2. Source 选 **Deploy from a branch**。
@@ -155,14 +176,27 @@ git push -u origin main
 5. 等 1–2 分钟，页面会显示你的网址：
    `https://你的用户名.github.io/portfolio-news/`
 
+> 💡 **为什么做这一步**：
+> - Pages 是 GitHub 的"免费网页托管"功能。代码推上去只是存在仓库里，普通访客打不开；开了 Pages，GitHub 才会把 `index.html` 等文件编译成一个谁都能访问的网址。
+> - 选 `main` 分支 + `/ (root)` 目录，是告诉 Pages"用主分支根目录下的网页文件"。
+> - 等 1–2 分钟是因为 GitHub 要后台构建一次，不是点了立刻生效。
+>
+> **没有这步，你就只有一个代码仓库，而没有可以打开看的网站。**
+
 ### 第 6 步：让爬虫自动跑起来（开 Actions）
 1. 进仓库 → 顶部 **Actions** 标签。
 2. 第一次可能看到绿色提示 **"I understand my workflows, go ahead and enable them"** → 点一下启用。
 3. 之后 `持仓新闻爬虫` 工作流会**每 30 分钟自动跑**；也可手动立即跑一次（见下一节）。
 
+> 💡 **为什么做这一步**：
+> - Actions 就是"云端机器人"。`.github/workflows/crawl.yml` 已经写好了"每 30 分钟抓一次新闻"的指令，但**默认是禁用状态**，必须手动点一下启用，它才开始按时干活。
+> - 启用后，机器人的运行不再依赖你的电脑——你关机、睡觉，它都在 GitHub 服务器上按时抓取，这就是"自动更新"的真正来源。
+
 ### 第 7 步：验证上线
 浏览器打开你的 Pages 网址，能看到"持仓监控 · 新闻回看"深色面板、首屏有新闻，即成功。
 本项目实际网址：https://huanghua-2019.github.io/portfolio-news/
+
+> 💡 **为什么做这一步**：前面 6 步都是"配置"，只有打开网址亲眼看到面板和新闻，才证明整条链路（仓库 → Actions 抓取 → Pages 展示）真正打通了。没看到就说明中间某步没生效，需要回头排查（见第十节 FAQ）。
 
 ---
 
@@ -179,8 +213,10 @@ git push -u origin main
 2. 左侧列表点 **`持仓新闻爬虫`**。
 3. 右侧 **`Run workflow ▾`** 按钮 → 点 → 再点确认。
 
+> 💡 **为什么有这一步**：爬虫默认按排程每 30 分钟跑，但你改了持仓、或想马上看最新消息时，不用干等。手动 Run workflow 就是"立刻让机器人跑一次"，跑完它把新新闻提交回仓库，Pages 再自动刷新。
+> 注意：手动跑**不是必须**的，不点也完全正常。
+
 跑完后（约 1–2 分钟），它会把新抓的新闻提交回仓库，Pages 再过 1–2 分钟自动刷新。你刷新网址即见最新数据。
-> 注意：手动跑**不是必须**的。爬虫已按排程自动每 30 分钟跑，不点也完全正常。
 
 ---
 
@@ -189,6 +225,8 @@ git push -u origin main
 1. **看 Actions 运行记录**：仓库 → Actions → 点 `持仓新闻爬虫`，能看到一条条运行历史（绿色 ✓ = 成功）。
 2. **看数据更新时间**：访问 `https://你的用户名.github.io/portfolio-news/data/news.json`，看里面 `updatedAt` 字段的时间，应该离现在不超过 30 分钟。
 3. **看提交记录**：仓库 → 顶部 **Commits**，会看到爬虫定时提交的 "update news" 之类提交。
+
+> 💡 **为什么有这一步**：万一爬虫挂了（比如某个新闻源全挂、或 GitHub 临时抽风），网页会一直显示旧新闻而你不知情。定期看一眼这三项，能确认"机器人还活着、还在按时干活"。
 
 ---
 
@@ -214,6 +252,8 @@ git add holdings.json
 git commit -m "更新持仓"
 git push
 ```
+
+> 💡 **为什么要 `commit` + `push`**：你只是在自己电脑上改了文件，GitHub 上的仓库和爬虫都不知道。必须 `commit`（本地存档）+ `push`（上传到 GitHub），改动的 `holdings.json` 才会进到仓库、被下次爬虫运行读到。只改本地不推 = 白改。
 
 ---
 
@@ -272,8 +312,18 @@ portfolio-news/
 - 确认工作流已"启用"（首次需点绿色启用提示）。
 - 免费账号偶有限流，稍等重试。
 
-**Q：推送被拒（non-fast-forward）？**
-- 若仓库里已有文件冲突：`git pull origin main --rebase` 再 `git push`；或确认 `remote` 指向的是正确仓库。
+**Q：推送被拒（non-fast-forward / 远端领先）？**
+- **原因**：GitHub 上的仓库已经有了新提交（比如爬虫自动跑了），而你本地没有这些，直接 push 会被拒。
+- **安全修复法**（比 `git pull --rebase` 更稳，不易把本地 `.git` 弄坏）：
+  ```bash
+  git fetch origin                              # 把远端最新提交下载到本地（不改动你的文件）
+  git checkout -B main FETCH_HEAD --force     # 让本地 main 对齐到远端最新，并强制覆盖冲突的未跟踪文件
+  # 然后重新放好你本地的改动（如更新后的 README），再：
+  git add .
+  git commit -m "你的说明"
+  git push origin main
+  ```
+- ⚠️ 慎用 `git pull --rebase`：在本地有未提交改动、或 `.git` 状态异常时，它中途报错可能导致本地仓库元数据损坏（本项目曾踩过此坑）。优先用上面的 `fetch` + `checkout -B main FETCH_HEAD --force`。
 
 **Q：想换仓库名 / 用户名？**
 - 改仓库名后，Pages 网址会变，重新走一遍第 5 步即可；本地 `git remote set-url origin 新地址` 更新推送目标。
