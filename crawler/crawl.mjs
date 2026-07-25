@@ -136,8 +136,9 @@ const SOURCE_BLACKLIST = [
   // 复制粘贴 / 自动聚合站（无原创编辑团队）
   "Sohu", "MSN", "Pchome电脑之家", "DoNews",
   "观点网", "中财网", "中华网",
+  "手机网易网",
   // 散户社区 / 券商引流站（非新闻机构）
-  "Moomoo", "富途牛牛", "TradingView", "同花顺",
+  "Moomoo", "TradingView", "同花顺",
   // 低质量 / 无关垂直站
   "风闻", "中国雄安官网", "ABB",
 ];
