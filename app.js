@@ -155,7 +155,7 @@ function metricsOf(h) {
   // 1. 折价
   const tp = parseTargetPrice(h.targetPrice, h.priceCcy);
   const m = tp ? marginOf(h.price, tp.value) : null;
-  const margin = m ? m.gap * 100 : null;  // 例 35.1 含义是现价较目标价低 35.1%
+  const margin = m ? m.pct : null;  // pct 已是百分比，如 35.1 含义是现价较目标价低 35.1%
   // 2. ROE：取最近年
   const fd = h.financials && h.financials.data;
   const roe = fd && fd.length ? fd[fd.length-1].roe : null;
