@@ -129,6 +129,43 @@ const ALIASES = {
   "中远海控": ["中远海控", "中远海运", "海控", "cosco"],
 };
 
+// 来源过滤：黑名单直接丢弃（内容农场/SEO站/复制粘贴站/无编辑团队）
+const SOURCE_BLACKLIST = [
+  // 内容农场 / SEO 垃圾站
+  "证券之星", "中金在线", "财富号", "见道网", "时代在线",
+  // 复制粘贴 / 自动聚合站（无原创编辑团队）
+  "Sohu", "MSN", "Pchome电脑之家", "DoNews",
+  "观点网", "中财网", "中华网",
+  // 散户社区 / 券商引流站（非新闻机构）
+  "Moomoo", "富途牛牛", "TradingView", "同花顺",
+  // 低质量 / 无关垂直站
+  "风闻", "中国雄安官网", "ABB",
+];
+
+// 白名单：权威财经媒体（同标题多源转载时优先保留白名单源）
+const SOURCE_WHITELIST = [
+  // 一线财经媒体
+  "财联社", "证券时报", "21财经", "第一财经", "华尔街见闻", "财新",
+  "中国基金报", "每日经济新闻",
+  // 权威门户财经频道
+  "东方财富", "新浪财经", "新京报", "京报网",
+  // 官媒 / 央媒
+  "新华网", "中国日报网", "南方日报", "广州日报新花城",
+  // 行业垂直（航运/白酒/消费）
+  "国际船舶网", "中外玩具网",
+  // 交易所 / IR / 官方公告
+  "深圳市发展和改革委员会",
+];
+
+// 来源过滤函数：返回 null=丢弃, 1=普通, 2=白名单优先
+function sourceScore(src) {
+  if (!src) return 0;
+  const s = String(src).trim();
+  for (const b of SOURCE_BLACKLIST) if (s.includes(b)) return null;  // 黑名单→丢弃
+  for (const w of SOURCE_WHITELIST) if (s.includes(w)) return 2;     // 白名单→优先
+  return 1;  // 其余普通来源（保留但低优先）
+}
+
 function classify(it, keyVars) {
   const text = (it.title || "") + " " + (it.source || "");
   let alert = null;
@@ -284,14 +321,24 @@ async function main() {
       if (kept >= CONFIG.perCompanyCap) break;
       if (!it.link || seenLink.has(it.link)) continue;
       const ct = cleanTitle(it.title);
+      // 来源过滤：黑名单直接丢弃
+      const sScore = sourceScore(ct.source || it.source);
+      if (sScore === null) continue;
       // 相关性过滤：标题须含公司名/别名，丢弃仅"顺带提到"的噪音
       if (!relevant(ct.title, aliases)) continue;
-      // 标题去重：同一新闻多源转载只留一条
+      // 标题去重：同一新闻多源转载只留一条（优先白名单源）
       const tkey = ct.title.toLowerCase().replace(/\s+/g, "");
-      if (seenTitle.has(tkey)) continue;
+      if (seenTitle.has(tkey)) {
+        // 已有记录：白名单源可替换普通源
+        if (sScore === 2) {
+          const idx = all.findIndex(a => a._tkey === tkey && a._sScore < 2);
+          if (idx >= 0) { all.splice(idx, 1); seenTitle.delete(tkey); seenLink.delete(all[idx]?._link); }
+          else continue;
+        } else continue;
+      }
       seenLink.add(it.link);
       seenTitle.add(tkey);
-      all.push(classify({
+      const classified = classify({
         title: ct.title,
         link: it.link,
         source: ct.source || it.source || "未知",
@@ -299,13 +346,21 @@ async function main() {
         code: h.code,
         pubDate: it.pubDate,
         pubRaw: it.pubRaw,
-      }, h.keyVars));
+      }, h.keyVars);
+      // 内部标记（不写入输出，用于去重优先级判断）
+      classified._tkey = tkey;
+      classified._sScore = sScore;
+      classified._link = it.link;
+      all.push(classified);
       kept++;
     }
     await new Promise((r) => setTimeout(r, CONFIG.requestDelayMs));
   }
 
   all.sort((a, b) => (b.pubDate || "").localeCompare(a.pubDate || ""));
+
+  // 输出前去除内部去重标记
+  all.forEach(a => { delete a._tkey; delete a._sScore; delete a._link; });
 
   // 抓取行情
   const quotes = await fetchQuotes(holdings);
