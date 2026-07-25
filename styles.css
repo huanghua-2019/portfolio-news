@@ -443,20 +443,14 @@ a:hover{text-decoration:underline}
 .hm-news-time{font-size:11px;color:var(--ink-dim);white-space:nowrap}
 
 /* —— 板块分布 & 护城河 —— */
-.hm-secbar{display:flex;gap:4px;margin-bottom:10px;border-radius:7px;overflow:hidden}
-.hm-secseg{height:26px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fffdf8;font-weight:600;white-space:nowrap;padding:0 6px;min-width:0;overflow:hidden;text-overflow:ellipsis;border-radius:5px}
-.hm-moats{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
-.hm-moat{display:flex;align-items:baseline;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line)}
-.hm-moat-n{font-weight:600;color:var(--ink);white-space:nowrap}
-.hm-moat-v{color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* (板块分布+护城河已移除) */
 
 /* —— 移动端适配 —— */
 @media (max-width:720px){
-  .hm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .hm-cols{grid-template-columns:1fr}
-  .hm-wall{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .hm-moats{grid-template-columns:1fr}
-  .hm-kpi-v{font-size:20px}
+  .hm-hero{flex-direction:column;gap:8px;padding:10px 14px}
+  .hero-sigs{gap:6px}
+  .hero-sig{font-size:12px;padding:3px 8px}
+  .hm-signal-flow .sf-block{margin-bottom:8px}
   .dp-v{font-size:12.5px}
 }
 
@@ -481,32 +475,23 @@ a:hover{text-decoration:underline}
 .tab{position:relative}
 .tab.active::before{content:"";position:absolute;left:-13px;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--brand-2)}
 
-/* —— 首页 Hero 品牌头 —— */
-.hm-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;padding:18px 20px;border-radius:14px;background:linear-gradient(120deg,var(--brand-soft),var(--panel) 65%);border:1px solid var(--line);box-shadow:var(--sh-sm)}
-.hm-hi{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:.3px}
-.hm-hi .accent{color:var(--brand)}
-.hm-date{font-size:12px;color:var(--ink-dim);margin-top:3px;font-family:var(--mono)}
-.hm-summary{font-size:13px;color:var(--ink-soft);margin-top:8px}
-.hm-summary b{color:var(--brand);font-family:var(--mono)}
-.hm-updated{font-size:11px;color:var(--ink-dim);white-space:nowrap;display:flex;align-items:center;gap:6px}
-.hm-updated .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+/* —— Hero：异常驱动摘要（瘦版） —— */
+.hm-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;padding:14px 18px;border-radius:12px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--sh-sm)}
+.hero-left{flex:1;min-width:0}
+.hero-date{font-size:12px;color:var(--ink-dim);font-family:var(--mono);margin-bottom:6px}
+.hero-sigs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero-sig{font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.hero-sig.hit{background:rgba(192,57,43,.14);color:var(--red);border:1px solid rgba(192,57,43,.30)}
+.hero-sig.warn{background:rgba(192,57,43,.10);color:var(--red);border:1px solid rgba(192,57,43,.25)}
+.hero-sig.cal{background:rgba(199,127,26,.12);color:var(--orange);border:1px solid rgba(199,127,26,.30)}
+.hero-sig.ok{background:rgba(46,125,79,.14);color:var(--green);border:1px solid rgba(46,125,79,.30)}
+.hero-right{font-size:11px;color:var(--ink-dim);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.hero-right .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* —— KPI 卡升级：图标 + 呼吸感 —— */
-.hm-kpis{gap:12px}
-.hm-kpi{display:flex;align-items:center;gap:11px;border-radius:13px;padding:14px 16px;box-shadow:var(--sh-sm)}
-.hm-kpi:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
-.hm-kpi-ic{font-size:21px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:11px;background:var(--brand-soft);flex:0 0 40px}
-.hm-kpi.warn .hm-kpi-ic{background:rgba(192,57,43,.10)}
-.hm-kpi.hot .hm-kpi-ic{background:rgba(199,127,26,.13)}
-.hm-kpi.good .hm-kpi-ic{background:rgba(46,125,79,.10)}
-.hm-kpi.hit .hm-kpi-ic{background:rgba(192,57,43,.10)}
-.hm-kpi.hit .hm-kpi-v{color:var(--red)}
-.hm-kpi-main{min-width:0}
+/* (KPI 条已移除，融入信号矩阵汇总行) */
 
-/* —— 持仓信号卡：板块色顶条 —— */
-.hm-card{position:relative;overflow:hidden;border-radius:11px;box-shadow:var(--sh-sm)}
-.hm-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--sc,var(--brand));opacity:.8}
+/* (持仓速览墙已移除，信号矩阵卡片已替代) */
 .hm-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
 .hm-sector{font-weight:600}
 
@@ -609,25 +594,85 @@ html[data-theme="dark"] .chip.active{color:#12141a}
 .ck-list .ck-no{color:var(--red);font-weight:700;margin-right:4px}
 .ck-list .ck-na{color:var(--ink-dim);font-weight:700;margin-right:4px}
 
-/* —— 首页：价值热力图 —— */
-.hm-heat{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:6px 0 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
-.heat-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:480px}
-.heat-tbl thead th{padding:8px 6px;text-align:center;font-weight:700;color:var(--ink-dim);border-bottom:1px solid var(--line);background:var(--panel-2);font-size:11.5px;letter-spacing:.5px}
-.heat-tbl thead th.ht-name{text-align:left;padding-left:12px;width:96px}
-.ht-row{cursor:pointer;transition:background .12s}
-.ht-row:hover{background:var(--panel-2)}
-.ht-row .ht-name{padding:7px 12px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;border-right:1px solid var(--line)}
-.ht-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
-.ht-cell{padding:7px 6px;text-align:center;font-family:var(--mono);font-weight:700;font-size:12px;border-left:1px solid var(--line)}
-.ht-cell.g0{background:rgba(192,57,43,.10);color:var(--red)}
-.ht-cell.g1{background:rgba(180,140,80,.08);color:var(--ink)}
-.ht-cell.g2{background:rgba(46,125,79,.12);color:var(--green)}
-.heat-legend{padding:7px 12px;font-size:11px;color:var(--ink-dim);display:flex;gap:14px;align-items:center;border-top:1px solid var(--line);background:var(--panel-2)}
-.heat-legend i{width:14px;height:14px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle;border:1px solid var(--line)}
-.heat-legend .g0{background:rgba(192,57,43,.18)}
-.heat-legend .g2{background:rgba(46,125,79,.20)}
+/* —— 首页：信号矩阵（块状卡片版） —— */
+.signal-matrix{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:4px 0}
+.sm-card{position:relative;border-radius:12px;background:var(--panel);border:2px solid var(--line);box-shadow:var(--sh-sm);cursor:pointer;transition:.18s;padding:10px 12px 8px;overflow:hidden}
+.sm-card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;border-radius:12px 12px 0 0;opacity:.9;transition:opacity .12s}
+.sm-card.good::before{background:var(--green)}
+.sm-card.mid::before{background:var(--orange)}
+.sm-card.weak::before{background:var(--red)}
+.sm-card:hover{border-color:var(--brand);box-shadow:var(--sh-md);transform:translateY(-2px)}
+.sm-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.sm-dot{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+.sm-name{font-size:14px;font-weight:800;color:var(--ink);flex:1;min-width:0}
+.sm-sector{font-size:11px;font-weight:600;white-space:nowrap}
+.sm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.sm-cell{border-radius:7px;padding:5px 6px 4px;display:flex;flex-direction:column;gap:1px;font-family:var(--mono);text-align:center;transition:transform .12s}
+.sm-cell:hover{transform:scale(1.06)}
+.sm-dim{font-size:9.5px;font-weight:600;color:var(--ink-dim);letter-spacing:.3px}
+.sm-val{font-size:13px;font-weight:700;line-height:1.3}
+/* 色块等级 */
+.sm-cell.g2{background:rgba(46,125,79,.22);color:var(--green);border:1px solid rgba(46,125,79,.35)}
+.sm-cell.g1{background:rgba(180,140,80,.14);color:var(--ink);border:1px solid rgba(180,140,80,.28)}
+.sm-cell.g0{background:rgba(192,57,43,.18);color:var(--red);border:1px solid rgba(192,57,43,.35)}
+.sm-cell.na{background:var(--panel-2);color:var(--ink-dim);border:1px dashed var(--line)}
+/* 汇总行 */
+.sm-summary{display:flex;gap:12px;align-items:center;padding:8px 0 4px;font-size:12px;font-weight:600}
+.sm-sum-item{padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.sm-sum-item.hit{background:rgba(192,57,43,.12);color:var(--red);cursor:pointer}
+.sm-sum-item.warn{background:rgba(192,57,43,.10);color:var(--red)}
+/* legend */
+.sm-legend{display:flex;gap:10px;padding:4px 0 0;font-size:10.5px;font-weight:600}
+.sm-leg{padding:2px 8px;border-radius:5px}
+.sm-leg.g2{background:rgba(46,125,79,.22);color:var(--green)}
+.sm-leg.g1{background:rgba(180,140,80,.14);color:var(--ink)}
+.sm-leg.g0{background:rgba(192,57,43,.18);color:var(--red)}
+.sm-leg.na{background:var(--panel-2);color:var(--ink-dim);border:1px dashed var(--line)}
+/* 信号矩阵：手机端堆叠（<560px） */
+@media (max-width:560px){
+  .signal-matrix{grid-template-columns:1fr 1fr;gap:8px}
+  .sm-card{padding:8px 10px 6px}
+  .sm-grid{grid-template-columns:1fr 1fr 1fr;gap:3px}
+  .sm-cell{padding:4px 4px 3px}
+  .sm-dim{font-size:8.5px}
+  .sm-val{font-size:11px}
+}
 
-/* —— 总览卡：点击闪亮高亮（不闪烁只是颜色变化，避免脳血管） —— */
+/* —— 首页：信号流（预警/财报/新闻纵向合并） —— */
+.hm-signal-flow{padding-bottom:6px}
+.sf-block{margin-bottom:12px}
+.sf-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sf-empty{padding:10px;text-align:center;color:var(--ink-dim);font-size:12px;border-radius:8px;background:var(--panel-2)}
+/* 预警块 */
+.sf-co{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--panel-2);cursor:pointer;font-size:13px;border-left:3px solid;transition:.15s;margin-bottom:6px}
+.sf-co:hover{background:var(--brand-soft);transform:translateX(2px)}
+.sf-co.sf-co-neg{border-color:var(--red);background:rgba(192,57,43,.06)}
+.sf-co.sf-co-pos{border-color:var(--green);background:rgba(46,125,79,.06)}
+.sf-co-dot{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+.sf-co-dot.sf-co-neg{background:var(--red)}
+.sf-co-dot.sf-co-pos{background:var(--green)}
+.sf-co-nums{font-size:12px;color:var(--ink-dim);font-family:var(--mono)}
+/* 财报块 */
+.sf-earn{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;background:var(--panel-2);cursor:pointer;transition:.15s;margin-bottom:6px}
+.sf-earn:hover{background:var(--brand-soft);transform:translateX(2px)}
+.sf-earn.sf-earn-hot{border-left:3px solid var(--red);background:rgba(192,57,43,.06)}
+.sf-earn.sf-earn-mid{border-left:3px solid var(--orange);background:rgba(199,127,26,.08)}
+.sf-earn.sf-earn-ok{border-left:3px solid var(--green);background:rgba(46,125,79,.06)}
+.sf-earn-body{flex:1;min-width:0}
+.sf-earn-body b{font-size:13px;color:var(--ink)}
+.sf-earn-body span{font-size:11px;color:var(--ink-dim);font-family:var(--mono);margin-left:8px}
+.sf-earn-d{font-size:11px;color:var(--ink-dim);white-space:nowrap;font-family:var(--mono)}
+/* 新闻块 */
+.sf-news{display:flex;align-items:baseline;gap:8px;padding:6px 2px;border-bottom:1px dashed var(--line);font-size:13px;color:var(--ink);text-decoration:none;transition:.12s}
+.sf-news:last-child{border-bottom:none}
+.sf-news:hover{background:var(--brand-soft);text-decoration:none}
+.sf-news.sf-news-neg{color:var(--red)}
+.sf-news.sf-news-pos{color:var(--green)}
+.sf-news-co{font-size:11px;color:var(--brand);padding:1px 7px;border-radius:99px;white-space:nowrap}
+.sf-news-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sf-news-time{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+
+/* —— 总览卡：点击闪亮高亮 —— */
 .dc-flash{animation:dc-pulse 2s ease-out 1}
 @keyframes dc-pulse{
   0%{box-shadow:0 0 0 0 var(--brand),var(--sh-md);transform:scale(1.01)}
@@ -643,20 +688,6 @@ html[data-theme="dark"] .chip.active{color:#12141a}
 /* —— 总览卡：财报静默期徽章 —— */
 .dc-quiet{font-size:10.5px;padding:2px 7px;border-radius:99px;background:rgba(180,140,80,.12);color:#8a6d20;border:1px solid rgba(180,140,80,.35);font-weight:600;display:inline-flex;align-items:center;gap:3px}
 .dc-quiet.est{background:rgba(180,140,80,.06);color:var(--ink-dim);border-style:dashed}
-
-/* —— 热力图：移动端堆叠布局（<560px） —— */
-@media (max-width:560px){
-  .heat-tbl{display:block;min-width:0}
-  .heat-tbl thead{display:none}
-  .heat-tbl tbody{display:flex;flex-direction:column;gap:8px;padding:8px}
-  .ht-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:8px;overflow:hidden}
-  .ht-row .ht-name{grid-column:1/-1;padding:8px 10px;background:var(--panel);border-right:0}
-  .ht-cell{border-left:0;padding:8px 6px;background:var(--panel);font-size:11px;display:flex;flex-direction:column-reverse;gap:1px}
-  .ht-cell::before{content:attr(data-label);font-size:9.5px;color:var(--ink-dim);font-weight:600;font-family:var(--ink)}
-  .ht-row .ht-cell[data-label]{font-family:var(--mono)}
-  /* 隐藏最后一列（列名在隐藏前显示） */
-  .heat-legend{flex-wrap:wrap;font-size:10.5px}
-}
 
 /* —— 骨架屏（加载跳动条） —— */
 .page-skeleton{position:fixed;inset:64px 12px 12px;z-index:8;background:var(--bg);animation:fadeIn .15s ease}

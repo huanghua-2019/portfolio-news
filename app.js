@@ -182,34 +182,56 @@ function metricsOf(h) {
   return { margin, roe, dy, power, check, newsNegRate, _itemsLen: items.length };
 }
 
-// 热力图：渲染 7家公司 × 6维度网格
+// 信号矩阵：块状卡片版（取代热力图表格）
+// 每家公司一张圆角卡，内部 6 个色块格子排成 3×2
 function renderHeatmap(hs) {
   if (!hs.length) return "";
-  const cols = [
+  const dims = [
     { key: "margin", label: "折价", val: m => m.margin == null ? "—" : (m.margin >= 0 ? "+"+m.margin.toFixed(1) : m.margin.toFixed(1))+"%" },
-    { key: "roe",    label: "ROE", val: m => m.roe == null ? "—" : m.roe.toFixed(1)+"%" },
-    { key: "dy",     label: "股息",val: m => m.dy == null ? "—" : m.dy.toFixed(2)+"%" },
-    { key: "power",  label: "七力",val: m => m.power == null ? "—" : m.power+"★" },
-    { key: "check",  label: "清单",val: m => m.check == null ? "—" : Math.round(m.check*100)+"%" },
-    { key: "news",   label: "利空",val: m => m._itemsLen === 0 ? "无" : (m.newsNegRate*100).toFixed(0)+"%" }
+    { key: "roe",    label: "ROE",  val: m => m.roe == null ? "—" : m.roe.toFixed(1)+"%" },
+    { key: "dy",     label: "股息",  val: m => m.dy == null ? "—" : m.dy.toFixed(2)+"%" },
+    { key: "power",  label: "七力",  val: m => m.power == null ? "—" : m.power+"★" },
+    { key: "check",  label: "清单",  val: m => m.check == null ? "—" : Math.round(m.check*100)+"%" },
+    { key: "news",   label: "利空",  val: m => m._itemsLen === 0 ? "无" : (m.newsNegRate*100).toFixed(0)+"%" }
   ];
-  let h = '<div class="hm-heat">';
-  h += '<table class="heat-tbl"><thead><tr><th class="ht-name">公司</th>';
-  cols.forEach(c => { h += `<th class="ht-col" title="${c.label}">${c.label}</th>`; });
-  h += '</tr></thead><tbody>';
+  // 维度图标（让色块更有设计感）
+  const dimIcons = { margin:"🎯", roe:"📈", dy:"💰", power:"🛡", check:"✅", news:"⚠" };
+  let h = '<div class="signal-matrix">';
   for (const ho of hs) {
     const m = metricsOf(ho);
-    h += `<tr class="ht-row" data-co="${esc(ho.name)}" onclick="dashJumpTo('${esc(ho.name).replace(/'/g, "\\'")}')">`;
-    h += `<td class="ht-name"><span class="ht-dot" style="background:${sectorColor(ho.sector)}"></span>${esc(ho.name)}</td>`;
-    cols.forEach(c => {
-      const g = gradeOf(c.key, c.key==="margin"?m.margin : c.key==="roe"?m.roe : c.key==="dy"?m.dy : c.key==="power"?m.power : c.key==="check"?m.check : c.key==="news"?m.newsNegRate : null);
-      h += `<td class="ht-cell g${g}" data-label="${c.label}" title="${c.label}: ${esc(c.val(m))}">${c.val(m)}</td>`;
+    const sc = sectorColor(ho.sector);
+    // 计算全卡总评分（6维度平均 gradeOf）
+    const grades = dims.map(d => gradeOf(d.key, d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null));
+    const avgG = grades.reduce((a,b)=>a+b,0)/grades.length;
+    const cardClass = avgG >= 1.8 ? "good" : avgG >= 1.3 ? "mid" : "weak";
+    h += `<div class="sm-card ${cardClass}" data-co="${esc(ho.name)}" onclick="dashJumpTo('${esc(ho.name).replace(/'/g, "\\'")}')" title="点击跳转总览">`;
+    h += `<div class="sm-head"><span class="sm-dot" style="background:${sc}"></span><span class="sm-name">${esc(ho.name)}</span><span class="sm-sector" style="color:${sc}">${esc(ho.sector||"")}</span></div>`;
+    h += '<div class="sm-grid">';
+    dims.forEach((d, i) => {
+      const rawVal = d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null;
+      const g = gradeOf(d.key, rawVal);
+      // 缺数据用 na 样式（灰色虚线边框）
+      const na = rawVal == null;
+      const cls = na ? "na" : "g"+g;
+      h += `<div class="sm-cell ${cls}" data-dim="${d.label}" title="${d.label}: ${esc(d.val(m))}">`;
+      h += `<span class="sm-dim">${dimIcons[d.key]} ${d.label}</span>`;
+      h += `<span class="sm-val">${d.val(m)}</span>`;
+      h += '</div>';
     });
-    h += '</tr>';
+    h += '</div>'; // sm-grid
+    h += '</div>'; // sm-card
   }
-  h += '</tbody></table>';
-  h += '<div class="heat-legend"><i class="g2"></i>好 <i class="g1"></i>中 <i class="g0"></i>差 <i class="g1"></i>缺数据</div>';
-  h += '</div>';
+  // 底部汇总 + legend
+  const hitN = hs.filter(h => { const tp=parseTargetPrice(h.targetPrice,h.priceCcy); return tp && marginOf(h.price,tp.value) && marginOf(h.price,tp.value).band === "hit"; }).length;
+  const negStocks = hs.filter(h => { const m = metricsOf(h); return m.newsNegRate && m.newsNegRate > 0.05; });
+  h += '<div class="sm-summary">';
+  h += `<span class="sm-sum-item hit" onclick="gotoView('dash')" title="折价≥30%为击球区">⚾ 击球区 ${hitN} 只</span>`;
+  if (negStocks.length) {
+    h += '<span class="sm-sum-item warn">⚠ 利空股 ' + negStocks.map(s=>esc(s.name)).join(' · ') + '</span>'; 
+  }
+  h += '</div>'; // sm-summary
+  h += '<div class="sm-legend"><span class="sm-leg g2">好</span><span class="sm-leg g1">中</span><span class="sm-leg g0">差</span><span class="sm-leg na">缺</span></div>';
+  h += '</div>'; // signal-matrix
   return h;
 }
 
@@ -836,116 +858,88 @@ function renderHome(){
   if(!wrap)return;
   const hs=state.holdings||[];
   const now=Date.now();
-  const todayStart=new Date();todayStart.setHours(0,0,0,0);
 
-  // ---- KPI 计算 ----
-  const todayNews=state.all.filter(x=>x.ts>=todayStart.getTime()).length;
+  // ---- 汇总数据 ----
+  const hitN=hs.filter(h=>{const tp=parseTargetPrice(h.targetPrice,h.priceCcy);return tp?marginOf(h.price,tp.value)&&marginOf(h.price,tp.value).band==="hit":false;}).length;
   const alerts7d=state.all.filter(x=>x.alert&&x.ts>=now-7*86400000);
+  const negStocks=hs.filter(h=>{const m=metricsOf(h);return m.newsNegRate&&m.newsNegRate>0.05;});
   const earnRows=hs.map(h=>({h,ne:nextEarnings(h)})).filter(r=>r.ne&&r.ne.inDays>=0).sort((a,b)=>a.ne.inDays-b.ne.inDays);
   const nearest=earnRows[0]||null;
-  const roes=hs.map(h=>{const d=h.financials&&h.financials.data;if(!d||!d.length)return null;const last=d[d.length-1];return typeof last.roe==="number"?last.roe:null;}).filter(v=>v!=null);
-  const avgRoe=roes.length?(roes.reduce((a,b)=>a+b,0)/roes.length):null;
-  // 击球区：现价较目标价折价≥30%的家数
-  const hitN=hs.filter(h=>{const tp=parseTargetPrice(h.targetPrice,h.priceCcy);return tp?marginOf(h.price,tp.value)&&marginOf(h.price,tp.value).band==="hit":false;}).length;
-
-  // ---- Hero 品牌头（问候 + 日期 + 摘要 + 更新时间）----
-  const hr=new Date().getHours();
-  const greet=hr<6?"凌晨好":hr<11?"早上好":hr<13?"中午好":hr<18?"下午好":"晚上好";
-  const wk=["日","一","二","三","四","五","六"][new Date().getDay()];
-  const dateStr=`${new Date().getFullYear()}年${new Date().getMonth()+1}月${new Date().getDate()}日 · 周${wk}`;
   const upd=state.generatedAt?relTime(state.generatedAt):"—";
-  let html=`<div class="hm-hero">
-    <div>
-      <div class="hm-hi">${greet}，<span class="accent">华</span> 👋</div>
-      <div class="hm-date">${dateStr}</div>
-      <div class="hm-summary">今日 <b>${todayNews}</b> 条要闻 · 近7日 <b>${alerts7d.length}</b> 条预警${nearest?` · 最近财报 <b>${esc(nearest.h.name)}</b> ${nearest.ne.inDays} 天后`:""}</div>
-    </div>
-    <div class="hm-updated"><span class="dot"></span>数据更新 ${esc(upd)}</div>
-  </div>`;
+  const wk=["日","一","二","三","四","五","六"][new Date().getDay()];
+  const dateStr=new Date().getFullYear()+"年"+(new Date().getMonth()+1)+"月"+new Date().getDate()+"日 周"+wk;
 
-  // ---- KPI 条（图标 + 微图）----
-  html+=`<div class="hm-kpis">
-    <div class="hm-kpi" onclick="gotoView('news','all')" title="点击查看新闻"><div class="hm-kpi-ic">📰</div><div class="hm-kpi-main"><div class="hm-kpi-l">今日新闻</div><div class="hm-kpi-v">${todayNews}<span class="u">条</span></div></div></div>
-    <div class="hm-kpi ${alerts7d.length?"warn":""}" onclick="gotoView('alert')" title="点击查看预警"><div class="hm-kpi-ic">🔔</div><div class="hm-kpi-main"><div class="hm-kpi-l">7日预警</div><div class="hm-kpi-v">${alerts7d.length}<span class="u">条</span></div></div></div>
-    <div class="hm-kpi ${nearest&&nearest.ne.inDays<=15?"hot":""}" onclick="gotoView('cal')" title="点击查看日历"><div class="hm-kpi-ic">📅</div><div class="hm-kpi-main"><div class="hm-kpi-l">最近财报${nearest?" · "+esc(nearest.h.name):""}</div><div class="hm-kpi-v">${nearest?nearest.ne.inDays+"<span class='u'>天</span>":"—"}</div></div></div>
-    <div class="hm-kpi good" onclick="gotoView('stat')" title="点击查看财务"><div class="hm-kpi-ic">🛡</div><div class="hm-kpi-main"><div class="hm-kpi-l">组合平均ROE</div><div class="hm-kpi-v">${avgRoe!=null?avgRoe.toFixed(1)+"<span class='u'>%</span>":"—"}</div></div></div>
-    <div class="hm-kpi ${hitN>0?"hit":""}" onclick="gotoView('dash')" title="点击查看总览（折价≥30%为击球区）"><div class="hm-kpi-ic">⚾</div><div class="hm-kpi-main"><div class="hm-kpi-l">击球区</div><div class="hm-kpi-v">${hitN}<span class="u">只</span></div></div></div>
-  </div>`;
+  // ==== 层① Hero：异常驱动摘要 ====
+  const signals=[];
+  if(hitN) signals.push('<span class="hero-sig hit">⚾ 击球区 '+hitN+' 只</span>');
+  if(negStocks.length) signals.push('<span class="hero-sig warn">⚠ '+negStocks.map(s=>esc(s.name)).join(' · ')+' 利空</span>');
+  if(nearest && nearest.ne.inDays <= 45) signals.push('<span class="hero-sig cal">📅 '+esc(nearest.h.name)+' '+nearest.ne.inDays+'天后财报</span>');
+  const signalHtml = signals.length ? signals.join(' ') : '<span class="hero-sig ok">🟢 今日无异常信号</span>';
 
-  // ---- 热力图（7家×6维度一眼对照） ----
-  html+=`<div class="hm-sec"><div class="hm-title">🌡 价值热力图 <span class="hm-sub">点击公司名跳转总览 · 6维度对照·色块趋绿越优</span></div>${renderHeatmap(hs)}</div>`;
+  let html='<div class="hm-hero">'
+    +'<div class="hero-left"><div class="hero-date">'+dateStr+'</div><div class="hero-sigs">'+signalHtml+'</div></div>'
+    +'<div class="hero-right"><span class="dot"></span>'+esc(upd)+' 更新</div>'
+    +'</div>';
 
-  // ---- 持仓速览墙 ----
-  html+=`<div class="hm-sec"><div class="hm-title">💼 持仓速览 <span class="hm-sub">点卡片看该公司新闻</span></div><div class="hm-wall">`;
-  for(const h of hs){
-    const items=state.all.filter(x=>x.company===h.name);
-    const n7=items.filter(x=>x.ts>=now-7*86400000).length;
-    const hasAlert=items.some(x=>x.alert&&x.ts>=now-3*86400000);
-    const ne=nextEarnings(h);
-    const soon=ne&&ne.inDays>=0&&ne.inDays<=15;
-    const sc=sectorColor(h.sector);
-    html+=`<div class="hm-card ${hasAlert?"alerted":""}" style="--sc:${sc}" onclick="gotoView('news','${esc(h.name).replace(/'/g,"\\'")}')">
-      <div class="hm-card-top"><span class="hm-name">${esc(h.name)}</span><span class="hm-sector" style="color:${sc}">${esc(h.sector||"")}</span></div>
-      <div class="hm-card-meta">7日 ${n7} 条新闻</div>
-      <div class="hm-card-tags">
-        ${hasAlert?'<span class="hm-tag neg">● 预警</span>':""}
-        ${soon?`<span class="hm-tag hot">财报 ${ne.inDays}天</span>`:(ne&&ne.inDays>=0?`<span class="hm-tag dim">财报 ${ne.inDays}天</span>`:"")}
-      </div>
-    </div>`;
+  // ==== 层② 信号矩阵（块状卡片） ====
+  html+='<div class="hm-sec"><div class="hm-title">🧭 信号矩阵 <span class="hm-sub">点击卡片跳转总览 · 色块趋绿越优 · 顶条=综合评分</span></div>'+renderHeatmap(hs)+'</div>';
+
+  // ==== 层③ 信号流（只展示异常） ====
+  html+='<div class="hm-sec hm-signal-flow">';
+
+  // -- 预警块 --
+  html+=`<div class="sf-block"><div class="sf-title">🔔 预警信号 <span class="hm-link" onclick="gotoView('alert')">全部 ›</span></div>`;
+  if(alerts7d.length){
+    const byCo={};
+    alerts7d.forEach(a=>{const co=a.company;if(!byCo[co])byCo[co]=[];byCo[co].push(a);});
+    for(const [co,items] of Object.entries(byCo).slice(0,4)){
+      const negN=items.filter(x=>x.alert==='neg').length;
+      const posN=items.filter(x=>x.alert==='pos').length;
+      const tag=negN?'sf-co-neg':'sf-co-pos';
+      html+=`<div class="sf-co ${tag}" onclick="gotoView('alert')"><span class="sf-co-dot ${tag}"></span><b>${esc(co)}</b> <span class="sf-co-nums">${posN?'📈'+posN:''}${negN?' ⚠'+negN:''}</span></div>`;
+    }
+  } else {
+    html+='<div class="sf-empty">🟢 近7日无预警</div>';
   }
-  html+=`</div></div>`;
+  html+='</div>';
 
-  // ---- 中段两栏：财报倒计时 + 预警流 ----
-  html+=`<div class="hm-cols">`;
-  html+=`<div class="hm-sec hm-col"><div class="hm-title">📅 财报倒计时 <span class="hm-link" onclick="gotoView('cal')">全部 ›</span></div>`;
-  if(!earnRows.length){html+=`<div class="hm-empty">暂无待披露财报</div>`;}
-  else{
+  // -- 财报块 --
+  if(earnRows.length){
+    html+=`<div class="sf-block"><div class="sf-title">📅 财报倒计时 <span class="hm-link" onclick="gotoView('cal')">全部 ›</span></div>`;
     for(const r of earnRows.slice(0,3)){
       const d=r.ne.inDays;
-      html+=`<div class="hm-earn">${earnRing(d)}<div class="hm-earn-body"><div class="hm-earn-n">${esc(r.h.name)}</div><div class="hm-earn-d">${r.ne.confirmed?esc(r.ne.date):"约"+r.ne.month+"月"}${r.ne.confirmed?"":" ·待核实"}</div></div><div class="hm-earn-tail">天后披露</div></div>`;
+      const cls=d<=15?'sf-earn-hot':d<=30?'sf-earn-mid':'sf-earn-ok';
+      html+=`<div class="sf-earn ${cls}" onclick="gotoView('cal')">${earnRing(d)}<div class="sf-earn-body"><b>${esc(r.h.name)}</b><span>${esc(r.ne.confirmed?r.ne.date:'约'+r.ne.month+'月')}</span></div><span class="sf-earn-d">${d}天</span></div>`;
     }
+    html+='</div>';
   }
-  html+=`</div>`;
-  html+=`<div class="hm-sec hm-col"><div class="hm-title">🔔 最新预警 <span class="hm-link" onclick="gotoView('alert')">全部 ›</span></div>`;
-  const alertsLatest=state.all.filter(x=>x.alert).sort((a,b)=>b.ts-a.ts).slice(0,4);
-  if(!alertsLatest.length){html+=`<div class="hm-empty">暂无预警命中</div>`;}
-  else{
-    for(const a of alertsLatest){
-      const neg=a.alert==="neg";
-      html+=`<a class="hm-alert ${neg?"neg":"pos"}" href="${esc(a.link)}" target="_blank" rel="noopener"><span class="hm-alert-co">${esc(a.company)}</span><span class="hm-alert-w">${esc((a.alertWords||[]).slice(0,2).join(" / "))}</span><span class="hm-alert-t">${esc(relTime(a.ts))}</span></a>`;
-    }
-  }
-  html+=`</div></div>`;
 
-  // ---- 最新要闻 ----
-  html+=`<div class="hm-sec"><div class="hm-title">📰 最新要闻 <span class="hm-link" onclick="gotoView('news','all')">全部 ›</span></div>`;
-  const latest=state.all.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
-  if(!latest.length){html+=`<div class="hm-empty">暂无新闻数据，等云端爬虫跑完自动出现</div>`;}
+  // -- 最新要闻（去重：同一标题多源只留一个） --
+  html+=`<div class="sf-block"><div class="sf-title">📰 最新要闻 <span class="hm-link" onclick="gotoView('news','all')">全部 ›</span></div>`;
+  const latestRaw=state.all.slice().sort((a,b)=>b.ts-a.ts);
+  const seenTitle=new Set();
+  const latest=[];
+  for(const it of latestRaw){
+    const k=it.title.replace(/\s+/g,' ').trim().slice(0,40);
+    if(seenTitle.has(k))continue;
+    seenTitle.add(k);
+    latest.push(it);
+    if(latest.length>=6)break;
+  }
+  if(!latest.length){html+=`<div class="sf-empty">暂无新闻，等爬虫跑完</div>`;}
   else{
     for(const it of latest){
-      html+=`<a class="hm-news" href="${esc(it.link)}" target="_blank" rel="noopener"><span class="hm-news-co">${esc(it.company)}</span><span class="hm-news-t">${esc(it.title)}</span><span class="hm-news-time">${esc(relTime(it.ts))}</span></a>`;
+      const neg=it.alert==='neg',pos=it.alert==='pos';
+      const cls=neg?'sf-news-neg':pos?'sf-news-pos':'';
+      const sc=sectorColor((hs.find(h=>h.name===it.company)||{}).sector);
+      html+='<a class="sf-news '+cls+'" href="'+esc(it.link)+'" target="_blank" rel="noopener"><span class="sf-news-co" style="background:'+sc+'14">'+esc(it.company)+'</span><span class="sf-news-t">'+esc(it.title)+'</span><span class="sf-news-time">'+esc(relTime(it.ts))+'</span></a>';
     }
   }
-  html+=`</div>`;
+  html+='</div>';
 
-  // ---- 板块分布 + 护城河速览 ----
-  const secCount={};
-  hs.forEach(h=>{const s=h.sector||"未分类";secCount[s]=(secCount[s]||0)+1;});
-  const secArr=Object.entries(secCount).sort((a,b)=>b[1]-a[1]);
-  html+=`<div class="hm-sec"><div class="hm-title">🛡 板块分布 & 护城河</div><div class="hm-secbar">`;
-  secArr.forEach(([s,c])=>{
-    html+=`<div class="hm-secseg" style="flex:${c};background:${sectorColor(s)}">${esc(s)} ${Math.round(c/hs.length*100)}%</div>`;
-  });
-  html+=`</div><div class="hm-moats">`;
-  for(const h of hs){
-    const m=(h.moat||"").split("+")[0].trim();
-    html+=`<div class="hm-moat"><span class="hm-moat-n">${esc(h.name)}</span><span class="hm-moat-v">${esc(m||"—")}</span></div>`;
-  }
-  html+=`</div></div>`;
-
+  html+='</div>'; // hm-signal-flow
   wrap.innerHTML=html;
 }
-
 function buildChips(){
   const coBox=document.getElementById("company-chips");
   let co=`<span class="chip-label">公司</span><span class="chip ${state.filterCo==="all"?"active":""}" data-co="all">全部</span>`;
