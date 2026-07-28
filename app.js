@@ -610,19 +610,21 @@ function renderCal(){
     evts.push({pct,r,sc:sectorColor(r.h.sector)});
   }
   evts.sort((a,b)=>a.pct-b.pct);
-  // 交错：上一行 near=8px（默认），下一行 near=28px
-  let lastTop=false;let lastPct=-100;
+  // 4 条轨道交错，避免公司名互相重叠（时间轴已加高到 118px）
+  const lanes=[10,40,70,100];
+  let lastPct=-100,lastLane=0;
   let eventsHtml="";
   for(const e of evts){
-    let topPx=8;
-    if(e.pct-lastPct<2.5){ // 太近 → 错位
-      topPx=lastTop?8:28;
-    }else{
-      topPx=8;
+    let lane=0;
+    if(e.pct-lastPct<3.5){ // 太近 → 换轨道
+      lane=(lastLane+1)%lanes.length;
     }
-    lastPct=e.pct;lastTop=topPx===28;
+    lastLane=lane;lastPct=e.pct;
+    const topPx=lanes[lane];
+    // 标签截短：太长会 ellipsis，hover title 显示完整
+    const short=esc(e.r.h.name).replace(/控股|有限|集团|公司/g,"").slice(0,4)||esc(e.r.h.name).slice(0,4);
     eventsHtml+=`<div class="cal-evt" style="left:${e.pct.toFixed(2)}%;top:${topPx}px;--sc:${e.sc}" data-name="${esc(e.r.h.name)}" data-date="${esc(e.r.ne.date)}" data-in="${e.r.ne.inDays}" data-src="${esc(e.r.ne.source||"权威源")}" data-code="${esc(e.r.h.code)}" title="${esc(e.r.h.name)} · ${esc(e.r.ne.date)}（${e.r.ne.inDays}天后）· ${esc(e.r.ne.source||"权威源")}">
-      <span class="cal-evt-dot"></span><span class="cal-evt-lbl">${esc(e.r.h.name)}</span>
+      <span class="cal-evt-dot"></span><span class="cal-evt-lbl"><b>${short}</b><i>${esc(e.r.ne.date).slice(5).replace("-","/")}</i></span>
     </div>`;
   }
 
