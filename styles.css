@@ -771,3 +771,42 @@ html[data-theme="dark"] .chip.active{color:#12141a}
 .cal-card.estimated{border-left:3px dashed rgba(184,134,27,.5)}
 .cal-card .est-tag{font-size:10px;color:#b8861b;background:var(--brand-soft);padding:1px 5px;border-radius:3px;margin-left:4px}
 .cal-card .d.est{color:#b8861b}
+
+/* ============================================================
+   V19 新增：数据健康条 / ROE5年达标 / 七力确认数 / 复盘卡 / 关键变量方向 / 展开收起
+   ============================================================ */
+
+/* —— 数据健康状态条 —— */
+.hm-health{display:flex;flex-wrap:wrap;gap:8px;padding:8px 14px;background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:14px;font-size:11.5px}
+.hh-item{display:inline-flex;align-items:center;gap:3px;color:var(--ink-soft)}
+.hh-item.warn{color:var(--neg);font-weight:600}
+
+/* —— 信号矩阵：数据不足/部分 —— */
+.sm-card.insufficient{border:1px dashed var(--ink-dim);opacity:.7}
+.sm-data-warn{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(192,57,43,.1);color:var(--neg);font-weight:600}
+.sm-data-partial{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(184,134,27,.1);color:#b8861b;font-weight:600}
+.sm-sub{font-size:9.5px;opacity:.7;font-weight:400;display:block;line-height:1.2;margin-top:1px}
+.sm-leg.insufficient{background:transparent;border:1px dashed var(--ink-dim);color:var(--ink-dim)}
+
+/* —— 关键变量流：方向标签 —— */
+.kv-dir{font-size:13px;flex-shrink:0}
+.kv-item.kv-up{border-left:2px solid var(--green)}
+.kv-item.kv-down{border-left:2px solid var(--neg)}
+.kv-item.kv-more{justify-content:center;color:var(--brand);font-weight:600;cursor:pointer;font-size:12px}
+.kv-extra{display:none}
+.kv-flow.expanded .kv-extra{display:flex}
+
+/* —— 复盘卡 —— */
+.dc-review{margin-top:8px;padding:10px 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-size:12px;line-height:1.6}
+.rv-head{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.rv-label{font-weight:700;color:var(--brand);font-size:11px}
+.rv-status{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600}
+.rv-status.rv-pending{background:rgba(184,134,27,.12);color:#b8861b}
+.rv-status.rv-intact{background:rgba(46,125,79,.12);color:var(--green)}
+.rv-status.rv-partial{background:rgba(199,127,26,.12);color:#8a6d20}
+.rv-status.rv-broken{background:rgba(192,57,43,.12);color:var(--neg)}
+.rv-date{font-size:10.5px;color:var(--ink-dim);margin-left:auto}
+.rv-row{display:flex;gap:6px;margin-bottom:3px}
+.rv-row:last-child{margin-bottom:0}
+.rv-l{font-weight:700;color:var(--ink-soft);white-space:nowrap;min-width:56px}
+.rv-v{color:var(--ink-soft);flex:1}

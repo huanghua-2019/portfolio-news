@@ -138,16 +138,33 @@ function powersHTML(h) {
   }).join("");
 }
 
-// 6维度评分：返回 0=红/差 1=黄/中 2=绿/好；数据缺失返回 1（中性灰）
+// 6维度评分：返回 0=红/差 1=黄/中 2=绿/好；数据缺失返回 null（不参与平均）
 function gradeOf(kind, val) {
-  if (val == null || (typeof val === "number" && isNaN(val))) return 1;
+  if (val == null || (typeof val === "number" && isNaN(val))) return null;
   if (kind === "margin")  { if (val >= 30) return 2; if (val >= 0) return 1; return 0; }   // 折价 %（越大越好）
   if (kind === "roe")     { if (val >= 15) return 2; if (val >= 10) return 1; return 0; }
   if (kind === "dy")      { if (val >= 5)  return 2; if (val >= 2)  return 1; return 0; }
   if (kind === "power")   { if (val >= 5)  return 2; if (val >= 3)  return 1; return 0; }   // 七力 max 1-5
   if (kind === "check")   { if (val >= 0.8) return 2; if (val >= 0.4) return 1; return 0; }  // 通过率 0-1
   if (kind === "news")    { if (val < 0.05) return 2; if (val <= 0.20) return 1; return 0; }// 利空率5%/20% 分档，越低越好
-  return 1;
+  return null;
+}
+
+// 计算有效维度的平均分（跳过 null），返回 {avg, valid, total, insufficient}
+function avgGrade(grades) {
+  const valid = grades.filter(g => g !== null);
+  if (!valid.length) return { avg: 0, valid: 0, total: grades.length, insufficient: true };
+  const avg = valid.reduce((a,b)=>a+b,0) / valid.length;
+  return { avg, valid: valid.length, total: grades.length, insufficient: false };
+}
+
+// 计算 ROE 5年达标年数
+function roeYears达标(h) {
+  const fd = h.financials && h.financials.data;
+  if (!fd || !fd.length) return { pass: 0, total: 0 };
+  let pass = 0;
+  for (const d of fd) { if (d.roe != null && d.roe >= 15) pass++; }
+  return { pass, total: fd.length };
 }
 
 // 掫取一家公司 6 维度的原始数值（不评分）
@@ -155,17 +172,20 @@ function metricsOf(h) {
   // 1. 折价
   const tp = parseTargetPrice(h.targetPrice, h.priceCcy);
   const m = tp ? marginOf(h.price, tp.value) : null;
-  const margin = m ? m.pct : null;  // pct 已是百分比，如 35.1 含义是现价较目标价低 35.1%
-  // 2. ROE：取最近年
+  const margin = m ? m.pct : null;
+  // 2. ROE：最新年
   const fd = h.financials && h.financials.data;
   const roe = fd && fd.length ? fd[fd.length-1].roe : null;
+  // 2b. ROE 5年达标
+  const roe5y = roeYears达标(h);
   // 3. 股息率
   const dyRes = dividendYield(h);
   const dy = (dyRes && !dyRes.mismatch && dyRes.pct != null) ? dyRes.pct : null;
-  // 4. 七力：取最强那项的 score
+  // 4. 七力：最强项 score + 已确认几项
   const ps = h.powers || [];
   const power = ps.length ? Math.max(...ps.map(p => p.score || 0)) : null;
-  // 5. 清单通过率：有状态的看是否通过，null 视为不计
+  const powerCount = ps.length;
+  // 5. 清单通过率
   const cl = h.checklist || {};
   const ckFields = ["roe15","fcfPositive","mgmtIntegrity","marginSafety","divOk"];
   let ckTotal = 0, ckPass = 0;
@@ -179,7 +199,7 @@ function metricsOf(h) {
   const items = (state.all || []).filter(x => x.company === h.name && x.ts >= now - 7*86400000);
   const negN = items.filter(x => x.alert === "neg").length;
   const newsNegRate = items.length ? negN / items.length : null;
-  return { margin, roe, dy, power, check, newsNegRate, _itemsLen: items.length };
+  return { margin, roe, roe5y, dy, power, powerCount, check, newsNegRate, _itemsLen: items.length, _ckTotal: ckTotal, _ckPass: ckPass };
 }
 
 // 信号矩阵：块状卡片版（取代热力图表格）
@@ -252,20 +272,36 @@ function renderHeatmapWithActions(hs) {
     const m = metricsOf(ho);
     const sc = sectorColor(ho.sector);
     const grades = dims.map(d => gradeOf(d.key, d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null));
-    const avgG = grades.reduce((a,b)=>a+b,0)/grades.length;
-    const cardClass = avgG >= 1.8 ? "good" : avgG >= 1.3 ? "mid" : "weak";
+    const ag = avgGrade(grades);
+    const cardClass = ag.insufficient ? "insufficient" : ag.avg >= 1.8 ? "good" : ag.avg >= 1.3 ? "mid" : "weak";
     const act = actionSuggest(ho);
     h += '<div class="sm-card '+cardClass+'" data-co="'+esc(ho.name)+'" onclick="dashJumpTo(\''+esc(ho.name).replace(/'/g, "\\'")+'\')" title="点击跳转总览">';
-    h += '<div class="sm-head"><span class="sm-dot" style="background:'+sc+'"></span><span class="sm-name">'+esc(ho.name)+'</span><span class="sm-sector" style="color:'+sc+'">'+esc(ho.sector||"")+'</span></div>';
+    h += '<div class="sm-head"><span class="sm-dot" style="background:'+sc+'"></span><span class="sm-name">'+esc(ho.name)+'</span><span class="sm-sector" style="color:'+sc+'">'+esc(ho.sector||"")+'</span>';
+    // 顶条：X/6项有数据
+    if (ag.insufficient) {
+      h += '<span class="sm-data-warn">数据不足</span>';
+    } else if (ag.valid < ag.total) {
+      h += '<span class="sm-data-partial">'+ag.valid+'/'+ag.total+'项有数据</span>';
+    }
+    h += '</div>';
     h += '<div class="sm-grid">';
     dims.forEach((d, i) => {
       const rawVal = d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null;
       const g = gradeOf(d.key, rawVal);
       const na = rawVal == null;
       const cls = na ? "na" : "g"+g;
+      // ROE 特殊处理：显示5年达标
+      let valStr = d.val(m);
+      if (d.key === "roe" && m.roe5y && m.roe5y.total > 0) {
+        valStr += ' <span class="sm-sub">'+m.roe5y.pass+'/'+m.roe5y.total+'年达标</span>';
+      }
+      // 七力特殊处理：显示已确认几项
+      if (d.key === "power" && m.powerCount) {
+        valStr += ' <span class="sm-sub">'+m.powerCount+'项确认</span>';
+      }
       h += '<div class="sm-cell '+cls+'" data-dim="'+d.label+'" title="'+d.label+': '+esc(d.val(m))+'">';
       h += '<span class="sm-dim">'+dimIcons[d.key]+' '+d.label+'</span>';
-      h += '<span class="sm-val">'+d.val(m)+'</span>';
+      h += '<span class="sm-val">'+valStr+'</span>';
       h += '</div>';
     });
     h += '</div>';
@@ -282,7 +318,7 @@ function renderHeatmapWithActions(hs) {
     h += '<span class="sm-sum-item warn">⚠ 利空股 ' + negStocks.map(s=>esc(s.name)).join(' · ') + '</span>';
   }
   h += '</div>';
-  h += '<div class="sm-legend"><span class="sm-leg g2">好</span><span class="sm-leg g1">中</span><span class="sm-leg g0">差</span><span class="sm-leg na">缺</span></div>';
+  h += '<div class="sm-legend"><span class="sm-leg g2">好</span><span class="sm-leg g1">中</span><span class="sm-leg g0">差</span><span class="sm-leg na">缺</span><span class="sm-leg insufficient">数据不足</span></div>';
   h += '</div>';
   return h;
 }
@@ -560,6 +596,21 @@ function renderDash(){
       </div>
       ${(()=>{const act=actionSuggest(h);return '<div class="dc-action '+act.cls+'" title="'+esc(act.tip)+'">'+act.label+'</div>';})()}
       ${h.notes?'<div class="dc-notes"><div class="dn-row"><span class="dn-l">关注</span><span class="dn-v">'+esc(h.notes.focus||'')+'</span></div><div class="dn-row"><span class="dn-l">验证点</span><span class="dn-v">'+esc(h.notes.nextCheck||'')+'</span></div><div class="dn-row dn-nogo"><span class="dn-l">不可接受</span><span class="dn-v">'+esc(h.notes.noGo||'')+'</span></div></div>':''}
+      ${(()=>{
+        const r = h.review;
+        if(!r) return '';
+        const statusMap = {pending:'待复盘', intact:'逻辑成立', partial:'部分成立', broken:'逻辑破坏'};
+        const statusCls = {pending:'rv-pending', intact:'rv-intact', partial:'rv-partial', broken:'rv-broken'};
+        let s = '<div class="dc-review"><div class="rv-head"><span class="rv-label">复盘</span>';
+        s += '<span class="rv-status '+statusCls[r.status]||''+'">'+(statusMap[r.status]||r.status||'待复盘')+'</span>';
+        if(r.lastDate) s += '<span class="rv-date">上次: '+esc(r.lastDate)+'</span>';
+        s += '</div>';
+        if(r.result) s += '<div class="rv-row"><span class="rv-l">验证结果</span><span class="rv-v">'+esc(r.result)+'</span></div>';
+        if(r.changes) s += '<div class="rv-row"><span class="rv-l">变化</span><span class="rv-v">'+esc(r.changes)+'</span></div>';
+        if(r.nextCheckDate) s += '<div class="rv-row"><span class="rv-l">下次检查</span><span class="rv-v">'+esc(r.nextCheckDate)+'</span></div>';
+        s += '</div>';
+        return s;
+      })()}
       ${last?`<div class="dc-kpis">
         <div class="dc-kpi"><div class="k-l">净利 <i>${last.year}</i></div><div class="k-v">${fmtNum(last.netProfit)}<i>${esc((f&&f.unit)||"亿")}</i></div>${yoyBadge(npYoy)}</div>
         <div class="dc-kpi"><div class="k-l">ROE <i>${last.year}</i></div><div class="k-v">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${(last.roe!=null&&prev&&prev.roe!=null)?yoyBadge(last.roe-prev.roe,"pp"):""}</div>
@@ -923,29 +974,33 @@ function actionSuggest(h){
   const mg = tp ? marginOf(h.price, tp.value) : null;
   const its = (state.all||[]).filter(x=>x.company===h.name && x.ts >= Date.now()-7*86400000);
   const negN = its.filter(x=>x.alert==="neg").length;
+  const negRate = m.newsNegRate;
   
-  // 财报前≤7天
-  if(ne && ne.inDays>=0 && ne.inDays<=7) 
+  // 1. 一票否决 / 明确利空（优先级最高）
+  if(negN >= 3 || (negRate && negRate > 0.20))
+    return {label:"利空预警", cls:"act-warn", tip:"近7天"+negN+"条利空，利空率"+(negRate*100).toFixed(0)+"%"};
+  // 2. 财报前后静默期
+  if(ne && ne.inDays>=0 && ne.inDays<=7)
     return {label:"财报前静默", cls:"act-quiet", tip:"财报"+(ne.inDays===0?"今天":ne.inDays+"天后")+"，减少操作"};
-  // 财报后≤7天
   if(ne && ne.inDays<0 && ne.inDays>=-7)
     return {label:"财报后复盘", cls:"act-review", tip:"刚发完财报，该复盘论点"};
-  // 击球区 + 有清单待核
+  // 3. 关键变量恶化（利空 2条以上）
+  if(negN >= 2)
+    return {label:"关键变量恶化", cls:"act-warn", tip:"近7天"+negN+"条利空新闻，关注关键变量"};
+  // 4. 估值击球区
   if(mg && mg.band==="hit"){
     const ck = h.checklist||{};
     const nulls = ["fcfPositive","mgmtIntegrity","divOk"].filter(k=>ck[k]==null);
     if(nulls.length) return {label:"击球区但需核查", cls:"act-hit-check", tip:"安全边际达标，但清单"+nulls.length+"项待核"};
     return {label:"击球区", cls:"act-hit", tip:"折价"+mg.pct.toFixed(0)+"%，安全边际充足"};
   }
-  // 高估值
+  // 5. 高估值等待
   if(mg && mg.band==="premium")
     return {label:"高估值需等待", cls:"act-premium", tip:"溢价"+Math.abs(mg.pct).toFixed(0)+"%，等待回调"};
-  // 利空预警
-  if(negN>=2) return {label:"利空预警", cls:"act-warn", tip:"近7天"+negN+"条利空新闻"};
-  // 周期股特殊
+  // 6. 周期股特殊
   if(h.sector==="航运")
     return {label:"周期股盯运价", cls:"act-cycle", tip:"盯SCFI/CCFI与红海局势"};
-  // 默认
+  // 7. 默认
   return {label:"继续观察", cls:"act-watch", tip:"无异常信号，维持观察"};
 }
 
@@ -993,13 +1048,22 @@ function keyVarItems(){
   const cutoff = now - 7*86400000;
   let pool = (state.all||[]).filter(x=>x.ts >= cutoff);
   const result = [];
+  // 变化方向判断词表
+  const upWords = ["上涨","增长","提升","改善","超预期","创新高","回升","反弹","加速","上调","增加","扩大","盈利","突破","强劲","复苏"];
+  const downWords = ["下降","下跌","减少","恶化","不及预期","创新低","回落","下滑","下调","萎缩","亏损","暴跌","遇冷","承压","放缓","减少"];
   for(const it of pool){
     const h = (state.holdings||[]).find(x=>x.name===it.company);
     if(!h || !h.keyVars || !h.keyVars.length) continue;
     const hits = h.keyVars.filter(kw=>it.title.includes(kw));
-    if(hits.length) result.push({it, hits, co:h});
+    if(!hits.length) continue;
+    // 判断变化方向
+    let direction = "neutral";
+    let upHit = upWords.filter(w=>it.title.includes(w)).length;
+    let downHit = downWords.filter(w=>it.title.includes(w)).length;
+    if(it.alert === "neg" || downHit > upHit) direction = "down";
+    else if(it.alert === "pos" || upHit > downHit) direction = "up";
+    result.push({it, hits, co:h, direction});
   }
-  // 按时间倒序
   result.sort((a,b)=>b.it.ts-a.it.ts);
   return result;
 }
@@ -1035,6 +1099,30 @@ function renderHome(){
     +'<div class="hero-right"><span class="dot"></span>'+esc(upd)+' 更新</div>'
     +'</div>';
 
+  // ==== 数据健康状态条 ====
+  const newsN = state.all.length;
+  const newsAge = state.generatedAt ? Math.floor((now - state.generatedAt) / 3600000) : null;
+  const priceAge = hs[0] && hs[0].priceTime ? Math.floor((now - new Date(hs[0].priceTime).getTime()) / 3600000) : null;
+  // 统计待核字段
+  let pendingFields = [];
+  for(const h of hs){
+    const ck = h.checklist || {};
+    const nulls = ["fcfPositive","mgmtIntegrity","divOk"].filter(k=>ck[k]==null);
+    if(nulls.length) pendingFields.push(esc(h.name)+"清单"+nulls.length+"项");
+    const ne = nextEarnings(h);
+    if(ne && ne.status === "estimated") pendingFields.push(esc(h.name)+"财报日待核");
+  }
+  let healthHtml = '<div class="hm-health">';
+  healthHtml += '<span class="hh-item">📰 新闻 '+newsN+' 条'+(newsAge!=null?(newsAge<1?"刚刚":newsAge+"h前"):"")+'</span>';
+  if(priceAge != null) healthHtml += '<span class="hh-item">💰 行情 '+(priceAge<1?"刚刚":priceAge+"h前")+'</span>';
+  // 财报日权威/待核/估算统计
+  const neStats = {confirmed:0, estimated:0, guessed:0};
+  for(const h of hs){ const ne = nextEarnings(h); if(ne) neStats[ne.status]++; }
+  healthHtml += '<span class="hh-item">📅 财报日 '+neStats.confirmed+'权威/'+neStats.estimated+'待核/'+neStats.guessed+'估算</span>';
+  if(pendingFields.length) healthHtml += '<span class="hh-item warn">⚠ 待核: '+pendingFields.slice(0,3).join(" · ")+(pendingFields.length>3?" 等"+pendingFields.length+"项":"")+'</span>';
+  healthHtml += '</div>';
+  html += healthHtml;
+
   // ==== 层①.5 今日最该看的 3 条 ====
   const picks = topPicks();
   if(picks.length){
@@ -1063,15 +1151,35 @@ function renderHome(){
   // ==== 层③ 关键变量流 ====
   const kvs = keyVarItems();
   if(kvs.length){
-    html+='<div class="hm-sec"><div class="hm-title">🔑 关键变量流 <span class="hm-sub">新闻命中关键变量的条目</span></div><div class="kv-flow">';
-    for(const item of kvs.slice(0,8)){
+    html+='<div class="hm-sec"><div class="hm-title">🔑 关键变量流 <span class="hm-sub">命中关键变量 · 箭头表示变化方向</span></div><div class="kv-flow" id="kv-flow-box">';
+    const kvShow = kvs.slice(0,5);
+    const kvRest = kvs.slice(5);
+    for(const item of kvShow){
       const sc = sectorColor(item.co.sector);
-      html+='<a class="kv-item" href="'+esc(item.it.link)+'" target="_blank" rel="noopener">';
+      const dirIcon = item.direction==="up"?"📈":item.direction==="down"?"📉":"➡️";
+      const dirCls = item.direction==="up"?"kv-up":item.direction==="down"?"kv-down":"";
+      html+='<a class="kv-item '+dirCls+'" href="'+esc(item.it.link)+'" target="_blank" rel="noopener">';
       html+='<span class="kv-co" style="background:'+sc+'14">'+esc(item.it.company)+'</span>';
+      html+='<span class="kv-dir">'+dirIcon+'</span>';
       html+='<span class="kv-tags">'+item.hits.map(k=>'<b>'+esc(k)+'</b>').join(' ')+'</span>';
       html+='<span class="kv-title">'+esc(item.it.title.slice(0,60))+(item.it.title.length>60?'…':'')+'</span>';
       html+='<span class="kv-time">'+esc(relTime(item.it.ts))+'</span>';
       html+='</a>';
+    }
+    if(kvRest.length){
+      html+='<a class="kv-item kv-more" onclick="var b=document.getElementById(\'kv-flow-box\');b.classList.toggle(\'expanded\');this.style.display=\'none\';return false;">展开剩余 '+kvRest.length+' 条 ▼</a>';
+      for(const item of kvRest){
+        const sc = sectorColor(item.co.sector);
+        const dirIcon = item.direction==="up"?"📈":item.direction==="down"?"📉":"➡️";
+        const dirCls = item.direction==="up"?"kv-up":item.direction==="down"?"kv-down":"";
+        html+='<a class="kv-item '+dirCls+' kv-extra" href="'+esc(item.it.link)+'" target="_blank" rel="noopener">';
+        html+='<span class="kv-co" style="background:'+sc+'14">'+esc(item.it.company)+'</span>';
+        html+='<span class="kv-dir">'+dirIcon+'</span>';
+        html+='<span class="kv-tags">'+item.hits.map(k=>'<b>'+esc(k)+'</b>').join(' ')+'</span>';
+        html+='<span class="kv-title">'+esc(item.it.title.slice(0,60))+(item.it.title.length>60?'…':'')+'</span>';
+        html+='<span class="kv-time">'+esc(relTime(item.it.ts))+'</span>';
+        html+='</a>';
+      }
     }
     html+='</div></div>';
   }
