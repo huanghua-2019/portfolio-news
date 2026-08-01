@@ -97,7 +97,7 @@ function earningsQuietPeriod(h) {
   else if (ne.inDays > -10 && ne.inDays < 0 && daysAgo <= 7)
     label = `财报后${daysAgo}天`;                                  // 后静默
   else return null;
-  return { daysAgo, daysToGo, label, est: !ne.confirmed };
+  return { daysAgo, daysToGo, label, est: ne.status !== "confirmed" };
 }
 
 function dividendYield(h) {
@@ -167,7 +167,7 @@ function metricsOf(h) {
   const power = ps.length ? Math.max(...ps.map(p => p.score || 0)) : null;
   // 5. 清单通过率：有状态的看是否通过，null 视为不计
   const cl = h.checklist || {};
-  const ckFields = ["roe15","strongBS","steadyRev","highMargin","dcfUnder"];
+  const ckFields = ["roe15","fcfPositive","mgmtIntegrity","marginSafety","divOk"];
   let ckTotal = 0, ckPass = 0;
   for (const k of ckFields) {
     const v = cl[k];
@@ -232,6 +232,58 @@ function renderHeatmap(hs) {
   h += '</div>'; // sm-summary
   h += '<div class="sm-legend"><span class="sm-leg g2">好</span><span class="sm-leg g1">中</span><span class="sm-leg g0">差</span><span class="sm-leg na">缺</span></div>';
   h += '</div>'; // signal-matrix
+  return h;
+}
+
+// 信号矩阵升级版：每张卡底部加动作建议
+function renderHeatmapWithActions(hs) {
+  if (!hs.length) return "";
+  const dims = [
+    { key: "margin", label: "折价", val: m => m.margin == null ? "—" : (m.margin >= 0 ? "+"+m.margin.toFixed(1) : m.margin.toFixed(1))+"%" },
+    { key: "roe",    label: "ROE",  val: m => m.roe == null ? "—" : m.roe.toFixed(1)+"%" },
+    { key: "dy",     label: "股息",  val: m => m.dy == null ? "—" : m.dy.toFixed(2)+"%" },
+    { key: "power",  label: "七力",  val: m => m.power == null ? "—" : m.power+"★" },
+    { key: "check",  label: "清单",  val: m => m.check == null ? "—" : Math.round(m.check*100)+"%" },
+    { key: "news",   label: "利空",  val: m => m._itemsLen === 0 ? "无" : (m.newsNegRate*100).toFixed(0)+"%" }
+  ];
+  const dimIcons = { margin:"🎯", roe:"📈", dy:"💰", power:"🛡", check:"✅", news:"⚠" };
+  let h = '<div class="signal-matrix">';
+  for (const ho of hs) {
+    const m = metricsOf(ho);
+    const sc = sectorColor(ho.sector);
+    const grades = dims.map(d => gradeOf(d.key, d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null));
+    const avgG = grades.reduce((a,b)=>a+b,0)/grades.length;
+    const cardClass = avgG >= 1.8 ? "good" : avgG >= 1.3 ? "mid" : "weak";
+    const act = actionSuggest(ho);
+    h += '<div class="sm-card '+cardClass+'" data-co="'+esc(ho.name)+'" onclick="dashJumpTo(\''+esc(ho.name).replace(/'/g, "\\'")+'\')" title="点击跳转总览">';
+    h += '<div class="sm-head"><span class="sm-dot" style="background:'+sc+'"></span><span class="sm-name">'+esc(ho.name)+'</span><span class="sm-sector" style="color:'+sc+'">'+esc(ho.sector||"")+'</span></div>';
+    h += '<div class="sm-grid">';
+    dims.forEach((d, i) => {
+      const rawVal = d.key==="margin"?m.margin : d.key==="roe"?m.roe : d.key==="dy"?m.dy : d.key==="power"?m.power : d.key==="check"?m.check : d.key==="news"?m.newsNegRate : null;
+      const g = gradeOf(d.key, rawVal);
+      const na = rawVal == null;
+      const cls = na ? "na" : "g"+g;
+      h += '<div class="sm-cell '+cls+'" data-dim="'+d.label+'" title="'+d.label+': '+esc(d.val(m))+'">';
+      h += '<span class="sm-dim">'+dimIcons[d.key]+' '+d.label+'</span>';
+      h += '<span class="sm-val">'+d.val(m)+'</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+    // 动作建议
+    h += '<div class="sm-action '+act.cls+'" title="'+esc(act.tip)+'">'+act.label+'</div>';
+    h += '</div>';
+  }
+  // 底部汇总 + legend
+  const hitN = hs.filter(h => { const tp=parseTargetPrice(h.targetPrice,h.priceCcy); return tp && marginOf(h.price,tp.value) && marginOf(h.price,tp.value).band === "hit"; }).length;
+  const negStocks = hs.filter(h => { const m = metricsOf(h); return m.newsNegRate && m.newsNegRate > 0.05; });
+  h += '<div class="sm-summary">';
+  h += '<span class="sm-sum-item hit" onclick="gotoView(\'dash\')" title="折价≥30%为击球区">⚾ 击球区 '+hitN+' 只</span>';
+  if (negStocks.length) {
+    h += '<span class="sm-sum-item warn">⚠ 利空股 ' + negStocks.map(s=>esc(s.name)).join(' · ') + '</span>';
+  }
+  h += '</div>';
+  h += '<div class="sm-legend"><span class="sm-leg g2">好</span><span class="sm-leg g1">中</span><span class="sm-leg g0">差</span><span class="sm-leg na">缺</span></div>';
+  h += '</div>';
   return h;
 }
 
@@ -506,6 +558,8 @@ function renderDash(){
         </div>
         <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利五年</div>`:""}</div>
       </div>
+      ${(()=>{const act=actionSuggest(h);return '<div class="dc-action '+act.cls+'" title="'+esc(act.tip)+'">'+act.label+'</div>';})()}
+      ${h.notes?'<div class="dc-notes"><div class="dn-row"><span class="dn-l">关注</span><span class="dn-v">'+esc(h.notes.focus||'')+'</span></div><div class="dn-row"><span class="dn-l">验证点</span><span class="dn-v">'+esc(h.notes.nextCheck||'')+'</span></div><div class="dn-row dn-nogo"><span class="dn-l">不可接受</span><span class="dn-v">'+esc(h.notes.noGo||'')+'</span></div></div>':''}
       ${last?`<div class="dc-kpis">
         <div class="dc-kpi"><div class="k-l">净利 <i>${last.year}</i></div><div class="k-v">${fmtNum(last.netProfit)}<i>${esc((f&&f.unit)||"亿")}</i></div>${yoyBadge(npYoy)}</div>
         <div class="dc-kpi"><div class="k-l">ROE <i>${last.year}</i></div><div class="k-v">${last.roe==null?"—":fmtNum(last.roe)+"%"}</div>${(last.roe!=null&&prev&&prev.roe!=null)?yoyBadge(last.roe-prev.roe,"pp"):""}</div>
@@ -530,22 +584,23 @@ function renderDash(){
       ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
       ${h.checklist?`<details class="dc-checklist"><summary>✓ 买入检查清单</summary>${checklistHTML(h, mg?mg.band:null)}</details>`:""}
       <div class="dc-latest">${latest?`<span class="dc-latest-l">最新</span><a href="${esc(latest.link)}" target="_blank" rel="noopener" title="${esc(latest.title)}">${esc(latest.title)}</a><span class="dc-latest-t">${esc(relTime(latest.ts))}</span>`:`<span class="dc-latest-l">最新</span><span class="dc-latest-none">暂无新闻</span>`}</div>
-      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.confirmed?`<b>${esc(nextEarn.date)}</b>`:`约 ${nextEarn.month} 月`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
+      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.status==="confirmed"?`<b>${esc(nextEarn.date)}</b>`:`${nextEarn.status==="estimated"?"约 "+esc(nextEarn.date):"约 "+nextEarn.month+" 月"}`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.status==="estimated"?' <span class="e-src est">待核</span>':nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
     </div>`;
   }
   grid.innerHTML=html;
 }
 
+// 财报日三态：confirmed(权威) / estimated(估算待核) / guessed(月份级猜测)
 function nextEarnings(h){
-  // 优先读取 holdings 中由权威源核实的 nextEarningsDate（经 crawler 透传到 news.json.companies）
   if(h&&h.nextEarningsDate){
     const d=new Date(h.nextEarningsDate+"T00:00:00");
     if(!isNaN(d)){
       const inDays=Math.ceil((d.getTime()-Date.now())/86400000);
-      return {month:d.getMonth()+1,date:h.nextEarningsDate,inDays,source:h.nextEarningsSource||"",confirmed:h.nextEarningsEstimated?false:true};
+      // 三态：nextEarningsEstimated=true → 估算待核；false → 权威确认
+      const status = h.nextEarningsEstimated ? "estimated" : "confirmed";
+      return {month:d.getMonth()+1,date:h.nextEarningsDate,inDays,source:h.nextEarningsSource||"",status};
     }
   }
-  // 回退：按 earningsMonths「当月1日」粗略估算（仅兜底）
   const months=h&&h.earningsMonths;
   if(!months||!months.length)return null;
   const now=new Date();const y=now.getFullYear();const m=now.getMonth()+1;
@@ -554,7 +609,7 @@ function nextEarnings(h){
   const year=cand.length?y:(m>months[months.length-1]?y+1:y);
   const d=new Date(year,target-1,1);
   const inDays=Math.ceil((d.getTime()-now.getTime())/86400000);
-  return {month:target,inDays,source:"估算(月份级)",confirmed:false};
+  return {month:target,inDays,source:"估算(月份级)",status:"guessed"};
 }
 
 // ============================================================
@@ -591,7 +646,7 @@ function renderCal(){
   const monthItems={}; // monthIdx → [{h,ne,sc,name,soon}]
   for(const r of rows){
     if(!r.ne||r.ne.inDays<0)continue;
-    const d=new Date((r.ne.confirmed&&r.ne.date)?r.ne.date+"T00:00:00":yearStart.getTime());
+    const d=new Date((r.ne.status==="confirmed"||r.ne.status==="estimated")&&r.ne.date?r.ne.date+"T00:00:00":yearStart.getTime());
     d.setMonth((r.ne.month||(d.getMonth()+1))-1,15);
     const mi=d.getMonth();
     if(!monthItems[mi])monthItems[mi]=[];
@@ -599,11 +654,12 @@ function renderCal(){
     monthCount[mi]++;
   }
 
-  // 事件点（按真实时间定位）—— 仅 confirmed 的事件会画到轴上
+  // 事件点（按真实时间定位）—— confirmed + estimated 的事件会画到轴上
   // 先按 left 排序，按相邻间距交替到上下两行避免重叠
   const evts=[];
   for(const r of rows){
-    if(!r.ne||!r.ne.confirmed||r.ne.inDays<0)continue;
+    if(!r.ne||r.ne.inDays<0)continue;
+    if(r.ne.status==="guessed")continue; // 月份级猜测不画到轴上
     const d=new Date(r.ne.date+"T00:00:00");
     const pct=(d.getTime()-yearStart.getTime())/yearMs*100;
     if(pct<0||pct>100)continue;
@@ -640,8 +696,10 @@ function renderCal(){
   const filterBtns=[
     {k:"all",l:"全部",n:rows.length},
     {k:"soon",l:"45天内",n:rows.filter(r=>r.ne&&r.ne.inDays>=0&&r.ne.inDays<=45).length},
-    {k:"confirmed",l:"已确认",n:rows.filter(r=>r.ne&&r.ne.confirmed).length},
-    {k:"unknown",l:"待核实",n:rows.filter(r=>r.ne&&!r.ne.confirmed).length},
+    {k:"confirmed",l:"权威",n:rows.filter(r=>r.ne&&r.ne.status==="confirmed").length},
+    {k:"estimated",l:"待核",n:rows.filter(r=>r.ne&&r.ne.status==="estimated").length},
+    {k:"guessed",l:"估算",n:rows.filter(r=>r.ne&&r.ne.status==="guessed").length},
+    {k:"unknown",l:"未配置",n:rows.filter(r=>!r.ne).length},
   ].map(b=>`<button class="cal-f-btn ${filt===b.k?"on":""}" data-f="${b.k}">${b.l}<i>${b.n}</i></button>`).join("");
 
   // 过滤后的卡片列表
@@ -649,8 +707,10 @@ function renderCal(){
     if(filt==="all")return true;
     if(!r.ne)return false;
     if(filt==="soon")return r.ne.inDays>=0&&r.ne.inDays<=45;
-    if(filt==="confirmed")return r.ne.confirmed;
-    if(filt==="unknown")return !r.ne.confirmed;
+    if(filt==="confirmed")return r.ne.status==="confirmed";
+    if(filt==="estimated")return r.ne.status==="estimated";
+    if(filt==="guessed")return r.ne.status==="guessed";
+    if(filt==="unknown")return !r.ne;
     return true;
   });
 
@@ -660,13 +720,14 @@ function renderCal(){
     if(!ne){cardsHtml+=`<div class="cal-card"><div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span></div><div class="cal-note">未配置财报月份</div></div>`;continue;}
     const soon=ne.inDays>=0&&ne.inDays<=45;
     const sc=sectorColor(h.sector);
-    cardsHtml+=`<div class="cal-card ${soon?"soon":""} ${ne.confirmed?"confirmed":"unknown"}" style="--sc:${sc}">
+    const stCls = ne.status==="confirmed"?"confirmed":ne.status==="estimated"?"estimated":"unknown";
+    cardsHtml+=`<div class="cal-card ${soon?"soon":""} ${stCls}" style="--sc:${sc}">
       <div class="cal-row">
         ${ne.inDays>=0?earnRing(ne.inDays):""}
         <div class="cal-main">
           <div class="cal-name">${esc(h.name)}<span class="cal-code">${esc(h.code)}</span>${soon?`<span class="cal-tag-soon">临近</span>`:""}</div>
-          <div class="cal-next">${ne.confirmed?`披露日 <span class="d">${esc(ne.date)}</span>`:`距约 <span class="d">${ne.month}月</span> 披露`}</div>
-          <div class="cal-months">${ne.confirmed?`✓ 已确认 · ${esc(ne.source||"权威源")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月 · ⚠ 待核实`}</div>
+          <div class="cal-next">${ne.status==="confirmed"?`披露日 <span class="d">${esc(ne.date)}</span>`:ne.status==="estimated"?`<span class="d est">${esc(ne.date)}</span> <i class="est-tag">待核</i>`:`距约 <span class="d">${ne.month}月</span> 披露`}</div>
+          <div class="cal-months">${ne.status==="confirmed"?`✓ 权威 · ${esc(ne.source||"")}`:ne.status==="estimated"?`⚠ 待核 · ${esc(ne.source||"")}`:`披露月：${esc((h.earningsMonths||[]).join(" / "))} 月 · 估算`}</div>
         </div>
       </div>
     </div>`;
@@ -853,6 +914,97 @@ function earnRing(d){
 }
 
 // ============================================================
+//  当前动作建议（优先级2.3）
+// ============================================================
+function actionSuggest(h){
+  const m = metricsOf(h);
+  const ne = nextEarnings(h);
+  const tp = parseTargetPrice(h.targetPrice, h.priceCcy);
+  const mg = tp ? marginOf(h.price, tp.value) : null;
+  const its = (state.all||[]).filter(x=>x.company===h.name && x.ts >= Date.now()-7*86400000);
+  const negN = its.filter(x=>x.alert==="neg").length;
+  
+  // 财报前≤7天
+  if(ne && ne.inDays>=0 && ne.inDays<=7) 
+    return {label:"财报前静默", cls:"act-quiet", tip:"财报"+(ne.inDays===0?"今天":ne.inDays+"天后")+"，减少操作"};
+  // 财报后≤7天
+  if(ne && ne.inDays<0 && ne.inDays>=-7)
+    return {label:"财报后复盘", cls:"act-review", tip:"刚发完财报，该复盘论点"};
+  // 击球区 + 有清单待核
+  if(mg && mg.band==="hit"){
+    const ck = h.checklist||{};
+    const nulls = ["fcfPositive","mgmtIntegrity","divOk"].filter(k=>ck[k]==null);
+    if(nulls.length) return {label:"击球区但需核查", cls:"act-hit-check", tip:"安全边际达标，但清单"+nulls.length+"项待核"};
+    return {label:"击球区", cls:"act-hit", tip:"折价"+mg.pct.toFixed(0)+"%，安全边际充足"};
+  }
+  // 高估值
+  if(mg && mg.band==="premium")
+    return {label:"高估值需等待", cls:"act-premium", tip:"溢价"+Math.abs(mg.pct).toFixed(0)+"%，等待回调"};
+  // 利空预警
+  if(negN>=2) return {label:"利空预警", cls:"act-warn", tip:"近7天"+negN+"条利空新闻"};
+  // 周期股特殊
+  if(h.sector==="航运")
+    return {label:"周期股盯运价", cls:"act-cycle", tip:"盯SCFI/CCFI与红海局势"};
+  // 默认
+  return {label:"继续观察", cls:"act-watch", tip:"无异常信号，维持观察"};
+}
+
+// 今日最该看的 3 条（优先级2.2）
+// 排序：关键变量命中 > 利空预警 > 财报临近 > 权威来源
+function topPicks(){
+  const now = Date.now();
+  const cutoff = now - 3*86400000; // 近3天
+  let pool = (state.all||[]).filter(x=>x.ts >= cutoff);
+  
+  // 评分
+  const scored = pool.map(it=>{
+    let score = 0;
+    const h = (state.holdings||[]).find(x=>x.name===it.company);
+    // 关键变量命中
+    if(h && h.keyVars && h.keyVars.length){
+      for(const kw of h.keyVars){
+        if(it.title.includes(kw)){ score += 30; break; }
+      }
+    }
+    // 利空预警
+    if(it.alert==="neg") score += 20;
+    else if(it.alert==="pos") score += 10;
+    // 财报临近
+    if(h){
+      const ne = nextEarnings(h);
+      if(ne && ne.inDays>=0 && ne.inDays<=30) score += 15;
+    }
+    // 权威来源
+    const authSources = ["财联社","证券时报","21财经","第一财经","华尔街见闻","财新","中国基金报","每日经济新闻","东方财富","新浪财经","新华网"];
+    for(const s of authSources){ if((it.source||"").includes(s)){ score += 8; break; } }
+    // 时效性（越新越高）
+    const ageH = (now - it.ts) / 3600000;
+    score += Math.max(0, 10 - ageH);
+    return {it, score};
+  });
+  
+  scored.sort((a,b)=>b.score-a.score);
+  return scored.slice(0,3).map(x=>x.it);
+}
+
+// 关键变量流（优先级3.1）
+function keyVarItems(){
+  const now = Date.now();
+  const cutoff = now - 7*86400000;
+  let pool = (state.all||[]).filter(x=>x.ts >= cutoff);
+  const result = [];
+  for(const it of pool){
+    const h = (state.holdings||[]).find(x=>x.name===it.company);
+    if(!h || !h.keyVars || !h.keyVars.length) continue;
+    const hits = h.keyVars.filter(kw=>it.title.includes(kw));
+    if(hits.length) result.push({it, hits, co:h});
+  }
+  // 按时间倒序
+  result.sort((a,b)=>b.it.ts-a.it.ts);
+  return result;
+}
+
+// ============================================================
 //  渲染：首页仪表盘（驾驶舱：聚合 + 引流，不重复各视图细节）
 // ============================================================
 function renderHome(){
@@ -871,7 +1023,7 @@ function renderHome(){
   const wk=["日","一","二","三","四","五","六"][new Date().getDay()];
   const dateStr=new Date().getFullYear()+"年"+(new Date().getMonth()+1)+"月"+new Date().getDate()+"日 周"+wk;
 
-  // ==== 层① Hero：异常驱动摘要 ====
+  // ==== 层① Hero：异常驱动摘要 ====  
   const signals=[];
   if(hitN) signals.push('<span class="hero-sig hit">⚾ 击球区 '+hitN+' 只</span>');
   if(negStocks.length) signals.push('<span class="hero-sig warn">⚠ '+negStocks.map(s=>esc(s.name)).join(' · ')+' 利空</span>');
@@ -883,10 +1035,48 @@ function renderHome(){
     +'<div class="hero-right"><span class="dot"></span>'+esc(upd)+' 更新</div>'
     +'</div>';
 
-  // ==== 层② 信号矩阵（块状卡片） ====
-  html+='<div class="hm-sec"><div class="hm-title">🧭 信号矩阵 <span class="hm-sub">点击卡片跳转总览 · 色块趋绿越优 · 顶条=综合评分</span></div>'+renderHeatmap(hs)+'</div>';
+  // ==== 层①.5 今日最该看的 3 条 ====
+  const picks = topPicks();
+  if(picks.length){
+    html+='<div class="hm-sec"><div class="hm-title">🎯 今日最该看 <span class="hm-sub">关键变量·利空·财报临近·权威来源 综合排序</span></div><div class="top-picks">';
+    for(const it of picks){
+      const h = hs.find(x=>x.name===it.company);
+      const sc = h ? sectorColor(h.sector) : "#9a7b2e";
+      const neg = it.alert==="neg", pos = it.alert==="pos";
+      const cls = neg?"tp-neg":pos?"tp-pos":"";
+      // 检查是否命中关键变量
+      let kvHits = [];
+      if(h && h.keyVars) kvHits = h.keyVars.filter(kw=>it.title.includes(kw));
+      html+='<a class="tp-item '+cls+'" href="'+esc(it.link)+'" target="_blank" rel="noopener">';
+      html+='<div class="tp-head"><span class="tp-co" style="background:'+sc+'14">'+esc(it.company)+'</span>'+(kvHits.length?'<span class="tp-kv">🔑 '+esc(kvHits.join('/'))+'</span>':'')+(neg?'<span class="tp-badge neg">利空</span>':pos?'<span class="tp-badge pos">利好</span>':'')+'</div>';
+      html+='<div class="tp-title">'+highlightKeyVars(it.title, it.company)+'</div>';
+      html+='<div class="tp-meta"><span>'+esc(it.source)+'</span><span>'+esc(relTime(it.ts))+'</span></div>';
+      html+='</a>';
+    }
+    html+='</div></div>';
+  }
 
-  // ==== 层③ 信号流（只展示异常） ====
+  // ==== 层② 信号矩阵（块状卡片）+ 当前动作建议 ====
+  html+='<div class="hm-sec"><div class="hm-title">🧭 信号矩阵 <span class="hm-sub">点击卡片跳转总览 · 色块趋绿越优 · 顶条=综合评分 · 底部=动作建议</span></div>';
+  html+=renderHeatmapWithActions(hs)+'</div>';
+
+  // ==== 层③ 关键变量流 ====
+  const kvs = keyVarItems();
+  if(kvs.length){
+    html+='<div class="hm-sec"><div class="hm-title">🔑 关键变量流 <span class="hm-sub">新闻命中关键变量的条目</span></div><div class="kv-flow">';
+    for(const item of kvs.slice(0,8)){
+      const sc = sectorColor(item.co.sector);
+      html+='<a class="kv-item" href="'+esc(item.it.link)+'" target="_blank" rel="noopener">';
+      html+='<span class="kv-co" style="background:'+sc+'14">'+esc(item.it.company)+'</span>';
+      html+='<span class="kv-tags">'+item.hits.map(k=>'<b>'+esc(k)+'</b>').join(' ')+'</span>';
+      html+='<span class="kv-title">'+esc(item.it.title.slice(0,60))+(item.it.title.length>60?'…':'')+'</span>';
+      html+='<span class="kv-time">'+esc(relTime(item.it.ts))+'</span>';
+      html+='</a>';
+    }
+    html+='</div></div>';
+  }
+
+  // ==== 层④ 信号流（只展示异常） ====
   html+='<div class="hm-sec hm-signal-flow">';
 
   // -- 预警块 --
@@ -911,7 +1101,7 @@ function renderHome(){
     for(const r of earnRows.slice(0,3)){
       const d=r.ne.inDays;
       const cls=d<=15?'sf-earn-hot':d<=30?'sf-earn-mid':'sf-earn-ok';
-      html+=`<div class="sf-earn ${cls}" onclick="gotoView('cal')">${earnRing(d)}<div class="sf-earn-body"><b>${esc(r.h.name)}</b><span>${esc(r.ne.confirmed?r.ne.date:'约'+r.ne.month+'月')}</span></div><span class="sf-earn-d">${d}天</span></div>`;
+      html+=`<div class="sf-earn ${cls}" onclick="gotoView('cal')">${earnRing(d)}<div class="sf-earn-body"><b>${esc(r.h.name)}</b><span>${r.ne.status==="confirmed"?esc(r.ne.date):r.ne.status==="estimated"?"≈"+esc(r.ne.date):"约"+r.ne.month+"月"}</span></div><span class="sf-earn-d">${d}天</span></div>`;
     }
     html+='</div>';
   }
