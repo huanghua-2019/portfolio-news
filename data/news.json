@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T23:25:36.688Z",
+  "generatedAt": "2026-08-09T23:56:27.948Z",
   "companies": [
     {
       "name": "贵州茅台",
@@ -113,9 +113,9 @@
         "source": "上交所e互动官方回复(2026-06-30)",
         "confirmed": true
       },
-      "price": 1309.22,
+      "price": null,
       "priceCcy": "CNY",
-      "priceTime": "20260807161437"
+      "priceTime": null
     },
     {
       "name": "五粮液",
@@ -229,9 +229,9 @@
         "source": "东方财富/同花顺预约披露",
         "confirmed": true
       },
-      "price": 75.11,
+      "price": null,
       "priceCcy": "CNY",
-      "priceTime": "20260807161430"
+      "priceTime": null
     },
     {
       "name": "泸州老窖",
@@ -339,9 +339,9 @@
         "source": "东方财富预约披露",
         "confirmed": true
       },
-      "price": 88.64,
+      "price": null,
       "priceCcy": "CNY",
-      "priceTime": "20260807161409"
+      "priceTime": null
     },
     {
       "name": "腾讯控股",
@@ -453,9 +453,9 @@
         "source": "腾讯董事会公告(2026-06-22)+腾讯会议邀请",
         "confirmed": true
       },
-      "price": 478.8,
+      "price": null,
       "priceCcy": "HKD",
-      "priceTime": "2026/08/07 16:08:23"
+      "priceTime": null
     },
     {
       "name": "拼多多",
@@ -567,9 +567,9 @@
         "source": "Benzinga/earningscountdown第三方预估,待IR确认",
         "confirmed": false
       },
-      "price": 91.76,
+      "price": null,
       "priceCcy": "USD",
-      "priceTime": "2026-08-07 16:00:01"
+      "priceTime": null
     },
     {
       "name": "泡泡玛特",
@@ -681,9 +681,9 @@
         "source": "港交所财务日历(新浪引用);历史2025亦8/19盘后",
         "confirmed": true
       },
-      "price": 157.8,
+      "price": null,
       "priceCcy": "HKD",
-      "priceTime": "2026/08/07 16:08:24"
+      "priceTime": null
     },
     {
       "name": "中远海控",
@@ -790,9 +790,9 @@
         "source": "东方财富预约披露(A股)",
         "confirmed": true
       },
-      "price": 15.43,
+      "price": null,
       "priceCcy": "CNY",
-      "priceTime": "20260807161453"
+      "priceTime": null
     }
   ],
   "all": [
@@ -1096,9 +1096,9 @@
       "alertWords": []
     },
     {
-      "title": "拼多多淘宝“夹攻” 新加坡商家生意暴跌50%",
+      "title": "拼多多淘宝“夹攻” 新加坡商家生意暴跌50% - enanyang.my",
       "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBMUnlfUjFINUYxU24xM3JnbEdTUXF6SUtMN0NBaTBzQnJuM1ZwbFYtVEtRUHlJVkxnSFhpS1FMQWdqc0h3SHB2R0lKLW5rOXhUWk91RjdDMkpGYjVBbzFRaHhGZw?oc=5",
-      "source": "e南洋",
+      "source": "Google",
       "company": "拼多多",
       "code": "PDD",
       "pubDate": "2026-08-08T13:19:00.000Z",
@@ -1684,13 +1684,13 @@
       "alertWords": []
     },
     {
-      "title": "第八代五粮液批价上行：整箱两天涨近百元，终端价格同步走高 - thepaper.cn",
-      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBVZXFIRDBFUkYwRU44QTNDcGVlMXNpd0I2S0lwUVhwMHphLXYzWS1yMEhOenRzNUdkbVFyV1FRT3JpRGdhVDZWSml2dTQ3OTBMZGFXTlBnclZrNHd2UGdYZg?oc=5",
-      "source": "Google",
+      "title": "第八代五粮液批价上行：整箱两天涨近百元 终端价格同步走高",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9fMnZfV3d1UjV5V29BMmZiM3B4N0FyVlBSQnljQVlNVEZxeXNGREg1OENneGkwdlF5SUhBZW5wcVk0aTdOTE15NzgxeFNIMGxheTl2Z2NGWVRQVkYyN0FCZQ?oc=5",
+      "source": "东方财富",
       "company": "五粮液",
       "code": "000858.SZ",
-      "pubDate": "2026-08-07T00:06:00.000Z",
-      "pubRaw": "Fri, 07 Aug 2026 00:06:00 GMT",
+      "pubDate": "2026-08-07T00:42:20.000Z",
+      "pubRaw": "Fri, 07 Aug 2026 00:42:20 GMT",
       "category": "关键变量",
       "alert": null,
       "alertWords": []
@@ -1728,6 +1728,18 @@
       "pubDate": "2026-08-06T23:01:11.000Z",
       "pubRaw": "Thu, 06 Aug 2026 23:01:11 GMT",
       "category": "股价",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "五粮液渠道价一箱上涨近百元",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5HRlVuRTdRUm1ualF1d2NDYUZUVUFjbGZMMWNnWkkyZ1J1WlIzYXpZQzJvRTB6dEE5RThNaVFPZk9pdHA0Rms0dGExNWVPRElDT3lGckE0N3pwb2JucmJZVw?oc=5",
+      "source": "东方财富",
+      "company": "五粮液",
+      "code": "000858.SZ",
+      "pubDate": "2026-08-06T22:58:49.000Z",
+      "pubRaw": "Thu, 06 Aug 2026 22:58:49 GMT",
+      "category": "其他",
       "alert": null,
       "alertWords": []
     },
@@ -1854,18 +1866,6 @@
       "alertWords": [
         "分红"
       ]
-    },
-    {
-      "title": "五粮液渠道价一箱上涨近百元",
-      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE9UYS1zWHpmTlJibklQTkN2ZUxWLTVSQmNfY2JmMG1PSlc1aWtmUzNTWjd1VnFYN2doRHctTEh6X1BlYkZCYjhZY214VGNKZlU0WkR3blRn?oc=5",
-      "source": "腾讯新闻",
-      "company": "五粮液",
-      "code": "000858.SZ",
-      "pubDate": "2026-08-06T12:38:00.000Z",
-      "pubRaw": "Thu, 06 Aug 2026 12:38:00 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
     },
     {
       "title": "第八代五粮液市场批价近日持续走强",
@@ -2814,8 +2814,8 @@
       "source": "财联社",
       "company": "五粮液",
       "code": "000858.SZ",
-      "pubDate": "2026-08-03T13:14:00.000Z",
-      "pubRaw": "Mon, 03 Aug 2026 13:14:00 GMT",
+      "pubDate": "2026-08-03T13:17:12.000Z",
+      "pubRaw": "Mon, 03 Aug 2026 13:17:12 GMT",
       "category": "公告",
       "alert": "pos",
       "alertWords": [
@@ -2909,6 +2909,18 @@
       "pubDate": "2026-08-03T09:36:00.000Z",
       "pubRaw": "Mon, 03 Aug 2026 09:36:00 GMT",
       "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "贵州茅台上市25年专题：员工增10倍，高学历扩容，只有一个数据恒定",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9RS0JDVkEtNks0SWhRTmpfRk1ZbFBqYm5fdXlDblhiYTloNEtBNExJcEUxYlFHTGkzeFpfaU51MVFsUFl6THhINldvQ1RvV3VqTnBoUHd1Um1RdUhsUnJpY3E4STdyQTBPOHowbWdKaw?oc=5",
+      "source": "新浪财经",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-03T08:56:24.000Z",
+      "pubRaw": "Mon, 03 Aug 2026 08:56:24 GMT",
+      "category": "产品",
       "alert": null,
       "alertWords": []
     },
@@ -3181,18 +3193,6 @@
       "alertWords": []
     },
     {
-      "title": "贵州茅台已步入黄金投资期",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1saDhiQkx6LUU1azRGa0s4MlJJRDF0TGszOXpodmNwOURmUGpsTGRWeVJpQ0VkM3Nha2FZbWcxZDI3RXpyZXhsQ1l5MVl2RklLR1NNQjF5ZmpiUW15X2xaV2hDMnNnZTduTFlWSjFB?oc=5",
-      "source": "新浪财经",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-07-30T09:54:43.000Z",
-      "pubRaw": "Thu, 30 Jul 2026 09:54:43 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "贵州茅台今日大宗交易折价成交6.96万股 成交额9421.75万元",
       "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9KMGVFQldYWEgxVjVib1BRRzJ3S0xwTEdEZjV3dTRTSWNNc0R1ekYtUGVvelpPajdxaUpkSUpmTUVUbjdlQ3dTanpYSndidDd4ZWdjUlZFTDJvQ2tSWHU0Yw?oc=5",
       "source": "东方财富",
@@ -3224,6 +3224,18 @@
       "code": "PDD",
       "pubDate": "2026-07-30T07:34:48.000Z",
       "pubRaw": "Thu, 30 Jul 2026 07:34:48 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "贵州茅台已步入黄金投资期",
+      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1saDhiQkx6LUU1azRGa0s4MlJJRDF0TGszOXpodmNwOURmUGpsTGRWeVJpQ0VkM3Nha2FZbWcxZDI3RXpyZXhsQ1l5MVl2RklLR1NNQjF5ZmpiUW15X2xaV2hDMnNnZTduTFlWSjFB?oc=5",
+      "source": "新浪财经",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-07-30T07:00:00.000Z",
+      "pubRaw": "Thu, 30 Jul 2026 07:00:00 GMT",
       "category": "其他",
       "alert": null,
       "alertWords": []
@@ -3775,18 +3787,6 @@
       "alertWords": []
     },
     {
-      "title": "时隔两个月，贵州茅台重返1300元关口，市场主线变了吗？丨川观解盘",
-      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1XMVNUN3pPRG1PRGJmNk16Z2otNDRvYk5OekdfejVKa1huN3oweS1jUHhyNTJYeU5Bd0J2Vl9GcG94b0taVUMwTURucER4Q3FjN2hYd0o4ZWtwRGR1QzNkQTBWcw?oc=5",
-      "source": "四川新闻",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-07-20T07:00:00.000Z",
-      "pubRaw": "Mon, 20 Jul 2026 07:00:00 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "大涨5％！贵州茅台股价重回1300元",
       "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9HSVFPNFA3cmJtaXJkRmc1TGtUNUQ3bTAyVlBPRVhnODZNWVM3VEF1aFFxZ210QXhKckxRbDVqWFlNamtxQWp0ZS1XYnVfVmRTTE5zWkpfMGFIUmxERmNOLQ?oc=5",
       "source": "东方财富",
@@ -3867,6 +3867,18 @@
       "pubDate": "2026-07-18T07:00:00.000Z",
       "pubRaw": "Sat, 18 Jul 2026 07:00:00 GMT",
       "category": "公告",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "53度飞天茅台再调价，i茅台零售价调整至1639元/瓶",
+      "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1sZTExWXJRYWRNRnlQZEdOSWNreTdoenZ2VERWbkZ2UEI0a29qWXZMN1FPQTFqYWNKZWlvRENsSFV2anVrSGJwVlBMbG5qSDIxaEg5eU1Ub0FOejM3NHdMYy1R?oc=5",
+      "source": "新京报",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-07-18T07:00:00.000Z",
+      "pubRaw": "Sat, 18 Jul 2026 07:00:00 GMT",
+      "category": "行业",
       "alert": null,
       "alertWords": []
     },
@@ -4622,8 +4634,8 @@
     },
     {
       "title": "拼多多重仓雄安：补齐数字经济“产业应用”关键一环",
-      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE44MUNPSVhpZ0RUVGgwekxBb3hWTXVDNFRuRnVxYkJJMlNOMXZacC05SGpzTTVVSDZ6SHJkWk5KeGNrbUd5QmZYMlA0blBYVTJSVG5pUnNSNTdfWjR1UmRqXw?oc=5",
-      "source": "东方财富",
+      "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPU0M2SWs4VmJvVVcyR2JjTnFockVITnVlNlhzOGtnb1Z6RkVzWC10N0VNMldxNDBHOXU4VWtjMVFodm0xMmozZWV1N0dBNm9MZXlmTVBnemZVaVhGSmtFcWlzZUNLSmlkQ1ZpZzFLQjNQTlZkT0J2Q2ZZcVl5NlhSakpCdlREVVZpVlg0QTV1SQ?oc=5",
+      "source": "21财经",
       "company": "拼多多",
       "code": "PDD",
       "pubDate": "2026-06-16T07:00:00.000Z",
@@ -4952,7 +4964,7 @@
     },
     {
       "title": "拼多多发布Q1财报，“千亿扶持”加码惠商助农，新拼姆助力供应链转型升级 - eeo.com.cn",
-      "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5nVXlFVGNIYXMyN1lpSE9Tb1A0OVVWa1VrSDNqVzk4VzBqZ1ZjR1pOTHdWd2xwMXV1ZExTdlRLbWNFZWJJZUVxTXQ1T1hibWowVlVUaA?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE5IOHB6TjBoZ3Nmb1JGNFk4M2lrQi1lMGtEMzRZSjd6b0JyUzFfckE5VDRBREdCMzBDVXV5NXExd0R0ZVlYczdHRnA2bVp5OEtvbXZ6bTFHaw?oc=5",
       "source": "Google",
       "company": "拼多多",
       "code": "PDD",
@@ -5023,18 +5035,6 @@
       "alertWords": []
     },
     {
-      "title": "贵州茅台新董秘，是他！",
-      "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE8tajhEdVhybEtBeVNrYWJ0SnFxck02cS00anZoLVdUYjRRMnl3VENTdE5qd0NvQmMyVVVDUFBablNtLUVjdnhiVWFNWDZRbU5mSnlYNzVlaw?oc=5",
-      "source": "证券时报",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-05-21T07:00:00.000Z",
-      "pubRaw": "Thu, 21 May 2026 07:00:00 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "贵州茅台酒调整线下门店营业时间及i茅台APP开售时间",
       "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVXEyZmYwbFQ5TnhCNEpUVmRtcnNzbEVRbDY0QXFLejJfcDl0U3p4eWlPd2VzbVNyazhXcEhJOTZnWEdiN3EtM0haMHNGcFZwNlIxamFYbWRsNkRobkN0QkdFaU5FekpfZEVCem01YUFiR3lRVzRNdTVsdHNBMGxHVVlxNko?oc=5",
       "source": "新华网",
@@ -5098,18 +5098,6 @@
       "alertWords": []
     },
     {
-      "title": "贵州茅台凌晨公告！茅台非标产品涨价！",
-      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE15Wk1BZVdLV3kwSDVlMFgzRll5ZEVXRjAyTHNULThxbHVXZFBfWVBUenM4OWgyc0EzY1RyUFZoSlZoNDZYdUV1M1U0dV9JaGhZZFN4M2lyQTVzRkRV?oc=5",
-      "source": "证券时报",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-05-16T07:00:00.000Z",
-      "pubRaw": "Sat, 16 May 2026 07:00:00 GMT",
-      "category": "公告",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "茅台宣布涨价",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBwbm1GQWpKZE4wNmpSYXMwQTJ4VmxmY0RIalcxTGk2M3plTXQ3emdNMDBwQ3JCM0h5ank2M2VQalFyR00xalFudTh3VlBwVTh3bUNxcHNRUVJZV3ZQWFZ3dTU3bGU?oc=5",
       "source": "观察者网",
@@ -5118,6 +5106,18 @@
       "pubDate": "2026-05-16T07:00:00.000Z",
       "pubRaw": "Sat, 16 May 2026 07:00:00 GMT",
       "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "贵州茅台凌晨公告！茅台非标产品涨价！",
+      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE15Wk1BZVdLV3kwSDVlMFgzRll5ZEVXRjAyTHNULThxbHVXZFBfWVBUenM4OWgyc0EzY1RyUFZoSlZoNDZYdUV1M1U0dV9JaGhZZFN4M2lyQTVzRkRV?oc=5",
+      "source": "证券时报",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-05-16T07:00:00.000Z",
+      "pubRaw": "Sat, 16 May 2026 07:00:00 GMT",
+      "category": "公告",
       "alert": null,
       "alertWords": []
     },
