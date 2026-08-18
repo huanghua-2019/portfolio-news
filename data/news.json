@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T08:00:44.789Z",
+  "generatedAt": "2026-08-18T09:00:45.946Z",
   "companies": [
     {
       "name": "贵州茅台",
@@ -115,7 +115,7 @@
       },
       "price": 1297.99,
       "priceCcy": "CNY",
-      "priceTime": "20260818160019"
+      "priceTime": "20260818161449"
     },
     {
       "name": "五粮液",
@@ -231,7 +231,7 @@
       },
       "price": 72.56,
       "priceCcy": "CNY",
-      "priceTime": "20260818155948"
+      "priceTime": "20260818161448"
     },
     {
       "name": "泸州老窖",
@@ -341,7 +341,7 @@
       },
       "price": 86.62,
       "priceCcy": "CNY",
-      "priceTime": "20260818155951"
+      "priceTime": "20260818161451"
     },
     {
       "name": "腾讯控股",
@@ -453,9 +453,9 @@
         "source": "腾讯董事会公告(2026-06-22)+腾讯会议邀请",
         "confirmed": true
       },
-      "price": 443.4,
+      "price": 442.4,
       "priceCcy": "HKD",
-      "priceTime": "2026/08/18 16:00:00"
+      "priceTime": "2026/08/18 16:08:08"
     },
     {
       "name": "拼多多",
@@ -681,9 +681,9 @@
         "source": "港交所财务日历(新浪引用);历史2025亦8/19盘后",
         "confirmed": true
       },
-      "price": 150.3,
+      "price": 150.1,
       "priceCcy": "HKD",
-      "priceTime": "2026/08/18 16:00:00"
+      "priceTime": "2026/08/18 16:08:09"
     },
     {
       "name": "中远海控",
@@ -792,10 +792,70 @@
       },
       "price": 16.31,
       "priceCcy": "CNY",
-      "priceTime": "20260818160036"
+      "priceTime": "20260818161436"
     }
   ],
   "all": [
+    {
+      "title": "名创优品宣传物料错印成泡泡玛特？客服回应：将上报给相关部门核查",
+      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQcGQwVVA5eEN4TS1wZzZkRE9BcWJUS3lMUkdZZ3N5cEh3Zms3XzU4d2JHZnplWHgyMmJiQjJjcVdzN1UxdXZ6WjhwNnE3SkoyYlc1NG5yaU5VTldETDNGZDViTExyNnVfdDBQanFFZTJCb3RFU2ctaTRpVjBHenJFY3daMGw3ZDBTVHhEUQ?oc=5",
+      "source": "搜狐网",
+      "company": "泡泡玛特",
+      "code": "09992.HK",
+      "pubDate": "2026-08-18T08:43:42.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 08:43:42 GMT",
+      "category": "公告",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "i茅台贡献四成营收，贵州茅台安全边际凸显，白酒静待拐点",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE84akg2dzJLcTFqV3E4Vy04LU0tY2R4MlBDWWNNNjhWYXp5a3ZoN095M29zMHlaeGFrdWg5NFk4cHZGcE1YeDJqWDJYUl8zRXI3RjVRYk1GcTBRa3JjeFRtTmdqZFFZZw?oc=5",
+      "source": "证券市场周刊",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-18T08:43:00.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 08:43:00 GMT",
+      "category": "业绩",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "黄俊平｜拼多多低价，消费者只看价格，没看见代价？ - 8tvnews.my",
+      "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOXzN5NmotNVBKb3FjZF96TXRfNWZTbk0tZzFfVTNkSUF0QVM5MmNYcWZ5RVZaN3FodFVZSUxKRW9xa0VKTzNnRE9fQWE1QWJnVmU2V1dmREc4NUg0SDRGMTVHRUlhNjNBV2tPSWU4RjFYSlVfVGpoYVNNem85UkZWakEwZzRfalcwYWJ3N0RzbXBOaUpRVG9KSDdlRXY?oc=5",
+      "source": "Google",
+      "company": "拼多多",
+      "code": "PDD",
+      "pubDate": "2026-08-18T08:24:00.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 08:24:00 GMT",
+      "category": "行业",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "腾讯的AI Capex，还可以更高",
+      "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBGRlpHbDdOSGdNRnJsVlllaHY5UDc4OERiWHdwTXV2THZ0UC1fT01HcXczWTdoZWtMekp0dElGeTc0U0JRRUl3UjdwbmsxZw?oc=5",
+      "source": "富途牛牛",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-18T08:04:57.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 08:04:57 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "曹中铭：证金等撤离茅台属于正常的市场行为",
+      "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE1BazlQNUl1X1NqOWZWRFQxOThIRFBnVVpsRWpHRjZWdmthOXJyNjVXSzM4RHh4VnNyNFdSN3h3QTVRRENLR2s1aHdWc19pYy1mRDNJNnVEV3FzbGV3b3FISkJPd0YxbUZkeGpCX2k3S2xHa25pRjk3VmlZU2Y?oc=5",
+      "source": "新浪财经",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-18T08:03:00.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 08:03:00 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
     {
       "title": "提价有望带动下半年改善，中邮证券：维持贵州茅台“买入”评级",
       "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOSWNodXJZWnU0OUpBSS0zZF9oWkNkbWgtcXZUZ2dwYktkcWFEZGZpU25lUDJGUGdTOE5oLS1vOHFTMjR0R09fMlFwcTJqekg3Q3JFTmRqeUZ3ZElZbjl2SS1IYlFLN0x4TTFMc1J4cl9DbUpJRkJpdGw4X0puRHUyc2RDcm9VeUc3Vmk4SA?oc=5",
@@ -833,6 +893,18 @@
       "alertWords": []
     },
     {
+      "title": "段永平重仓拼多多，阿里清仓后只买回观察仓",
+      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5hRzBVcTNRcUNoRWVNckRxcG1VX183Si02WFdodGF0VjhLMTY2VVdmbWF4MjkzQl9YVUZFanhsUk52WUNxaVpISUZVNE9yVkZ2ZVBRZFhTZ2ZmekJKSEtpb1RnVDZsV0hjcElLeGp3?oc=5",
+      "source": "新浪财经",
+      "company": "拼多多",
+      "code": "PDD",
+      "pubDate": "2026-08-18T05:24:00.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 05:24:00 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
       "title": "腾讯火力全开，依旧慢了半拍",
       "link": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE5ZT3RZRjRoYTBiRWxLWVhQY1Y2WWJiMzdmRDB2RzYtdzZVTE9na253d3hDSlB2VGNTTEsySTlYSE1Dc1dRSkpudlAyTWU?oc=5",
       "source": "凤凰网",
@@ -845,6 +917,18 @@
       "alertWords": []
     },
     {
+      "title": "贵州茅台：渠道重构下的舍与得？",
+      "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQREFGMEJuSFA0dGVueXJpQTQ1QmpLOFJSa3BWYkVieTVUenpjRXZ0Z0s3OTBUX3N0dmR3TDloRHR1elI0X0ZxUFFiT0I0aTZIakFSdS1nQ2lTZExOYURyNXlJVU9sWEQ0cEJNZXE1RGZLNHhWdkZKUC1PYUZKaUZpNlNZaTdxbDlyYmc?oc=5",
+      "source": "新浪财经",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-18T04:18:15.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 04:18:15 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
       "title": "京东超市“七夕酒礼”火了：五粮液一见倾心29首款星座酒“狮子座”成礼赠新选择",
       "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPUU1vMFEwWHpnakRqRExjZWxscFJPMUNaVllac3pWMGVJR1g0RlloaWpTM3U5Sk9yTGlUdEtzUUQ0LTlGTENTOGk3eTB5QnowdTFNaUIxaHNQa21UMjZWNGRydW5oVjJ2TmJCYU55UExTUE5UVEw4UmFVYjk3OEpiVmlqRUF5ek5y?oc=5",
       "source": "搜狐网",
@@ -852,18 +936,6 @@
       "code": "000858.SZ",
       "pubDate": "2026-08-18T04:06:02.000Z",
       "pubRaw": "Tue, 18 Aug 2026 04:06:02 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "贵州茅台：渠道重构下的舍与得？",
-      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQVUF4UDVncExmbEJGTVhwbGk3VnNlRDBodWcyVFdEdUZnM3huUmROZEQwZnd0TVJtczQ3RTFfbDNQa0NkSVNsYWtyM1EzenFhWFBraFpCeWRxeGpsM3RXTTVhbTZhT0xneGpsSU5UbF9fN3p6dkQ2YV9pODlyWW9hcloyMU54M3RyNWVqNg?oc=5",
-      "source": "搜狐网",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-18T04:04:55.000Z",
-      "pubRaw": "Tue, 18 Aug 2026 04:04:55 GMT",
       "category": "其他",
       "alert": null,
       "alertWords": []
@@ -925,6 +997,18 @@
       "pubDate": "2026-08-18T02:33:51.000Z",
       "pubRaw": "Tue, 18 Aug 2026 02:33:51 GMT",
       "category": "行业",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "A股第四大高价股，与贵州茅台仅一步之遥！频准激光暴涨超550%，中一签最高可赚逾55万元，认购阶段有投资者弃购1.08万股错失“大肉签”，国海证券未按时缴款尴尬“缺席”",
+      "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOVGNQQXF0TVBVOW9uUVVxa0plZTFJb3lLMlk3SHhJdjFQQlpIS2kwM1M2R1pSQ0dTaTc3WmFackdobS1QdkNCR3o2bXV1VFA4QVZsX0tQSUx6THA0WmZ5c1FSdVQyVlEtWExjdWlDUUhpc3ZubnJwVUR3Q0JFeFNRLUVKaWVaRHFC?oc=5",
+      "source": "搜狐网",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-18T02:25:09.000Z",
+      "pubRaw": "Tue, 18 Aug 2026 02:25:09 GMT",
+      "category": "股价",
       "alert": null,
       "alertWords": []
     },
@@ -1027,18 +1111,6 @@
       ]
     },
     {
-      "title": "茅台崩的不是利润",
-      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE0yOEZSdXFXaFpKcm0yLW9BR2xVaDVhVjIyTmJTMkdhQ1JRVEI5SkxIbFkwMGVmSXZ6ZmZSM085cEstQnJIUnFjQldWcVZGT3lr?oc=5",
-      "source": "凤凰网",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-18T01:20:11.000Z",
-      "pubRaw": "Tue, 18 Aug 2026 01:20:11 GMT",
-      "category": "业绩",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "但斌“坚守”AI、段永平李录联手“狂买”拼多多，二季度海外投资大佬们的“作业本” 在押注什么？",
       "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPVnBUcXJ6WExnbEVYdW13MFBMSmJ1VmlnRW5qWFVJdjROM0t6Vk9yUnVLNjhCcnhvWHNBZGRTRkUxR2NUN1RfeVZDRGRpMXJROWt2OEU5c1lvYUpsSTBIaWdyTmxoLW5fanBFV1l0eHFITHEyXzNjak82Y2YwSVNPMlFiLWs4R2Y4?oc=5",
       "source": "搜狐网",
@@ -1101,9 +1173,9 @@
       "alertWords": []
     },
     {
-      "title": "独家|拼多多在上海陆家嘴买了一栋楼",
+      "title": "独家|拼多多在上海陆家嘴买了一栋楼 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBOdFhKVjEyUnNadE82WEJqTzJmMEZLY0JCdFc2dGtLZS1NNGR3V1kxZzdTNXk4XzBOSmppMkk0eGlEdGZPOVlOUA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "拼多多",
       "code": "PDD",
       "pubDate": "2026-08-17T22:46:46.000Z",
@@ -1203,20 +1275,6 @@
       "alertWords": []
     },
     {
-      "title": "大摩：腾讯控股维持“增持”评级 目标价降至550港元",
-      "link": "https://news.google.com/rss/articles/CBMi6wNBVV95cUxNVTVxNXB0QkxidzhwaUFRZ2ZFemRHcG9NNjhQVHo2X1lPUjJzRFNlTWl3MTF5MnJnb0tzTk1uSF9SWFJ1bERLZDV5RVJfLUdmWnY1bWU5aTM2ZEc2clh0TFZjaTEzMm9jQ2RLaDlXVExIeTctNExVWEdRQ0JMSEV4bk9BQXA5RE41MWVPa2p6a0t1SExVX1NwVC1mLTMwWWgtNG5TSlI2STFsTXNLQzNQalVZVmluQWZxbUExQlRjR0ZrQUVndzBZUnZwWmNCMDRkN3I1YktRX2hsaHdYQy1CRFBOZUNHNVZrY0ZmejJzWHJIM183N1dMQlE0RjhKSVl6TE1rRnVtOWhXQ3FhYzlVUFBua0ZBb2xzaVh4YXNYa3FCSkdQOFdMc2NUZ1pMamZSTWFSTmxOUFEwVS1tSXBlR2Q5U0N2NWM5aFowbHRCbUZDWUZlM1dRQm5IX2ZNbnF1LVB3enhJQk5JeWs4Y0FGd0JXRi1SS1R5bVZGbXhxTHdkT3ZGN081SjZBanBWZlFTTnk5bnBVTG9xWkZoMDBra3R3SmpUU1ZJRGtXSDloX2w2cTBZMEdwNGVRS1hwT1dBM3U4ZG1FUmQzQUNCY0ZURzVVQnhKZGU4bXVmelNTVFlOVHlNaFJQOERDYw?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-17T11:40:38.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 11:40:38 GMT",
-      "category": "其他",
-      "alert": "pos",
-      "alertWords": [
-        "增持"
-      ]
-    },
-    {
       "title": "茅台市值蒸发611亿！中报“爆冷”，长期资金减持离场！白酒板块集体跟跌",
       "link": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxQNUtCWERRX3hPSXZXNnB5N3dKTUJnemsyTFZxZWtUQTVqUmN4OUMtRVhhTmhOdlZhTTBqQ2NTWW5RdVd0aG5Tb3o4bzdXQVV0WDl5QktPVWRvWXZJTmFsdHBZaTRENElVcnI3eXA4bDJnazdPMEdvQVZwRkpnbGpGU2V6bmNZbWpJbm1NZ2lDY0ZPZFNCTmZsMk02d25wcjhIeHZKVjZfRG5KdXpIYlBNd2VZRktqdUplUEZjV09ZZTNLNkJ0Um5KaFFkMGl6UUdpbHQ3WjFfVGlfdWg5bE8yenN4Ukh1aXpWNmpPOGUySEFDSGppaEE0aTdJNDk?oc=5",
       "source": "新浪财经",
@@ -1228,20 +1286,6 @@
       "alert": "neg",
       "alertWords": [
         "减持"
-      ]
-    },
-    {
-      "title": "腾讯回购67.3万股股份，耗资3.007亿港元",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE90UkxnZXZfSkJzMlZ6a1F3RGZENUdWMHZZTnNxR1ZrTllnY2FtVHZnZUpSb0hSVjkzajl3RWctWlk3eXBvUlJSTWRRR0FQcEk1YllaUEp4SzBFWG0xZFNNcm41ZjkyTTk2dkxJUFhKYw?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-17T11:12:22.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 11:12:22 GMT",
-      "category": "公告",
-      "alert": "pos",
-      "alertWords": [
-        "回购"
       ]
     },
     {
@@ -1257,6 +1301,20 @@
       "alertWords": []
     },
     {
+      "title": "大摩：腾讯控股维持“增持”评级 目标价降至550港元",
+      "link": "https://news.google.com/rss/articles/CBMivwRBVV95cUxPcHZZWFpXM253WXdwcUVfS3E2OExkbG9WM1NlQy1DZ0lRZFRzc29jSXdzTm11RktEdDVoV0puMmZXellxYVpZRXRwcmVTbnZGWE83aUVpQUdqMXBydV9QdDVRdUNCZmhNQ3RaMGNjV05XXzMyM2ItREVscDNyc2daaDJmUEY5RFNOT3dPLVVseTFzT29KQlJrOXNIRUY5bG4yMjV3OXd6U2hfaGU2MThIb3pfYkV1UXlVMzYtS1hIbTFYU1Jvc1d2UHk1cTFORzFReFBFZnQtazZHUDlmNXF5UGxxVGNraS13LWMwNnBYTWZkUUxTOU5FZUlOMkFUblc2UFQ2NGkwaWxCem5lVnBOajE4OVNqM09wZ2hkaHVKSzJ5T00zQXJGdGwtUFJGUVgxb1dmQkZXTFd3TVlZNlNwUGhwQUk3M1dkVWU3NDdNNk9qOHJtUFA3Vlp5eGRXOXItRmcyc1o4MzRhVkVxQ09ublg5eWVrSHZPekx0ekY0QVJtTDBJalMxSERwbVhVdTNEV2VVS08tcS1IZFBrRkxhTjdIc3NjRlRWa1pzN2ZPQ2F4cEg2dG1zRW5uZV85R05BYUVsSUZjWG9STWdHMkhzdFBwb1ZKQWZqaWp0VEoyTXNCaWpibTdPdEtuVkM2a2oyQ1k4Z3oxY01QZzMwTkJ4aGp6V3NSVDBweTU1ai1POF9uX2lDU1NVWm1yZ1hQbU1mZVlhclkwRGh6ckRXbVlramhBb0ExUHVrS2loX01BMA?oc=5",
+      "source": "新浪财经",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T11:02:02.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 11:02:02 GMT",
+      "category": "其他",
+      "alert": "pos",
+      "alertWords": [
+        "增持"
+      ]
+    },
+    {
       "title": "YOYO 手办印泡泡玛特字样？名创优品回应宣传物料“失误” - xinwen.bjd.com.cn",
       "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE5qcUlGS1I0X2FuaUxTZVJnbk9HZ0dtc3IwR2RRTnhsUFlILVFuNkM2dzF2d0Z3YVVDWnAyZ3RmYnYyLUVVVGxVb3liSGxXc1dScFNQZFVzcG5kc3lMR2ZRZElLVjFzSWhNVDJEcVRXaUI1dw?oc=5",
       "source": "Google",
@@ -1269,14 +1327,14 @@
       "alertWords": []
     },
     {
-      "title": "贵州茅台12年来中报净利润首度下滑：直销占比提升毛利率下降 渠道改革红利何时兑现？",
-      "link": "https://news.google.com/rss/articles/CBMigwJBVV95cUxPMk9HVEFCU2dzLXkwMWRYNzZBYkppTG44UDRqY052QWhXM1dMZEZUOU9EcVcxZjB0dUJ0T1dvNzNnekhpak5IQ2RPU2t2b21sanNURDZXOHh4dDlEUUYwNjNpVlM2SGRUODA4T0pjYTU0dGJidHBENFpBdzh5a001Z2o1NGFON3ZTdXhTMm8ycnRsaldfM2VDZloxdGFyTGxvZGlHbmJqYS13N1R3dGVOeXVNdjRNOFpheXZuekRZX3prZ3lQMmFuRUdiejNubWlfS29YYnljYzdUT1hZNy1KMElGd2dkSTZkeWxEaG5qVFNzeGFDcGNEMVE1dEc5SmM2SW1V?oc=5",
+      "title": "名创优品就宣传物料错印成泡泡玛特道歉",
+      "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbHlFTDB1YkVDMzJiVU9KWHphbGplaFpRSDlzcXU1cEIweURjTExnTk5Ga0RFS1NPTUk3aEJtX2VoUU1MZHpTOE5iLW1TSnF1dGplVFlTNS1fSExsdGlqeUNUMzFzZlJoYzRCM21KaTY3SmdBTF9fSEZNMWM0NUxudEZVZHFMMXp6NXRCeFQwdU1TcVYwT3diRw?oc=5",
       "source": "新浪财经",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-17T10:44:19.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 10:44:19 GMT",
-      "category": "业绩",
+      "company": "泡泡玛特",
+      "code": "09992.HK",
+      "pubDate": "2026-08-17T10:50:15.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 10:50:15 GMT",
+      "category": "其他",
       "alert": null,
       "alertWords": []
     },
@@ -1341,6 +1399,20 @@
       "alertWords": []
     },
     {
+      "title": "腾讯回购67.3万股股份，耗资3.007亿港元",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE90ODhGSTlkSkhnaWhSZ1UxaGRfQk5HZXdSU0tUeEdjTUxtVUJSM2NRQVpJRHpqWnI5ZlpDb2xidkxJZGg2UmRzS1M1OHIxVVp1R3pfcDhhMkVBUWJ6S2thdA?oc=5",
+      "source": "东方财富",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T10:00:19.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 10:00:19 GMT",
+      "category": "公告",
+      "alert": "pos",
+      "alertWords": [
+        "回购"
+      ]
+    },
+    {
       "title": "腾讯一笔浮盈500亿",
       "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBydDBSbEtoY1lBT0ZkeGhqTFBlS2F0VXFSQWxUNWNYdW5fVnVGM1RUa0czcEZkSEhJZXBTeXp1TmdGRExyQlo2amlrN2hLekxHVjYzYkVfTmxnUmRHbHRYZ1RnTmludktjcnh4NHVYVzZ2NVRJU09yR0VYeklsUQ?oc=5",
       "source": "新浪财经",
@@ -1386,20 +1458,6 @@
       "code": "00700.HK",
       "pubDate": "2026-08-17T09:40:19.000Z",
       "pubRaw": "Mon, 17 Aug 2026 09:40:19 GMT",
-      "category": "公告",
-      "alert": "pos",
-      "alertWords": [
-        "回购"
-      ]
-    },
-    {
-      "title": "腾讯控股：8月17日回购67.3万股，耗资约3.01亿港元",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE53NndMcWY5WndiQy1saWlvb3gyTDFaYU95UnRqOEFhYlBOWVZ1V01qSFk2S3k5akRLWUxNY2lONGVZT2prWlFSYk4xdw?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-17T09:38:48.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 09:38:48 GMT",
       "category": "公告",
       "alert": "pos",
       "alertWords": [
@@ -1503,6 +1561,18 @@
       "alertWords": []
     },
     {
+      "title": "白酒股全线下跌，贵州茅台重挫",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9PTXZDd29za2lvY0c1TXlwcE5MTmhTdklVcDlfcGJ1RmJrSVNwZE81aU53VXptZ09UOTNCVk5sc2hrSEdIa29Vc3dDWlA5R1h0eVVXUFlObGdsUFBncG9QTg?oc=5",
+      "source": "东方财富",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-17T08:50:23.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 08:50:23 GMT",
+      "category": "行业",
+      "alert": null,
+      "alertWords": []
+    },
+    {
       "title": "创业板涨超3%，芯片半导体爆发、长鑫爆拉超12%，贵州茅台逆势跌超3%，恒指、恒科指均涨超1%",
       "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE92Y1BSX05lTlRTS3BHd25lYXdPOEpQRzVnSW4zYk5pVEVRak9tcXNnRWJDN2E3OFFTQ0llMzhZYUFzQXlFdy1TajZ3SHVBdEltSlRB?oc=5",
       "source": "华尔街见闻",
@@ -1515,13 +1585,13 @@
       "alertWords": []
     },
     {
-      "title": "“股王”罕见失速！贵州茅台股价失守1300元",
-      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBTajVCQmxPM2FtSVVXOWVrdTh3RzFYOHF4d3VvaWFUTVhGNVUwVlZ2TlAzdmVESVY4Z2JnS1dDbkxjaXcyMHZvR2hmZ0x4SDRiMFBOZXFNU2NOMmtaWmFIbQ?oc=5",
-      "source": "东方财富",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-17T08:41:46.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 08:41:46 GMT",
+      "title": "腾讯控股盘中涨超3% 升级发布具身智能全栈方案",
+      "link": "https://news.google.com/rss/articles/CBMivARBVV95cUxNLUlNbExocTUzdUhtcGxsMFFCaXEzUzRZWDlKVlNvSnczbExVZWVlb28xVG5wV0hOZzFTckRCeTBjT0N6NjlNQlZLaWlrQWtKUHlCd2lBczNROVpVRjNjXzNvN0FWMmRwSF9xZmdqb2VLdmNIQjJ1aWNncV84VjluS2NIWlVBdUlVamU2NktjVHp4Ykd1TUtaWVFSQktwYUtQUDMtT3hlajc1dUlzYWJfd1E4RDJDOUx3UnNDdEpna1hfY001cUpETjItenlRSVktWnVINTA4RV9LMVBpenduZGw2bzdtLVBhR1J1Mng0VmNBelVKYXNfUUlhdTlHQTJheHVlQTBPUzNDWHBmajg4M25qTC0zcVhnUWNLaXY5eVBPSzQ2NkZNN2ZlNXhBUC15RnhZS1VTS0h6VEtZcXBpSnpmRzVxV09Nakl1VG5OV19JRlhSUWhYZmptVXdpdFh1MEktUTFGZENRUENUbm1ZVGpBYTBUckNzN0NDMVMxMjgtMThZcnE0UzBHN1VaOHdwb0x1bkRaNUhkV3ZpQnRvLW81MGY3ZWk0WGtHUEcwWFA3TkxoeERHbE55aTgtZS13S1E1Z1pZTUE2THVqNmhnT29YYVJ2UUstQW41RF90V2VMUmJRZXh2TEd6QXEyVURYYVZZaWNVNHZSQWtvNHFyMVR4alVHazAtQ2xxU0puYWRCRWliMFl0Uy1MMnk2ZmtoelhjTXdraDRGTVZkYjZUTXdra1dNdGt5UVNqUA?oc=5",
+      "source": "新浪财经",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T08:44:07.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 08:44:07 GMT",
       "category": "股价",
       "alert": null,
       "alertWords": []
@@ -1611,6 +1681,20 @@
       "alertWords": []
     },
     {
+      "title": "【券商聚焦】财通证券维持腾讯控股增持评级 指AI投入加速-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9MbGFrbUJ6MkMwSXBfNW1zZXdDSXFjSmEzOEp2b1JtRUNnb19GcC1PamtHMnZHelJlMHNzODl5S3VOa2c4X2RXa1Z6c3FtT2lwZG5hQjAtdlRsWVhaQVE?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T06:18:51.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 06:18:51 GMT",
+      "category": "其他",
+      "alert": "pos",
+      "alertWords": [
+        "增持"
+      ]
+    },
+    {
       "title": "招商证券国际：腾讯控股给予“增持”评级 目标价降至620港元",
       "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNT19aMzlmSHQ0TWkzMExPd2Q5ZWZUb0xRRk1pVll1Z1VpZjR6d29LTFNwYk5fQ09ubEk5bzRpdTc0Q09kd1ZfTjBTcWEyd05SMEZyeGhxSGNKRkVuai1pNDZTakhxWWtPbTJRN3Q5OEw2LWM3eHdicmlySEV1VFpFR29oa0ltU0wwMW8w?oc=5",
       "source": "新浪财经",
@@ -1640,13 +1724,37 @@
       ]
     },
     {
-      "title": "段永平最新持仓曝光：减持苹果、英伟达，加仓拼多多",
+      "title": "【券商聚焦】浦银国际维持腾讯控股买入评级 指AI推动价值重估-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBsNV9kb09JdjJxYWFuN2hGNUVBWUVWVHpSZk5jWDIzZkNkR1VCdlRDMjFhT2g0NFRpZDctVXZmSHM0dEtqUnFNM0F4TExKM0RPY0lWbnFfYm1QSkJyU1E?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T05:14:32.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 05:14:32 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "【券商聚焦】招商证券维持腾讯控股强烈推荐评级 指AI驱动业务增长-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1ZVi1OMG9ndDBmUTR1UDF2b2FKQlMtN05RQTJSVmwtQzlhSDVRN3MtWWJRUXIzaFM5MFRROGstRFZFdnFlZWJTa3pPQmtVZDhKb0RHX0lxVS1ZRUFsVUE?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T05:11:38.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 05:11:38 GMT",
+      "category": "其他",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "段永平最新持仓曝光：减持苹果、英伟达 加仓拼多多",
       "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBfd3VudVVkYXg5b3dPUjMybVFELWFwb2UtbEc0ZXkxcUtpekZGNVh0NXVfaUh2N0oxeXhla3ZRY1pXV2l6djVoTGd4bjhDbGpsWUxRZ05FbDhXX3l1aHY2cElhMU9ndw?oc=5",
       "source": "东方财富",
       "company": "拼多多",
       "code": "PDD",
-      "pubDate": "2026-08-17T04:33:22.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 04:33:22 GMT",
+      "pubDate": "2026-08-17T05:01:18.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 05:01:18 GMT",
       "category": "其他",
       "alert": "neg",
       "alertWords": [
@@ -1654,25 +1762,25 @@
       ]
     },
     {
-      "title": "白酒股全线下跌，贵州茅台重挫",
-      "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE96R0JVT2JOUWFNVHpaS19mTHNkdHBqX2QtMzJPQUZRV2tSZnVyN2loSm1FbHBxZDgyZ0psUmpMaUFpb2lFN3hEMVYzdHAyUVI4enMyX19DWE1rZVJ6Y3h3bDh0R3ZnTU9Dcm91by1XS3BDdWlOUjN1Sg?oc=5",
-      "source": "新浪财经",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-17T04:01:00.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 04:01:00 GMT",
-      "category": "行业",
+      "title": "【券商聚焦】国盛证券维持腾讯控股买入评级 指AI赋能广告及云业务-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5uY1dzRi12aGtpUGppRmVVazEwU2JOR19EejZNOEQ0MGNGRm53STN5RGszR2ZkeXNGN0pma1p2UllEZGJoTHIwdzd3V0VUVlk1eXI5bVJWY0ZVX29rTlE?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T04:53:14.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 04:53:14 GMT",
+      "category": "其他",
       "alert": null,
       "alertWords": []
     },
     {
-      "title": "2048亿营收背后的腾讯：主营引擎换档，AI军备重写估值逻辑 - t.cj.sina.cn",
-      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9JcGdfbGYxVGlLeDJCMmhjdGdGeDZjSFZ2MFlJQ0VDRkpfRVprUFFSUjdxRzhuQjJFX2RhM2Q0NXZibEk4emVkTWJyNVFLM2F3cXFfc3RJYzY3WldzcW1hbW1vUjFuMDBxcFJXNzlSSjJjdw?oc=5",
+      "title": "贵州茅台2026半年报：三个亮点与两个变化 - caifuhao.eastmoney.com",
+      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE53LU9yNERBbnlZZnItTkZYMkM2OGktdkJLWDBzUUEyYkZwbGRaYlpmLTlFOW81cWtnYmp3NnFmSHVlMnRibmpSMkVYSFZWWVl2ZkFNQXlUOVJrYlQ5UUQyOUhhWWZKQUlnaTd3?oc=5",
       "source": "Google",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-17T03:52:52.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 03:52:52 GMT",
+      "company": "贵州茅台",
+      "code": "600519.SH",
+      "pubDate": "2026-08-17T04:20:00.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 04:20:00 GMT",
       "category": "业绩",
       "alert": null,
       "alertWords": []
@@ -1724,6 +1832,30 @@
       "pubDate": "2026-08-17T03:07:50.000Z",
       "pubRaw": "Mon, 17 Aug 2026 03:07:50 GMT",
       "category": "行业",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "【券商聚焦】国联民生证券维持腾讯控股推荐评级 指业绩稳增AI进展显著-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFAyM1ZQTVRtRmZKVHZqRmdVU2RpMnIyUXlfY2dtLWFsZC1JTWN0RWR3TEwxbGZpdTFEQU85S3FiNnhJUS0zVGozaDFtemR5c1NuOGwwNWl0aEc0LXRxYmc?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T02:53:14.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 02:53:14 GMT",
+      "category": "业绩",
+      "alert": null,
+      "alertWords": []
+    },
+    {
+      "title": "【券商聚焦】国信证券维持腾讯控股优于大市评级 指广告业务增长强劲-证券之星 - hk.stockstar.com",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9CR1JoNi1LcVY2NEt0YXlNbzU4SE55XzNvSTNPYmpJem96RjBKSmUteGktUTdRaFlOY2NGVnRveTRQdUhlR0NXTTg1a3diTkZUZnhXbThqd2c3RnFFY1E?oc=5",
+      "source": "Google",
+      "company": "腾讯控股",
+      "code": "00700.HK",
+      "pubDate": "2026-08-17T02:40:28.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 02:40:28 GMT",
+      "category": "其他",
       "alert": null,
       "alertWords": []
     },
@@ -1788,13 +1920,13 @@
       "alertWords": []
     },
     {
-      "title": "茅台中报增收不增利拖累板块！白酒股集体下挫，古井贡酒、泸州老窖跌超4%",
-      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNUlF0WDVaYmp6TmZTYUdzRFNTdDZIWHFpSWlCRkJZbG9mNVVZbEVKS04wVzZvZkRFa0xRZ216RTRrRnFMVzdUbnI5bXlwbHRkLXJ1TUdHTmVqcG5scElCcjZiX2FvZFdWdHMwN2p3MUU0ZzhyUXhlRTlsZzFOWDZkS29TWUpuNHZiM2lVQw?oc=5",
-      "source": "搜狐网",
+      "title": "A股异动丨白酒股集体下挫，古井贡酒、泸州老窖跌超4%，茅台中报增收不增利拖累板块",
+      "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFAzNC1ZQ2RCUHUzU3lYYjNvODlfUWppTlJGOXVnM1p2RjJDVzUzdk5fdVJlZ1kxcVJzZDJDWlBTX2MxbHN0QlZJNFpGUVMzYUE?oc=5",
+      "source": "格隆汇",
       "company": "泸州老窖",
       "code": "000568.SZ",
-      "pubDate": "2026-08-17T02:01:00.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 02:01:00 GMT",
+      "pubDate": "2026-08-17T02:01:15.000Z",
+      "pubRaw": "Mon, 17 Aug 2026 02:01:15 GMT",
       "category": "业绩",
       "alert": null,
       "alertWords": []
@@ -1820,18 +1952,6 @@
       "pubDate": "2026-08-17T01:38:00.000Z",
       "pubRaw": "Mon, 17 Aug 2026 01:38:00 GMT",
       "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "贵州茅台大跌3.83％，股价失守1300元",
-      "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9BVUxFdGRtQ1lLMlNlWVc3MWk4Y0VfbGdnclIwRkR1c1gyOUI5eGV0UHcxZ2p2VXc2R1A0bFJsMWN2M1RXOEZmM083Sk0tZDdOSmc5SHRfcEpUN1JuallnMURwYVN6OTZTbDJBV1ZieEY1YUtH?oc=5",
-      "source": "大河财立方",
-      "company": "贵州茅台",
-      "code": "600519.SH",
-      "pubDate": "2026-08-17T01:32:17.000Z",
-      "pubRaw": "Mon, 17 Aug 2026 01:32:17 GMT",
-      "category": "股价",
       "alert": null,
       "alertWords": []
     },
@@ -2399,9 +2519,9 @@
       "alertWords": []
     },
     {
-      "title": "贵州茅台上半年营收增长但利润下滑 “i茅台”营收增长超270%(含视频) - companies.caixin.com",
+      "title": "贵州茅台上半年营收增长但利润下滑 “i茅台”营收增长超270%(含视频)",
       "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5hS0FfZlVXZXJsNEVQbVkyc3VEMW5XaWM3M0hMNXB1aFBrdkRUNUxrNVVTTkpqWEJrc2YxWi1FYkh1RDBON1o2eTlObE9hWUFkZy1DUGJUSUI5RmQ4UFdZR1Uyb091XzA?oc=5",
-      "source": "Google",
+      "source": "财新",
       "company": "贵州茅台",
       "code": "600519.SH",
       "pubDate": "2026-08-15T00:13:00.000Z",
@@ -2437,9 +2557,9 @@
       "alertWords": []
     },
     {
-      "title": "【早报】中行落地全国首个算力“Token贷”；贵州茅台、生益科技发布半年报；美存储板块走强",
+      "title": "【早报】中行落地全国首个算力“Token贷”；贵州茅台、生益科技发布半年报；美存储板块走强 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE8xOXpJUmFrVTdzM0NVZG1YYlJOc1g0amJ1ZmpXRmpUd0s2VVJLUmJKR2tFQWkwdXVRb2dGNEEyYlBqM0V0R0xUMg?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "贵州茅台",
       "code": "600519.SH",
       "pubDate": "2026-08-14T23:08:09.000Z",
@@ -2643,20 +2763,6 @@
       "alertWords": []
     },
     {
-      "title": "大摩：腾讯控股重申“增持”评级 目标价维持650港元",
-      "link": "https://news.google.com/rss/articles/CBMitAVBVV95cUxNdDRVOGRsMk52UzFwczd0bncteUYwU3hxYzBLV3ZVamRNRU42enMwajlhWUZLNE9oUkFacmQ2cTZBUmtpZHRsQ2xRSGtwYldCN0pxRzF5cGZvcE11bjJnRDJndlREQmZqRWVaUnY0Rkl5ZGVjNkVhWVVuS0tJd19wRVBfdzRnazQxTnBkaUZIWVpxd0JXRV9HZHlUWXN4SDduVjR5QXBBMXZHSmdiUE52dmlPN3FOSlFMalFkMmt3aFFVSWxlMWktRTZlYWw0ZHFxcXRFczVfN1JWVlIzVWQ1Z1o3SlNWMUw0dUpxU1B1V3Ixa3dnRUhkbzhQV2NUYU1xRnFlNk55WFk4YmxaaWJ6bDhsNDNsQjBhNno4STV6cHFPYnY0dGV1c1pOTG44Zlk5VmI4LVlTRWRIYkxfV0ZhNExkUWp2T1hjQk9jRXpXNWlCLWRTZzRLRzJjWWd5QnpfZzNiQVNETXdHNDZHVGF2U2tIX0l4ek9FQ3JKM3pUVWZLZmpFUWE0N0ZEQTN5SWhpbFk2UTdiZDZvajJhcnhPem55UjJPR1lHdWZjaXNhd3liTUVPQWJ0b0Q4R19GbURWbU5JeF9qU092RGdhX29wanM4UWVxTGlVaWF0UEVRTHNsMG9GU3ZZUFZGa3FxVVZyTGV0UTVtQ3pwRkZBZ3NUYXYtNGpLQWVud25rYWZMNUlwd3h4R25hZVg3Vzh0SldicUl3QkUySTVtVTducEFobGFFcm5SUVJvZHR0d2NPOUZtZ3A3NDR5cDJROU9NZzMyeHlGX1VpcUY0NXprcm9hMlNVX1dqTFhrMFI2UUctOU9hSXREYUU3Y2N4MmxBM3d5b1hSRVNBTEFhVHNwQl9jSUY0Y1pSWEhESFBQbUZzc2pSamVka180Nk9HSVByUHJ5RjhaNQ?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-14T13:43:22.000Z",
-      "pubRaw": "Fri, 14 Aug 2026 13:43:22 GMT",
-      "category": "其他",
-      "alert": "pos",
-      "alertWords": [
-        "增持"
-      ]
-    },
-    {
       "title": "贵州茅台上半年营收907.03亿元，i茅台收入占比达44%",
       "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5tc0xuV2k1ZnU0VkZqd0F2Z19PcDRaeDdoQndqakUxSnpSNHlJVTI1dDlwZURHSDF3OU5UY1V5Y21oUnZHMEJuaGw5MmNCSGltQTFNZ2lUM1NTTHFkeHNNdw?oc=5",
       "source": "东方财富",
@@ -2719,9 +2825,9 @@
       ]
     },
     {
-      "title": "净利润445亿元 贵州茅台上半年业绩出炉|盘后公告集锦",
+      "title": "净利润445亿元 贵州茅台上半年业绩出炉|盘后公告集锦 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE9yejhYMF9hVVVsUGU5Uk5OcmxLYWlJTGpJTXlpbkdDYW5heGk5MW5vYzA4YnJ0OGpZMTJOUGllTk9ZMjNIV1JaeA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "贵州茅台",
       "code": "600519.SH",
       "pubDate": "2026-08-14T13:12:00.000Z",
@@ -2878,20 +2984,6 @@
       "alert": "neg",
       "alertWords": [
         "被查"
-      ]
-    },
-    {
-      "title": "招商证券国际：予腾讯控股(00700)“增持”评级 目标价降至620港元",
-      "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE9QMnpUMHgxV2tDbExaTXVfaU5Yd3JpR0g2d2ZJX0ZBNDZHLWFYUTBZUXZjTC1jWlFqVVRLbFhQR20tSnlVVW1NNA?oc=5",
-      "source": "凤凰网",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-14T08:48:53.000Z",
-      "pubRaw": "Fri, 14 Aug 2026 08:48:53 GMT",
-      "category": "其他",
-      "alert": "pos",
-      "alertWords": [
-        "增持"
       ]
     },
     {
@@ -3127,18 +3219,6 @@
       ]
     },
     {
-      "title": "#长鑫科技市值今日超越腾讯控股，收盘市值为3.54万亿人民币 - caifuhao.eastmoney.com",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE50V0pjSUxEanZwdjNfcEt2b3d1cDlGTkdub0NMaTQ0VDAzUkJUR2VJOWg1Y1F2a281VDcwRklYdVc2YThXem9IV2YyZ1BTeXZqUDFxOUxaY2tDaXNOTjBtUzFHcndkbXRMd0Rj?oc=5",
-      "source": "Google",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-13T08:49:00.000Z",
-      "pubRaw": "Thu, 13 Aug 2026 08:49:00 GMT",
-      "category": "股价",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "长鑫科技超越腾讯控股，成中国市值最高上市公司",
       "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1TNUdqYnhNU1ZKekdZWm5xU3NRb2x3S2daODdWRzRVUEpBUWcwVnkyZFpjV2U2VEFUdnpGaU1ybHJCcHI3ejVzWnVFQ191YUYtZTRPdkdSVXQ1LS15SGZ6dndLWS1wdnFYS3N2QVFn?oc=5",
       "source": "新浪财经",
@@ -3223,18 +3303,6 @@
       "alertWords": []
     },
     {
-      "title": "大摩：腾讯控股(00700)加大AI投资影响短期盈利 降目标价至550港元",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1BWXRsdzFUOXl3bkgzS01EQUJERjhvejdmeFpYNWhvamQ2RjNSSDhGUGNoNlhRSzYzeG41WlRXQVZCQ3QxVTB2Y20xUWx6WHd5Rm9paVhOMnVndnl4VzRVSjlGYUE5dWk5WmdzTXZtRQ?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-13T02:55:47.000Z",
-      "pubRaw": "Thu, 13 Aug 2026 02:55:47 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
       "title": "8月13日港股开盘：恒指低开0.6% 腾讯控股领跌成分股",
       "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE8yRE52YkJqRDMzczY2dDlWdHJwOTktRE5oWGV0RkJhQU56MFdfbkw2STJjcGdqM0tXa1pHTGo3WFVxMXYwQ291OHVQeDI5QnBTSlVRai0tcHB1dDdVX2tN?oc=5",
       "source": "东方财富",
@@ -3267,18 +3335,6 @@
       "pubDate": "2026-08-13T02:15:16.000Z",
       "pubRaw": "Thu, 13 Aug 2026 02:15:16 GMT",
       "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "港股异动 | 腾讯控股(00700)绩后低开逾3% AI加码推升推升资本开支 单季自由现金流转负",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1JRXh5MC1PT19sQjY1Z1FPeUpMMVVnVHRJUmE4UkVzbm5wT1B5UWtsUWU4UnFkcE5UbUsxT0xyR0JsTzltMlFRbDVWN0pPZ2lGVk91ekFSTzRjc3YtbUhwMjBRVkYzbGpzNGp4eG5YVQ?oc=5",
-      "source": "新浪财经",
-      "company": "腾讯控股",
-      "code": "00700.HK",
-      "pubDate": "2026-08-13T01:24:18.000Z",
-      "pubRaw": "Thu, 13 Aug 2026 01:24:18 GMT",
-      "category": "业绩",
       "alert": null,
       "alertWords": []
     },
@@ -3405,9 +3461,9 @@
       "alertWords": []
     },
     {
-      "title": "大幅增加算力采购！腾讯看到AI变现的曙光了？",
+      "title": "大幅增加算力采购！腾讯看到AI变现的曙光了？ - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBBdmVMRzIySjVERkNnZVRReEF0YUVvaGlDa2FjX2JmMnNtc0NzT3gxLWFhWEdmQ0hCbWNCdmtlRG9XZE1tMmpDbQ?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "腾讯控股",
       "code": "00700.HK",
       "pubDate": "2026-08-12T11:06:01.000Z",
@@ -3517,26 +3573,14 @@
       "alertWords": []
     },
     {
-      "title": "16:33:53【腾讯控股：第二季度营收2,047.9亿元 同比增长11%】",
+      "title": "16:33:53【腾讯控股：第二季度营收2,047.9亿元 同比增长11%】 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1EM2FCaUwtTENWVXJkRmkwY2RrbjdjWEppV3pOcWZ3RGZVMzF5aDVUajdWekZUbFhDOXdMbFF4RUFNY1VybDluUA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "腾讯控股",
       "code": "00700.HK",
       "pubDate": "2026-08-12T08:33:53.000Z",
       "pubRaw": "Wed, 12 Aug 2026 08:33:53 GMT",
       "category": "业绩",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "拼多多首页上线“最快明天达”，加入时效竞赛？ - t.cj.sina.cn",
-      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE10MmxDNWxZNW1BSnNyQmNFM1RFSGt0UlE0VWJob29JNG04bmt0T19kWk01ZDd3bWxZamVZQzNQYzdTTUI1UUZ2VWJndzlDaEhkZGhNZVRYd2JieHFDSDI4X1NOcVduSTV2VDJMVjJPdFVTdw?oc=5",
-      "source": "Google",
-      "company": "拼多多",
-      "code": "PDD",
-      "pubDate": "2026-08-12T08:12:54.000Z",
-      "pubRaw": "Wed, 12 Aug 2026 08:12:54 GMT",
-      "category": "其他",
       "alert": null,
       "alertWords": []
     },
@@ -3809,9 +3853,9 @@
       "alertWords": []
     },
     {
-      "title": "第八代五粮液市场批价近日持续走强 下半年白酒行业有望边际企稳",
+      "title": "第八代五粮液市场批价近日持续走强 下半年白酒行业有望边际企稳 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBubjhxSUVmUG8xVzRjeDdtRXV1eU80UUNFN0V6aTcyQkptZDVxNHJpaG1TcTBRcExWWk5QSHRsbUpEcHV6bzVMYQ?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "五粮液",
       "code": "000858.SZ",
       "pubDate": "2026-08-07T07:00:00.000Z",
@@ -4107,9 +4151,9 @@
       "alertWords": []
     },
     {
-      "title": "加力提速！多公司披露7月回购进展 五粮液立讯精密回购金额已达10亿元|速读公告",
+      "title": "加力提速！多公司披露7月回购进展 五粮液立讯精密回购金额已达10亿元|速读公告 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE9id24xaGlzQ1Ftc2h2N1ZlT1RYTXlYZXZHWlVuZ1B4a01SSTZ0RF96MW00aENTbjJaRjNJRS13eVlLRUpxOUtrcg?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "五粮液",
       "code": "000858.SZ",
       "pubDate": "2026-08-03T07:00:00.000Z",
@@ -4207,9 +4251,9 @@
       "alertWords": []
     },
     {
-      "title": "五粮液试水星座酒，白酒年轻化能否打破“流量魔咒”？丨酒观 - sichuan.scol.com.cn",
+      "title": "五粮液试水星座酒，白酒年轻化能否打破“流量魔咒”？丨酒观",
       "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBsazdvZk1fLTdoUnF2T3lXQmVHd0hnTGxVYzI1M1laSEl0eWVpVHE2bmlUeGs3czlHWG9UUjA5TnNmZ1kteXRVeTZfMkxBVUJiQVUxc0VxdjY2bjJQeHU0cFhmMA?oc=5",
-      "source": "Google",
+      "source": "四川新闻",
       "company": "五粮液",
       "code": "000858.SZ",
       "pubDate": "2026-07-29T07:00:00.000Z",
@@ -4317,9 +4361,9 @@
       ]
     },
     {
-      "title": "段永平：10年内大概率不会卖泡泡玛特",
+      "title": "段永平：10年内大概率不会卖泡泡玛特 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE55eE5tRE1KR1RpMXl4Zm9aMlFNcWRYdlpPZlJycG01QWRDbUpLeExVdi1nT2paZk9oaVZTZ2FfcXVTeXpGeVVFeg?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "泡泡玛特",
       "code": "09992.HK",
       "pubDate": "2026-07-23T12:56:57.000Z",
@@ -4341,26 +4385,14 @@
       "alertWords": []
     },
     {
-      "title": "拼多多雄安公司员工突破2000人，加快助力新区打造数字产业新高地",
+      "title": "拼多多雄安公司员工突破2000人，加快助力新区打造数字产业新高地 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1mbnE0N1J3VFJ5dFRycFJ6VFhfYTZ6RzBDTjBkd2xSc3Nud0xZRVFyUXZicFZYc3hKOXJvUi03eVZtejliRzFFbA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "拼多多",
       "code": "PDD",
       "pubDate": "2026-07-20T07:00:00.000Z",
       "pubRaw": "Mon, 20 Jul 2026 07:00:00 GMT",
       "category": "股价",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "线下商圈消费回暖 泡泡玛特门店人气旺",
-      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBBM3dtUE43YWVQLS1BYnp0YWQwem83RkJmbFhFQjhPa2dGT2FJTUpONnVWb2lGM0ZoMi1mcWpvMDdpdG5YWmZHV1RhTE14ZVdkN3dVZEFTMEJwYTFONTBNTA?oc=5",
-      "source": "东方财富",
-      "company": "泡泡玛特",
-      "code": "09992.HK",
-      "pubDate": "2026-07-17T07:00:00.000Z",
-      "pubRaw": "Fri, 17 Jul 2026 07:00:00 GMT",
-      "category": "关键变量",
       "alert": null,
       "alertWords": []
     },
@@ -4454,9 +4486,9 @@
       "alertWords": []
     },
     {
-      "title": "林锋任泸州老窖股份有限公司副董事长 - sichuan.scol.com.cn",
+      "title": "林锋任泸州老窖股份有限公司副董事长",
       "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFB3cDM3VVdBTnBQTVlIcC1vUGdORG90c0hMQWVJMFR5N1piLTlGeEJMbC00UlJRYmxGOUdZanByRkwxV0VWelRMR2lBSUZNZGdRR19kcXBLU053aVZBUFVVc3UwYw?oc=5",
-      "source": "Google",
+      "source": "四川新闻",
       "company": "泸州老窖",
       "code": "000568.SZ",
       "pubDate": "2026-07-07T07:00:00.000Z",
@@ -4493,18 +4525,6 @@
       "alertWords": [
         "回购"
       ]
-    },
-    {
-      "title": "中远海控贯通南北中亚物流双通道 - seetao.com",
-      "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE9BVEhpbF9ONkczNVZSaXE0U0EwNVM2ZWE3anB5eWRscmhhc05EUGU4Y0JuTVViZkpTTHVhem1sUHItRHkwRVFGZWVzYWlmZFZlVXFKQQ?oc=5",
-      "source": "Google",
-      "company": "中远海控",
-      "code": "601919.SH",
-      "pubDate": "2026-07-07T07:00:00.000Z",
-      "pubRaw": "Tue, 07 Jul 2026 07:00:00 GMT",
-      "category": "其他",
-      "alert": null,
-      "alertWords": []
     },
     {
       "title": "泸州老窖：未来三至五年白酒行业市场格局重塑，大众与个人消费将成主导",
@@ -4678,9 +4698,9 @@
       "alertWords": []
     },
     {
-      "title": "新品遇冷 高基数下泡泡玛特压力渐显 段永平持仓又变了",
+      "title": "新品遇冷 高基数下泡泡玛特压力渐显 段永平持仓又变了 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE1rcC1zalVyZnVBY1FkSkZqLXd5d3ZIMkZVTHVNY0Vmakh6RW5WSFIybmlYWWYyRjlDYWlvX3Q4UDlPOXBSZEE?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "泡泡玛特",
       "code": "09992.HK",
       "pubDate": "2026-06-26T07:00:00.000Z",
@@ -4848,9 +4868,9 @@
       "alertWords": []
     },
     {
-      "title": "五粮液换帅！56岁本土国企老将邓敏接棒|速读公告",
+      "title": "五粮液换帅！56岁本土国企老将邓敏接棒|速读公告 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFAzUmFkM3R1MVJZVlRxNUxrNVExcVE1eVdEaVBQSkZWeXBMR0lYQmlKeGZMT2ROVWdRa3BNMDNIdFBfQkhHbEVRNA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "五粮液",
       "code": "000858.SZ",
       "pubDate": "2026-06-08T07:00:00.000Z",
@@ -4884,9 +4904,9 @@
       "alertWords": []
     },
     {
-      "title": "段永平举牌泡泡玛特3日后再增持 持股总市值近145亿港元",
+      "title": "段永平举牌泡泡玛特3日后再增持 持股总市值近145亿港元 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBPdjN1bzZqRzdCMFpibklCcTRidXh4Y3Y2SDhLS0FvYjZaOVJ5Z0RvY1hHT0lvblN6YXdkdmdzcGJheVFkdlZFQg?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "泡泡玛特",
       "code": "09992.HK",
       "pubDate": "2026-06-03T11:05:26.000Z",
@@ -5157,9 +5177,9 @@
       "alertWords": []
     },
     {
-      "title": "首次增设Q1电话交流会，泡泡玛特最新透露了什么？",
+      "title": "首次增设Q1电话交流会，泡泡玛特最新透露了什么？ - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE9ESGpGVFZjVEVXalZXM0c4T2hWclRMT0pqVjlhOFdPX3pDYWNDdi1WY1VCTE9SQnNhRWFfNFhzTEJvZkN5c19CZA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "泡泡玛特",
       "code": "09992.HK",
       "pubDate": "2026-05-13T07:00:00.000Z",
@@ -5429,9 +5449,9 @@
       "alertWords": []
     },
     {
-      "title": "19:00:31【中远海控：第一季度净利润同比下降49.75% 集装箱航运业务经营效益同比下降】",
+      "title": "19:00:31【中远海控：第一季度净利润同比下降49.75% 集装箱航运业务经营效益同比下降】 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1pWUFLTGRFV1JKd1F1Z3Z3SDNWN2otOWlvc2VSMXYwYmU4bHJsNnVzQVNBQ1VQcTk4dWxoNF95VHh0N1ExQUhfcQ?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "中远海控",
       "code": "601919.SH",
       "pubDate": "2026-04-29T07:00:00.000Z",
@@ -5501,16 +5521,19 @@
       "alertWords": []
     },
     {
-      "title": "段永平又发声！泡泡玛特暴涨超8%，高盛最新研判",
-      "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFBpcXYyeWdvNWc0UmJfSm1zUFBXTWdCTTRTN2wxWlg4YUtRM0h3azM5STN5cG1DdnU0NEJWSTZsYXVoWXRKZk1jSmU4WV8xNWIwUlU1TjRTSQ?oc=5",
-      "source": "证券时报",
-      "company": "泡泡玛特",
-      "code": "09992.HK",
+      "title": "大行评级丨小摩：下调中远海控AH股目标价，评级同为“增持”",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBoZ19XVXVZZjBzcXRxeUtrc2VOY2c0YUtxWVJnUFFSR3pmcllaTURwbjN5NXQ3Wk5WOEdDN0tSX0FwN2t2WXJIUENob1VwQ3pGeE9rU3haVTBqZkRYN1dYeWNmanY1WDZ4cFVjYmZtRQ?oc=5",
+      "source": "新浪财经",
+      "company": "中远海控",
+      "code": "601919.SH",
       "pubDate": "2026-04-14T07:00:00.000Z",
       "pubRaw": "Tue, 14 Apr 2026 07:00:00 GMT",
-      "category": "股价",
-      "alert": null,
-      "alertWords": []
+      "category": "其他",
+      "alert": "neg",
+      "alertWords": [
+        "增持",
+        "下调"
+      ]
     },
     {
       "title": "当新拼姆遇见AI，拼多多如何再造自己？",
@@ -5575,9 +5598,9 @@
       "alertWords": []
     },
     {
-      "title": "中美贸易战冲击航运业 中远海控2025年营收、净利同比双降 - companies.caixin.com",
+      "title": "中美贸易战冲击航运业 中远海控2025年营收、净利同比双降",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9XUmRJLWpOazVoalNuVTJBdndoYU9qclczdlBhNEp6NzJSWWFUVGNaSFlmOFhZV0lvcUYtSDVvQVcwLTdvU2JzanNhTU1WR2FxaWdFdXFfSkJxYXVSdXdhOWY4NWs?oc=5",
-      "source": "Google",
+      "source": "财新",
       "company": "中远海控",
       "code": "601919.SH",
       "pubDate": "2026-03-30T07:00:00.000Z",
@@ -5607,18 +5630,6 @@
       "pubDate": "2026-03-27T07:00:00.000Z",
       "pubRaw": "Fri, 27 Mar 2026 07:00:00 GMT",
       "category": "其他",
-      "alert": null,
-      "alertWords": []
-    },
-    {
-      "title": "受益于“千亿扶持”战略，拼多多全年营收4318亿元",
-      "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1oZzgzZXE0TDQ2ZjlEeWV3OWNqZk13bUtqQlJ3LWMzbklyZ19SUEV1S3pfdGhjWkszYW90SEVkdmtYYzY5TE1HWDdZQkpOREpNbk8xeVNYMW16eUFHYlJWQi13?oc=5",
-      "source": "新京报",
-      "company": "拼多多",
-      "code": "PDD",
-      "pubDate": "2026-03-26T07:00:00.000Z",
-      "pubRaw": "Thu, 26 Mar 2026 07:00:00 GMT",
-      "category": "关键变量",
       "alert": null,
       "alertWords": []
     },
@@ -5671,9 +5682,9 @@
       "alertWords": []
     },
     {
-      "title": "LABUBU家族首破百亿营收，泡泡玛特2026年目标增速不低于20%|直击业绩会",
+      "title": "LABUBU家族首破百亿营收，泡泡玛特2026年目标增速不低于20%|直击业绩会 - cls.cn",
       "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBqNjdEYkwzMTFoMGxlWVFFNDFqd0RfSVFLSFJ0NkkzMzdoaFgzVmZVRjB5eHpjcHpxNWp3VDcwd3V4X1NKR0Q5ZA?oc=5",
-      "source": "财联社",
+      "source": "Google",
       "company": "泡泡玛特",
       "code": "09992.HK",
       "pubDate": "2026-03-25T07:00:00.000Z",
