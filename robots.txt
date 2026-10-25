@@ -1,0 +1,6 @@
+# 本仓库部署于 https://huanghua-2019.github.io/portfolio-news/
+# 说明：爬虫只读取域名根目录的 /robots.txt，本文件对项目子路径实际不生效。
+# 真正起作用的是 index.html 中的 <meta name="robots" content="noindex, nofollow">。
+# 若要让本文件生效，需在 huanghua-2019.github.io 根仓库放置 robots.txt。
+User-agent: *
+Disallow: /
