@@ -635,7 +635,7 @@ function renderDash(){
       ${(h.keyVars&&h.keyVars.length)?`<div class="dc-kv">${h.keyVars.slice(0,6).map(k=>`<span class="dc-kv-chip">${esc(k)}</span>`).join("")}</div>`:""}
       ${h.checklist?`<details class="dc-checklist"><summary>✓ 买入检查清单</summary>${checklistHTML(h, mg?mg.band:null)}</details>`:""}
       <div class="dc-latest">${latest?`<span class="dc-latest-l">最新</span><a href="${esc(latest.link)}" target="_blank" rel="noopener" title="${esc(latest.title)}">${esc(latest.title)}</a><span class="dc-latest-t">${esc(relTime(latest.ts))}</span>`:`<span class="dc-latest-l">最新</span><span class="dc-latest-none">暂无新闻</span>`}</div>
-      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.status==="confirmed"?`<b>${esc(nextEarn.date)}</b>`:`${nextEarn.status==="estimated"?"约 "+esc(nextEarn.date):"约 "+nextEarn.month+" 月"}`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:""}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.status==="estimated"?' <span class="e-src est">待核</span>':nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
+      <div class="dc-earn ${soon?"soon":""}">📅 下次财报：${nextEarn?`${nextEarn.status==="confirmed"?`<b>${esc(nextEarn.date)}</b>`:`${nextEarn.status==="estimated"?"约 "+esc(nextEarn.date):"约 "+nextEarn.month+" 月"}`}${nextEarn.inDays>=0?` · <b>${nextEarn.inDays}</b> 天后`:` · 已披露`}${soon?' <span class="e-soon">临近</span>':""}${nextEarn.status==="estimated"?' <span class="e-src est">待核</span>':nextEarn.source?` <span class="e-src">${esc(nextEarn.source)}</span>`:""}`:"未配置"}</div>
     </div>`;
   }
   grid.innerHTML=html;
@@ -907,9 +907,21 @@ function finCard(h){
       <td class="num">${fmtNum(d.netProfit)}</td>
       <td class="num roe ${d.roe==null?"":(d.roe>=15?"pass":"fail")}">${d.roe==null?'<span class="ty">需核实</span>':fmtNum(d.roe)+'%'}${d.adj?'<span class="adj" title="口径调整（审慎调减）">⚠</span>':''}</td>
     </tr>`).join("");
+  // 最新季报块（2026 三季报 / 中报 等，独立于年度序列，避免误导）
+  const L=h.latest;
+  const latestBlock=L?`<div class="fin-latest">
+      <div class="fl-head">📌 最新季报 · ${esc(L.period)} <span class="fl-scope">${esc(L.scope||"")}</span> <span class="fl-asof">${esc(L.asOf||"")}</span></div>
+      <div class="fl-grid">
+        <div class="fl-item"><div class="fl-l">营收</div><div class="fl-v" style="color:${c1}">${fmtNum(L.revenue)}<span class="fl-u">${esc(unit)}</span></div>${L.revYoY!=null?yoyBadge(L.revYoY):""}</div>
+        <div class="fl-item"><div class="fl-l">净利</div><div class="fl-v" style="color:${c2}">${fmtNum(L.netProfit)}<span class="fl-u">${esc(unit)}</span></div>${L.npYoY!=null?yoyBadge(L.npYoY):""}</div>
+        <div class="fl-item"><div class="fl-l">ROE</div><div class="fl-v" style="color:${c3}">${L.roe==null?"—":fmtNum(L.roe)+"%"}</div></div>
+      </div>
+      <div class="fl-note">${esc(L.note||"")} · 来源：${esc(L.source||"需核实")}</div>
+    </div>`:"";
   return `<div class="fin-card">
     <div class="fin-h">${esc(h.name)}<span class="fin-code">${esc(h.code)}</span><span class="fin-unit">${esc(unit)}${f.currency?' · '+esc(f.currency):''}</span></div>
     ${summary}
+    ${latestBlock}
     <div class="fin-charts">
       <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c1}"></span>营业收入</div>${lineChartSVG(rev,{years,color:c1})}</div>
       <div class="fin-ch"><div class="fin-ch-t"><span class="dot" style="background:${c2}"></span>归母净利润</div>${lineChartSVG(np,{years,color:c2})}</div>
@@ -923,7 +935,7 @@ function renderStat(){
   const wrap=document.getElementById("stat-wrap");
   if(!state.holdings.length){wrap.innerHTML='<div class="empty">暂无持仓数据，请先确认爬虫已运行并刷新。</div>';return;}
   const cards=state.holdings.map(h=>finCard(h)).join("");
-  wrap.innerHTML=`<div class="fin-head">💰 各持仓近五年财务（营业收入 / 归母净利润 / ROE）</div>${cards}<div class="fin-foot">数据取自公开年报与财经媒体（检索于 2026-07），标注「需核实」者请以交易所公告为准；后续将由定时任务自动刷新。数值统一保留两位小数；同比涨跌按中国惯例涨红跌绿，ROE 同比为百分点差（pp）。</div>`;
+  wrap.innerHTML=`<div class="fin-head">💰 各持仓近五年财务（营业收入 / 归母净利润 / ROE）</div>${cards}<div class="fin-foot">年度序列为 2021–2025 年报（NeoData 结构化接口核实）；「最新季报」块为 2026 年已披露的三季报 / 中报（检索更新于 2026-11-09，来源见各卡）。数值统一保留两位小数；同比按中国惯例涨红跌绿，ROE 同比为百分点差（pp）。标注「需核实」者以交易所公告为准。</div>`;
 }
 
 // ============================================================

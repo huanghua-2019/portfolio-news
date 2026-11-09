@@ -378,6 +378,17 @@ a:hover{text-decoration:underline}
 .fin-tbl .adj{color:var(--orange);cursor:help}
 .fin-no{padding:20px;text-align:center;color:var(--ink-soft);font-size:13px}
 .fin-note{font-size:11px;color:var(--ink-dim);margin-top:8px;line-height:1.6}
+/* —— 最新季报块 —— */
+.fin-latest{background:linear-gradient(135deg,#fffdf8,#f7f0e0);border:1px solid var(--brand);border-radius:11px;padding:10px 12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(184,134,27,.10)}
+.fin-latest .fl-head{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fin-latest .fl-scope{font-size:10px;font-weight:600;color:var(--ink-soft);background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+.fin-latest .fl-asof{font-family:var(--mono);font-size:10px;color:var(--ink-dim);margin-left:auto}
+.fin-latest .fl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fin-latest .fl-item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 8px;text-align:center}
+.fin-latest .fl-l{font-size:11px;color:var(--ink-dim);margin-bottom:2px}
+.fin-latest .fl-v{font-family:var(--mono);font-size:15px;font-weight:700;line-height:1.3}
+.fin-latest .fl-v .fl-u{font-size:10px;font-weight:400;color:var(--ink-dim);margin-left:2px}
+.fin-latest .fl-note{font-size:10.5px;color:var(--ink-dim);margin-top:7px;line-height:1.55}
 
 /* ============================================================
    首页仪表盘（驾驶舱）
