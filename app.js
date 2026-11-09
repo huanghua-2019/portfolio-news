@@ -560,6 +560,32 @@ function miniSpark(vals,color){
   const lastP=pts[pts.length-1];
   return `<svg class="dc-spark" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0.02"/></linearGradient></defs><path d="${area}" fill="url(#${gid})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round"/><circle cx="${lastP.x.toFixed(1)}" cy="${lastP.y.toFixed(1)}" r="2.6" fill="${color}" stroke="#fffdf8" stroke-width="1"/></svg>`;
 }
+// 最新季报净利年化（run-rate），用于总览 sparkline 接最新季报，使走势延伸到 2026
+// 口径：年度序列是"全年净利"，季报是"部分期间"，直接拼会制造虚假下跌，
+//       故按 scope 年化（1-9月×4/3、半年×2、单季×4）后接在年度序列末尾。
+function annualizedLatestNetProfit(h){
+  const L=h&&h.latest; if(!L||L.netProfit==null) return null;
+  const s=(L.scope||"")+" "+(L.period||"");
+  let factor=1;
+  if(/1-9月|前三季度|前三季/.test(s)) factor=4/3;       // 9 个月 → 年化
+  else if(/上半年|中报|\bH1\b|half/i.test(s)) factor=2;    // 半年 → 年化
+  else if(/第三季度|Q3|三季/.test(s)) factor=4;            // 单季 → 年化
+  else if(/季度|Q[1-4]/i.test(s)) factor=4;                // 单季 → 年化
+  // 全年/年报/年度：factor=1（不折算）
+  let v=L.netProfit*factor;
+  // 单位对齐：财务序列单位是 financials.unit；若 latest 为人民币而财务列报为美元（拼多多），按约 7.1 折算
+  const finCcy=(h.financials&&h.financials.currency)||"";
+  if(/美元/.test(finCcy)&&/人民币/.test(L.note||"")) v=v/7.1;
+  return +v.toFixed(2);
+}
+// 总览 sparkline 用的净利序列：年度(2021-2025) + 最新季报年化（若有）
+function buildNpSeries(h){
+  const f=h.financials, fd=(f&&f.data)||[];
+  const series=fd.map(d=>d.netProfit);
+  const ann=annualizedLatestNetProfit(h);
+  if(ann!=null) series.push(ann);
+  return series;
+}
 function renderDash(){
   const grid=document.getElementById("dash-grid");
   if(!state.holdings.length){grid.innerHTML='<div class="empty">holdings.json 中没有配置持仓。</div>';return;}
@@ -576,7 +602,7 @@ function renderDash(){
     // 财务速览（来自 financials 透传）
     const f=h.financials,fd=(f&&f.data)||[];
     const last=fd[fd.length-1],prev=fd.length>1?fd[fd.length-2]:null;
-    const npSeries=fd.map(d=>d.netProfit);
+    const npSeries=buildNpSeries(h);
     const npYoy=last&&prev?yoyPct(last.netProfit,prev.netProfit):null;
     // 行情 + 安全边际
     const tp=parseTargetPrice(h.targetPrice,h.priceCcy);
@@ -592,7 +618,7 @@ function renderDash(){
           <div class="dc-name" onclick="flashCard('${esc(h.name).replace(/'/g, "\\'")}')" style="cursor:pointer" title="点击高亮">${esc(h.name)}</div>
           <div class="dc-sub"><span class="dc-code">${esc(h.code)}</span><span class="dc-sector" style="color:${sc};background:${sc}14;border-color:${sc}40">${esc(h.sector||"未分类")}</span>${(()=>{const qp=earningsQuietPeriod(h);return qp?`<span class="dc-quiet ${qp.est?"est":""}" title="${qp.est?"估算日期":"权威日期"}">⏸ ${qp.label}</span>`:"";})()}</div>
         </div>
-        <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利五年</div>`:""}</div>
+        <div class="dc-sparkbox">${miniSpark(npSeries,"#b8861b")}${fd.length?`<div class="dc-spark-l">净利·含最新季报</div>`:""}</div>
       </div>
       ${(()=>{const act=actionSuggest(h);return '<div class="dc-action '+act.cls+'" title="'+esc(act.tip)+'">'+act.label+'</div>';})()}
       ${h.notes?'<div class="dc-notes"><div class="dn-row"><span class="dn-l">关注</span><span class="dn-v">'+esc(h.notes.focus||'')+'</span></div><div class="dn-row"><span class="dn-l">验证点</span><span class="dn-v">'+esc(h.notes.nextCheck||'')+'</span></div><div class="dn-row dn-nogo"><span class="dn-l">不可接受</span><span class="dn-v">'+esc(h.notes.noGo||'')+'</span></div></div>':''}
