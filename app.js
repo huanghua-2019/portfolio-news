@@ -415,6 +415,8 @@ function loadData(data){
       alert:it.alert||null,
       alertWords:it.alertWords||[],
       pubRaw:it.pubRaw||null,
+      sourceWeight:it.sourceWeight||1,   // 来源权重：3=权威 1=普通（crawl.mjs 计算）
+      heat:typeof it.heat==="number"?it.heat:0,  // 热度分（来源权重×时间衰减×聚簇）
     };
   });
   state.generatedAt=data.generatedAt?new Date(data.generatedAt).getTime():Date.now();
@@ -438,7 +440,8 @@ function getVisible(){
     const q=state.search.toLowerCase();
     list=list.filter(x=>(x.title||"").toLowerCase().includes(q)||(x.company||"").toLowerCase().includes(q));
   }
-  list.sort((a,b)=>b.ts-a.ts);
+  // 排序：热度降序为主、时间降序为辅（heat 缺失/相等时退化为时间序）
+  list.sort((a,b)=> (b.heat-a.heat) || (b.ts-a.ts));
   return list;
 }
 
@@ -477,14 +480,18 @@ function newsRow(it,opts){
   const alertCls=it.alert==="pos"?"alert-pos":it.alert==="neg"?"alert-neg":"";
   const catCls="cat-"+it.category;
   const srcCls="src-"+it.source;
+  const authCls = it.sourceWeight>=3 ? "src-auth" : "src-normal";
+  const hotCls = it.heat>=2.2 ? "is-hot" : "";  // 高热度标"热"（阈值按权重×衰减经验值）
   let tag="";
   if(it.alert==="pos")tag=`<span class="tag-pos">利好·${esc(it.alertWords.join("/"))}</span>`;
   else if(it.alert==="neg")tag=`<span class="tag-neg">利空·${esc(it.alertWords.join("/"))}</span>`;
-  return `<div class="news-item ${alertCls} ${readCls?"is-read":""}" data-id="${esc(it.id)}">
+  const authTag = it.sourceWeight>=3 ? `<span class="src-badge">权威</span>` : "";
+  const hotTag = hotCls ? `<span class="hot-badge">热</span>` : "";
+  return `<div class="news-item ${alertCls} ${readCls?"is-read":""} ${hotCls}" data-id="${esc(it.id)}">
     <div>
       <div class="n-title"><a href="${esc(it.link)}" target="_blank" rel="noopener">${highlightKeyVars(it.title, it.company)}</a></div>
       <div class="n-meta">
-        <span class="src ${srcCls}">${esc(it.source)}</span>
+        <span class="src ${srcCls} ${authCls}">${esc(it.source)}</span>${authTag}${hotTag}
         <span class="n-co">${esc(it.company)} <span class="code">${esc(it.code)}</span></span>
         <span class="cat ${catCls}">${esc(it.category)}</span>
         ${tag}
@@ -1067,9 +1074,8 @@ function topPicks(){
       const ne = nextEarnings(h);
       if(ne && ne.inDays>=0 && ne.inDays<=30) score += 15;
     }
-    // 权威来源
-    const authSources = ["财联社","证券时报","21财经","第一财经","华尔街见闻","财新","中国基金报","每日经济新闻","东方财富","新浪财经","新华网"];
-    for(const s of authSources){ if((it.source||"").includes(s)){ score += 8; break; } }
+    // 权威来源（与 crawl.mjs 的 sourceWeight 统一：权重≥3 即权威）
+    if(it.sourceWeight>=3) score += 8;
     // 时效性（越新越高）
     const ageH = (now - it.ts) / 3600000;
     score += Math.max(0, 10 - ageH);

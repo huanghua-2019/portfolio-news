@@ -160,13 +160,14 @@ const SOURCE_WHITELIST = [
   "深圳市发展和改革委员会",
 ];
 
-// 来源过滤函数：返回 null=丢弃, 1=普通, 2=白名单优先
+// 来源过滤函数：返回 null=丢弃, 1=普通, 3=权威(白名单)。
+// 数值即"来源权重"，用于热度排序与来源等级展示（对应 AIHOT 的 T1/T2 信源分级）。
 function sourceScore(src) {
   if (!src) return 0;
   const s = String(src).trim();
   for (const b of SOURCE_BLACKLIST) if (s.includes(b)) return null;  // 黑名单→丢弃
-  for (const w of SOURCE_WHITELIST) if (s.includes(w)) return 2;     // 白名单→优先
-  return 1;  // 其余普通来源（保留但低优先）
+  for (const w of SOURCE_WHITELIST) if (s.includes(w)) return 3;     // 白名单→权威(高权重)
+  return 1;  // 其余普通来源（保留但低权重）
 }
 
 function classify(it, keyVars) {
@@ -332,9 +333,9 @@ async function main() {
       // 标题去重：同一新闻多源转载只留一条（优先白名单源）
       const tkey = ct.title.toLowerCase().replace(/\s+/g, "");
       if (seenTitle.has(tkey)) {
-        // 已有记录：白名单源可替换普通源
-        if (sScore === 2) {
-          const idx = all.findIndex(a => a._tkey === tkey && a._sScore < 2);
+        // 已有记录：权威源(权重3)可替换普通源(权重1)
+        if (sScore === 3) {
+          const idx = all.findIndex(a => a._tkey === tkey && a._sScore < 3);
           if (idx >= 0) { all.splice(idx, 1); seenTitle.delete(tkey); seenLink.delete(all[idx]?._link); }
           else continue;
         } else continue;
@@ -354,15 +355,27 @@ async function main() {
       classified._tkey = tkey;
       classified._sScore = sScore;
       classified._link = it.link;
+      // 来源权重（写入输出，供前端热度排序与等级展示）
+      classified.sourceWeight = sScore;
       all.push(classified);
       kept++;
     }
     await new Promise((r) => setTimeout(r, CONFIG.requestDelayMs));
   }
 
-  all.sort((a, b) => (b.pubDate || "").localeCompare(a.pubDate || ""));
+  // 计算热度分：来源权重 × 时间衰减 × 聚簇因子（聚簇因子预留，T2 阶段按聚合源数填充）
+  // 时间衰减：约每 48 小时感减半（1/(1+ageH/48)）；聚簇因子 (1+0.3*log10(1+sourceCount))。
+  const _now = Date.now();
+  for (const a of all) {
+    const ageH = Math.max(0, (_now - new Date(a.pubDate || Date.now()).getTime()) / 3600000);
+    const decay = 1 / (1 + ageH / 48);
+    const cluster = a._sourceCount || 1; // T2 阶段：同事件聚合的源数
+    a.heat = Number(((a._sScore || 1) * decay * (1 + 0.3 * Math.log10(1 + cluster))).toFixed(3));
+  }
+  // 排序：热度降序为主、时间降序为辅（对应 AIHOT 的事件热度排序）
+  all.sort((a, b) => (b.heat - a.heat) || (b.pubDate || "").localeCompare(a.pubDate || ""));
 
-  // 输出前去除内部去重标记
+  // 输出前去除内部去重标记（保留 heat / sourceWeight 供前端使用）
   all.forEach(a => { delete a._tkey; delete a._sScore; delete a._link; });
 
   // 抓取行情

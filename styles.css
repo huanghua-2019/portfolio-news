@@ -141,6 +141,12 @@ a:hover{text-decoration:underline}
 .src{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:5px;border:1px solid}
 .src-Google{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 35%,var(--line));background:var(--brand-soft)}
 .src-百度{color:var(--cyan);border-color:color-mix(in srgb,var(--cyan) 30%,var(--line));background:var(--panel-2)}
+/* 来源等级 / 热度角标（信源分级权重 + 热度排序，对应 AIHOT 的 T1/T2 分级与事件热度） */
+.src-auth{color:var(--brand);font-weight:600}
+.src-normal{color:var(--ink-soft)}
+.src-badge{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:4px;font-size:11px;line-height:1.4;background:color-mix(in srgb,var(--brand) 14%,var(--panel));color:var(--brand);border:1px solid color-mix(in srgb,var(--brand) 45%,var(--line))}
+.hot-badge{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:4px;font-size:11px;line-height:1.4;background:color-mix(in srgb,var(--orange) 14%,var(--panel));color:var(--orange);border:1px solid color-mix(in srgb,var(--orange) 42%,var(--line))}
+.news-item.is-hot{background:color-mix(in srgb,var(--orange) 5%,var(--panel))}
 .n-co{color:var(--ink);font-weight:600}
 .n-co .code{color:var(--ink-dim);font-weight:400;font-family:var(--mono);font-size:11px}
 .n-time{font-family:var(--mono);color:var(--ink-soft)}
