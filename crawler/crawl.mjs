@@ -311,6 +311,42 @@ async function fetchRss(company) {
   return collected;
 }
 
+// ===== T4 一手公告源（仅美股可用；A股/港股交易所不提供简单RSS，已核实不可用） =====
+// SEC EDGAR 官方 submissions API：结构化、免费、稳定。过滤 6-K/20-F/10-K/10-Q/8-K 等重大事项，
+// 跳过内部人交易(4/144)等噪声。对应 AIHOT 的 T1 官方一手信源。
+const EDGAR_CIK = { "拼多多": "0001737806" };
+async function fetchEdgar(company, cik) {
+  try {
+    const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; HoldingsBot/1.0)" },
+      signal: AbortSignal.timeout(CONFIG.timeoutMs),
+    });
+    if (!r.ok) return [];
+    const d = await r.json();
+    const rec = d.filings && d.filings.recent;
+    if (!rec) return [];
+    const KEEP = new Set(["6-K", "20-F", "10-K", "10-Q", "8-K"]);
+    const out = [];
+    const n = rec.accessionNumber.length;
+    for (let i = 0; i < n && out.length < 10; i++) {
+      const form = rec.form[i];
+      if (!KEEP.has(form)) continue; // 跳过 4/144 内部人交易等
+      const acc = rec.accessionNumber[i].replace(/-/g, "");
+      const doc = rec.primaryDocument[i] || "";
+      const link = doc
+        ? `https://www.sec.gov/Archives/edgar/data/${cik}/${acc}/${doc}`
+        : `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cik}&type=${form}&dateb=&owner=include&count=10`;
+      const dt = rec.acceptanceDateTime[i] || rec.filingDate[i];
+      const desc = rec.primaryDocDescription[i] || "";
+      out.push({
+        title: `${form} · ${desc || company.name} · ${rec.filingDate[i]}`,
+        link, source: "SEC EDGAR", pubDate: dt ? new Date(dt).toISOString() : null, pubRaw: dt, _edgar: true,
+      });
+    }
+    return out;
+  } catch (e) { console.warn("edgar failed:", e.message); return []; }
+}
+
 // T2 模糊聚簇去重（对应 AIHOT 的 group 聚簇）
 // 同公司 + 48h 时间窗 + (标题2-gram Jaccard≥0.5 且共享强数字, 或 Jaccard≥0.85) → 合并为一条。
 // 强数字 = 金额(亿/万+币种)/百分比/精确日期/独立年份；年份用负向断言排除港股代码(如01919中的1919)误判。
@@ -378,16 +414,21 @@ async function main() {
   for (const h of holdings) {
     const aliases = ALIASES[h.name] || [h.name];
     const raws = await fetchRss(h);
+    // T4：美股一手公告（EDGAR），作为官方一手信源并入抓取流（权重最高）
+    if (EDGAR_CIK[h.name]) {
+      const ed = await fetchEdgar(h, EDGAR_CIK[h.name]);
+      for (const it of ed) if (it && it.title && it.link) raws.push(it);
+    }
     let kept = 0;
     for (const it of raws) {
       if (kept >= CONFIG.perCompanyCap) break;
       if (!it.link || seenLink.has(it.link)) continue;
-      const ct = cleanTitle(it.title);
-      // 来源过滤：黑名单直接丢弃
-      const sScore = sourceScore(ct.source || it.source);
+      // 一手公告(EDGAR)直接视为相关、权重最高(3)，跳过 cleanTitle/白名单/别名过滤
+      const ct = it._edgar ? { title: it.title, source: it.source } : cleanTitle(it.title);
+      const sScore = it._edgar ? 3 : sourceScore(ct.source || it.source);
       if (sScore === null) continue;
       // 相关性过滤：标题须含公司名/别名，丢弃仅"顺带提到"的噪音
-      if (!relevant(ct.title, aliases)) continue;
+      if (!it._edgar && !relevant(ct.title, aliases)) continue;
       // 标题去重：同一新闻多源转载只留一条（优先白名单源）
       const tkey = ct.title.toLowerCase().replace(/\s+/g, "");
       if (seenTitle.has(tkey)) {
