@@ -545,6 +545,40 @@ function renderNews(){
 }
 
 // ============================================================
+//  渲染：每日要闻（聚合视图，对应 AIHOT 日报）
+//  纯前端聚合：从已聚类去重、按热度排序的 state.all 按发布日分组，
+//  每天取热度最高的 10 条；不依赖 crawler 重新生成数据，立即对所有现有数据生效。
+// ============================================================
+function renderBrief(){
+  const wrap=document.getElementById("brief-wrap");
+  if(!wrap)return;
+  if(!state.all.length){ wrap.innerHTML='<div class="empty">暂无新闻。点"刷新"或等云端爬虫抓取。</div>'; return; }
+  const groups={};
+  for(const it of state.all){
+    if(!it.pubDate) continue;
+    const d=new Date(it.pubDate);
+    if(isNaN(d.getTime())) continue;
+    // 按本地日期分组（pubDate 为 UTC，用本地时区归日，跨午夜边缘的小偏差可接受）
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    (groups[key]=groups[key]||[]).push(it);
+  }
+  const days=Object.keys(groups).sort((a,b)=>b.localeCompare(a)).slice(0,7); // 最近 7 天
+  const WEEK="日一二三四五六";
+  let html=`<div class="brief-head">每日要闻 · 按热度聚合（同事件多源已合并去重，每天取热度最高的 10 条）</div>`;
+  if(!days.length){ html+=`<div class="empty">暂无带日期的新闻。</div>`; }
+  for(const day of days){
+    const items=groups[day].slice().sort((a,b)=>(b.heat-a.heat)||(b.ts-a.ts)).slice(0,10);
+    const wk=WEEK[new Date(day+"T00:00:00").getDay()];
+    html+=`<section class="brief-day">
+      <div class="brief-date"><span class="bd-md">${day.slice(5)}</span><span class="bd-wk">周${wk}</span><span class="bd-cnt">${items.length} 条</span></div>
+      <div class="brief-list">${items.map(it=>newsRow(it)).join("")}</div>
+    </section>`;
+  }
+  wrap.innerHTML=html;
+  bindRowActions(wrap);
+}
+
+// ============================================================
 //  渲染：总览 Dashboard
 // ============================================================
 // 迷你走势线（sparkline）：总览卡里的五年净利小曲线
@@ -983,6 +1017,7 @@ function renderCurrent(){
   else if(state.view==="alert")renderAlert();
   else if(state.view==="cal")renderCal();
   else if(state.view==="stat")renderStat();
+  else if(state.view==="brief")renderBrief();
 }
 
 // 程序化切换视图（供首页卡片点击跳转用）
