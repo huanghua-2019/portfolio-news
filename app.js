@@ -416,6 +416,7 @@ function loadData(data){
       alertWords:it.alertWords||[],
       pubRaw:it.pubRaw||null,
       sourceWeight:it.sourceWeight||1,   // 来源权重：3=权威 1=普通（crawl.mjs 计算）
+      sourceCount:it.sourceCount||1,    // 同事件聚合的不同来源数（clusterDedup 计算，≥2 表示多家媒体报同一事）
       heat:typeof it.heat==="number"?it.heat:0,  // 热度分（来源权重×时间衰减×聚簇）
     };
   });
@@ -487,11 +488,12 @@ function newsRow(it,opts){
   else if(it.alert==="neg")tag=`<span class="tag-neg">利空·${esc(it.alertWords.join("/"))}</span>`;
   const authTag = it.sourceWeight>=3 ? `<span class="src-badge">权威</span>` : "";
   const hotTag = hotCls ? `<span class="hot-badge">热</span>` : "";
+  const srcN = it.sourceCount>1 ? `<span class="srcn-badge">${it.sourceCount}源</span>` : "";  // 多家媒体报同一事件
   return `<div class="news-item ${alertCls} ${readCls?"is-read":""} ${hotCls}" data-id="${esc(it.id)}">
     <div>
       <div class="n-title"><a href="${esc(it.link)}" target="_blank" rel="noopener">${highlightKeyVars(it.title, it.company)}</a></div>
       <div class="n-meta">
-        <span class="src ${srcCls} ${authCls}">${esc(it.source)}</span>${authTag}${hotTag}
+        <span class="src ${srcCls} ${authCls}">${esc(it.source)}</span>${authTag}${hotTag}${srcN}
         <span class="n-co">${esc(it.company)} <span class="code">${esc(it.code)}</span></span>
         <span class="cat ${catCls}">${esc(it.category)}</span>
         ${tag}

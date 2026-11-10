@@ -311,9 +311,67 @@ async function fetchRss(company) {
   return collected;
 }
 
+// T2 模糊聚簇去重（对应 AIHOT 的 group 聚簇）
+// 同公司 + 48h 时间窗 + (标题2-gram Jaccard≥0.5 且共享强数字, 或 Jaccard≥0.85) → 合并为一条。
+// 强数字 = 金额(亿/万+币种)/百分比/精确日期/独立年份；年份用负向断言排除港股代码(如01919中的1919)误判。
+function clusterDedup(list) {
+  const WINDOW_H = 48, THRESH = 0.5, HIGH = 0.85;
+  const grams = (t) => {
+    // 保留小数点（金额精度对聚类关键），只去空白与中英文标点（不含 .）
+    t = String(t || "").toLowerCase().replace(/[\s，。、！？!?;；:：""''()（）\[\]【】%]/g, "");
+    const s = new Set();
+    for (let i = 0; i < t.length - 1; i++) s.add(t.slice(i, i + 2));
+    return s;
+  };
+  const jac = (a, b) => {
+    if (!a.size || !b.size) return 0;
+    let n = 0;
+    for (const x of a) if (b.has(x)) n++;
+    return n / (a.size + b.size - n);
+  };
+  const strongNums = (t) => {
+    const s = new Set();
+    for (const m of String(t).matchAll(/(?<![\d])(?:19|20)\d{2}(?![\d])/g)) s.add(m[0]); // 年份(独立词，排除代码夹带)
+    for (const m of String(t).matchAll(/[\d]+(?:\.\d+)?(?:亿|万)(?:港元|美元|元)?/g)) s.add(m[0]); // 金额
+    for (const m of String(t).matchAll(/[\d]+(?:\.\d+)?%/g)) s.add(m[0]); // 百分比
+    for (const m of String(t).matchAll(/[\d]{1,2}月[\d]{1,2}日/g)) s.add(m[0]); // 日期
+    return s;
+  };
+  const shareNum = (a, b) => {
+    const na = strongNums(a), nb = strongNums(b);
+    for (const x of na) if (nb.has(x)) return true;
+    return false;
+  };
+  const clusters = [];
+  for (const it of list) {
+    const g = grams(it.title);
+    let placed = false;
+    for (const c of clusters) {
+      if (c.company !== it.company) continue;
+      const dt = Math.abs(new Date(it.pubDate) - new Date(c.rep.pubDate)) / 3600000;
+      if (dt > WINDOW_H) continue;
+      const j = jac(g, c.repG);
+      if ((j >= THRESH && shareNum(it.title, c.rep.title)) || j >= HIGH) { c.items.push(it); placed = true; break; }
+    }
+    if (!placed) clusters.push({ company: it.company, rep: it, repG: g, items: [it] });
+  }
+  const out = [];
+  for (const c of clusters) {
+    // 主条目：来源权重高 > 标题长 > 时间新（权重高者优先展示，标题长者信息更全）
+    const best = c.items.slice().sort((x, y) =>
+      (y.sourceWeight || 1) - (x.sourceWeight || 1) ||
+      (y.title.length - x.title.length) ||
+      (new Date(y.pubDate) - new Date(x.pubDate))
+    )[0];
+    best.sourceCount = new Set(c.items.map((x) => x.source)).size; // 不同来源数，喂热度与前端
+    out.push(best);
+  }
+  return out;
+}
+
 async function main() {
   const holdings = JSON.parse(readFileSync(HOLDINGS_PATH, "utf8"));
-  const all = [];
+  let all = [];
   const seenLink = new Set();
   const seenTitle = new Set();
 
@@ -363,13 +421,19 @@ async function main() {
     await new Promise((r) => setTimeout(r, CONFIG.requestDelayMs));
   }
 
-  // 计算热度分：来源权重 × 时间衰减 × 聚簇因子（聚簇因子预留，T2 阶段按聚合源数填充）
+  // ===== T2 模糊聚簇去重 =====
+  // 同公司 + 48h 时间窗 + (标题2-gram Jaccard≥0.5 且共享强数字, 或 Jaccard≥0.85)
+  // 合并为一条，主条目取来源权重最高者，记录 sourceCount(不同来源数) 喂热度（对应 AIHOT 的聚簇去重）。
+  // 强数字 = 金额(亿/万+币种)/百分比/精确日期/独立年份；排除港股代码(如01919中的1919)被误判。
+  all = clusterDedup(all);
+
+  // 计算热度分：来源权重 × 时间衰减 × 聚簇因子（聚合源数 sourceCount）
   // 时间衰减：约每 48 小时感减半（1/(1+ageH/48)）；聚簇因子 (1+0.3*log10(1+sourceCount))。
   const _now = Date.now();
   for (const a of all) {
     const ageH = Math.max(0, (_now - new Date(a.pubDate || Date.now()).getTime()) / 3600000);
     const decay = 1 / (1 + ageH / 48);
-    const cluster = a._sourceCount || 1; // T2 阶段：同事件聚合的源数
+    const cluster = a.sourceCount || 1; // T2：同事件聚合的源数（clusterDedup 写入）
     a.heat = Number(((a._sScore || 1) * decay * (1 + 0.3 * Math.log10(1 + cluster))).toFixed(3));
   }
   // 排序：热度降序为主、时间降序为辅（对应 AIHOT 的事件热度排序）
